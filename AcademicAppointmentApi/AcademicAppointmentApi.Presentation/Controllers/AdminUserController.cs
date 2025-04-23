@@ -54,6 +54,20 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 
             return Ok(userRoleList);
         }
+        [HttpGet("byrole/{role}")]
+        public async Task<IActionResult> GetUsersByRole(string role)
+        {
+            var usersInRole = await _userManager.GetUsersInRoleAsync(role);
+            var userDtos = usersInRole.Select(u => new
+            {
+                u.Id,
+                u.UserName,
+                u.Email
+            });
+
+            return Ok(userDtos);
+        }
+
 
     }
 

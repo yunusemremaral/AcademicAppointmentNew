@@ -1,5 +1,6 @@
 ﻿using AcademicAppointmentApi.DataAccessLayer.Abstract;
 using AcademicAppointmentApi.EntityLayer.Entities;
+using AcademicAppointmentApi.Presentation.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,12 +18,23 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Appointment appointment)
+        public async Task<IActionResult> Create(AppointmentCreateDto dto)
         {
+            var appointment = new Appointment
+            {
+                AcademicUserId = dto.AcademicUserId,
+                StudentUserId = dto.StudentUserId,
+                ScheduledAt = dto.ScheduledAt,
+                Subject = dto.Subject,
+                Description = dto.Description,
+                Status = dto.Status
+            };
+
             await _appointmentRepository.AddAsync(appointment);
             await _appointmentRepository.SaveAsync();
             return Ok("Randevu oluşturuldu");
         }
+
 
         [HttpGet("student/{studentId}")]
         public async Task<IActionResult> GetByStudent(string studentId)
