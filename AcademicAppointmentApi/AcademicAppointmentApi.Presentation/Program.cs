@@ -1,15 +1,27 @@
+using AcademicAppointmentApi.DataAccessLayer.Concrete;
+using AcademicAppointmentApi.EntityLayer.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Veritabaný baðlantýsý
+builder.Services.AddDbContext<Context>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Identity yapýlandýrmasý
+builder.Services.AddIdentity<AppUser, AppRole>()
+    .AddEntityFrameworkStores<Context>()
+    .AddDefaultTokenProviders();
+
+// Controller ve Swagger servisi
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -18,8 +30,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Authentication ve Authorization
+app.UseAuthentication(); // <-- Bunu da eklemeyi unutma!
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();
