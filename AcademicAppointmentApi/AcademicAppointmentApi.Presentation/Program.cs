@@ -1,3 +1,5 @@
+using AcademicAppointmentApi.BusinessLayer.Abstract;
+using AcademicAppointmentApi.BusinessLayer.Concrete;
 using AcademicAppointmentApi.DataAccessLayer.Abstract;
 using AcademicAppointmentApi.DataAccessLayer.Concrete;
 using AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore;
@@ -10,6 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Veritabaný baðlantýsý
 builder.Services.AddDbContext<Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 // Identity yapýlandýrmasý
 builder.Services.AddIdentity<AppUser, AppRole>()
@@ -17,6 +28,8 @@ builder.Services.AddIdentity<AppUser, AppRole>()
     .AddDefaultTokenProviders();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IAppointmentRepository, EfAppointmentRepository> ();
+builder.Services.AddTransient<IEmailService, EmailService>();
+
 
 // Controller ve Swagger servisi
 builder.Services.AddControllers();
@@ -31,6 +44,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors();
 
 app.UseHttpsRedirection();
 
