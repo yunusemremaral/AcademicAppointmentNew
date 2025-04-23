@@ -1,4 +1,6 @@
+using AcademicAppointmentApi.DataAccessLayer.Abstract;
 using AcademicAppointmentApi.DataAccessLayer.Concrete;
+using AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore;
 using AcademicAppointmentApi.EntityLayer.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,8 @@ builder.Services.AddDbContext<Context>(options =>
 builder.Services.AddIdentity<AppUser, AppRole>()
     .AddEntityFrameworkStores<Context>()
     .AddDefaultTokenProviders();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IAppointmentRepository, EfAppointmentRepository> ();
 
 // Controller ve Swagger servisi
 builder.Services.AddControllers();
