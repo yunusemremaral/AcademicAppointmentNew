@@ -26,8 +26,17 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
         // Kullanıcının dersleri
         public ICollection<Course> Courses { get; set; }
 
-        // Mesajlar
-        public virtual ICollection<Message> Messages { get; set; }
+        // Kullanıcıya ait oda bilgisi (nullable)
+        public string? RoomId { get; set; }
+        public Room Room { get; set; }  // Nullable oda
+
+        // Mesajlar (Sender ve Receiver ilişkisi)
+        public virtual ICollection<Message> MessagesSent { get; set; }  // Gönderilen mesajlar
+        public virtual ICollection<Message> MessagesReceived { get; set; }  // Alınan mesajlar
+
+        // AssignedRooms - kullanıcının atandığı odalar
         public virtual ICollection<Room> AssignedRooms { get; set; }
     }
+
+
 }

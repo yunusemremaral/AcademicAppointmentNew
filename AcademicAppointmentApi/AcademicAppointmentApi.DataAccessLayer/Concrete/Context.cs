@@ -26,7 +26,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.Concrete
                    .HasOne(a => a.AcademicUser)
                    .WithMany(u => u.AppointmentsAsAcademic)
                    .HasForeignKey(a => a.AcademicUserId)
-                   .OnDelete(DeleteBehavior.Restrict);  // Silme kısıtlaması uygulandı
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Appointment>()
                    .HasOne(a => a.StudentUser)
@@ -55,23 +55,23 @@ namespace AcademicAppointmentApi.DataAccessLayer.Concrete
                    .HasForeignKey(c => c.InstructorId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            // Room ve Department ilişkisi
+            // Room ve AppUser ilişkisi (Her odanın kesinlikle bir kullanıcısı olacak, kullanıcının ise nullable odası olabilir)
             builder.Entity<Room>()
-                   .HasOne(r => r.Department)
-                   .WithMany(d => d.Rooms)
-                   .HasForeignKey(r => r.DepartmentId)
-                   .OnDelete(DeleteBehavior.SetNull);  // Silinirse oda null yapılacak
+                   .HasOne(r => r.AppUser)
+                   .WithOne(u => u.Room)
+                   .HasForeignKey<AppUser>(u => u.RoomId)
+                   .OnDelete(DeleteBehavior.NoAction);  // Oda silindiğinde kullanıcıyı etkilemez
 
             // Message ve AppUser ilişkisi (sender ve receiver ilişkisi)
             builder.Entity<Message>()
                    .HasOne(m => m.Sender)
-                   .WithMany(u => u.Messages)
+                   .WithMany(u => u.MessagesSent)  // Gönderilen mesajları ilişkilendiriyoruz
                    .HasForeignKey(m => m.SenderId)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Message>()
                    .HasOne(m => m.Receiver)
-                   .WithMany()
+                   .WithMany(u => u.MessagesReceived)  // Alınan mesajları ilişkilendiriyoruz
                    .HasForeignKey(m => m.ReceiverId)
                    .OnDelete(DeleteBehavior.Restrict);
 
@@ -96,11 +96,6 @@ namespace AcademicAppointmentApi.DataAccessLayer.Concrete
                    .HasForeignKey(u => u.SchoolId)
                    .OnDelete(DeleteBehavior.NoAction); // Kullanıcı silindiğinde okul silinmez.
 
-            // Room ve AppUser ilişkisi (AssignedInstructors)
-            builder.Entity<Room>()
-                   .HasMany(r => r.AssignedInstructors)
-                   .WithMany(u => u.AssignedRooms)
-                   .UsingEntity(j => j.ToTable("RoomInstructors"));
         }
     }
 }
