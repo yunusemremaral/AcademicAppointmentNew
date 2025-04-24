@@ -1,10 +1,9 @@
 ﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
-using AcademicAppointmentApi.DataAccessLayer.Abstract;
 using AcademicAppointmentApi.EntityLayer.Entities;
 using AcademicAppointmentApi.Presentation.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.Presentation.Controllers
 {
@@ -13,12 +12,12 @@ namespace AcademicAppointmentApi.Presentation.Controllers
     [Authorize(Roles = "Student")]
     public class AppointmentController : ControllerBase
     {
-        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IAppointmentService _appointmentService;
         private readonly ICurrentUserService _currentUserService;
 
-        public AppointmentController(IAppointmentRepository repo, ICurrentUserService currentUserService)
+        public AppointmentController(IAppointmentService appointmentService, ICurrentUserService currentUserService)
         {
-            _appointmentRepository = repo;
+            _appointmentService = appointmentService;
             _currentUserService = currentUserService;
         }
 
@@ -39,48 +38,35 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 Status = dto.Status
             };
 
-            await _appointmentRepository.AddAsync(appt);
-            await _appointmentRepository.SaveAsync();
+            await _appointmentService.TAddAsync(appt);
+            await _appointmentService.TSaveAsync();
             return Ok("Appointment created.");
         }
 
         [HttpGet("student/{studentId}")]
         public async Task<IActionResult> GetByStudent(string studentId)
         {
-            var result = await _appointmentRepository.GetAppointmentsByStudentIdAsync(studentId);
+            var result = await _appointmentService.GetAppointmentsByStudentIdAsync(studentId);
             return Ok(result);
         }
 
         [HttpGet("academic/{academicId}")]
         public async Task<IActionResult> GetByAcademic(string academicId)
         {
-            var result = await _appointmentRepository.GetAppointmentsByAcademicIdAsync(academicId);
+            var result = await _appointmentService.GetAppointmentsByAcademicIdAsync(academicId);
             return Ok(result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var appointment = await _appointmentRepository.GetByIdAsync(id);
+            var appointment = await _appointmentService.TGetByIdAsync(id);
             if (appointment == null)
                 return NotFound();
 
-            _appointmentRepository.Delete(appointment);
-            await _appointmentRepository.SaveAsync();
+            await _appointmentService.TDeleteAsync(appointment);
+            await _appointmentService.TSaveAsync();
             return Ok("Appointment deleted.");
-        }
-
-        [Authorize]
-        [HttpGet("whoami")]
-        public IActionResult WhoAmI()
-        {
-            return Ok(new
-            {
-                Authenticated = User.Identity.IsAuthenticated,
-                NameIdentifier = _currentUserService.UserId,
-                Email = _currentUserService.Email,
-                Role = _currentUserService.Role
-            });
         }
     }
 }

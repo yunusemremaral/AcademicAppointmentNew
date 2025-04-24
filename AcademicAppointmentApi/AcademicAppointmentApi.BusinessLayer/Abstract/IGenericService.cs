@@ -9,13 +9,14 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
     public interface IGenericService<T> where T : class
     {
-        Task<List<T>> GetAllAsync();
-        Task<T> GetByIdAsync(int id);
-        Task<List<T>> GetWhereAsync(Expression<Func<T, bool>> predicate);
-        Task AddAsync(T entity);
-        Task UpdateAsync(T entity);
-        Task DeleteAsync(T entity);
-        Task<int> SaveAsync();
+        Task<List<T>> TGetAllAsync();
+        Task<T> TGetByIdAsync(int id);
+        Task<T> TGetByIdWithStringAsync(string id);
+        Task<List<T>> TGetWhereAsync(Expression<Func<T, bool>> predicate);
+        Task TAddAsync(T entity);
+        Task TUpdateAsync(T entity);
+        Task TDeleteAsync(T entity);
+        Task<int> TSaveAsync();
     }
 
 }

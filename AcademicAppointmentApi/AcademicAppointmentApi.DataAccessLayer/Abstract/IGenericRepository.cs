@@ -10,6 +10,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
     public interface IGenericRepository<T> where T : class
     {
         Task<List<T>> GetAllAsync();
+        Task<T> GetByIdWithStringAsync(string id);
         Task<T> GetByIdAsync(int id);
         Task<List<T>> GetWhereAsync(Expression<Func<T, bool>> predicate);
         Task AddAsync(T entity);

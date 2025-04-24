@@ -51,11 +51,34 @@ builder.Services
   });
 
 // 3) Dependency Injection
+// Generic Repository (Tüm entity'ler için geçerli)
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+// Özel Repositories
+builder.Services.AddScoped<ICourseRepository, EfCourseRepository>();
+builder.Services.AddScoped<IDepartmentRepository, EfDepartmentRepository>();
+builder.Services.AddScoped<IMessageRepository, EfMessageRepository>();
+builder.Services.AddScoped<INotificationRepository, EfNotificationRepository>();
+builder.Services.AddScoped<IRoomRepository, EfRoomRepository>();
+builder.Services.AddScoped<ISchoolRepository, EfSchoolRepository>();
+
+// Generic Service (Tüm entity'ler için geçerli)
+builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
+
+// Özel Services
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<ISchoolService, SchoolService>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>(); // AppointmentService eklenmeli
+
+// Diðer Servisler
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IAppointmentRepository, EfAppointmentRepository>();
-builder.Services.AddTransient<IEmailService, EmailService>();
-builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

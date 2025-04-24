@@ -50,6 +50,10 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
         {
             _dbSet.Remove(entity);
         }
+        public async Task<T> GetByIdWithStringAsync(string id)
+        {
+            return await _dbSet.FindAsync(id);
+        }
 
         public async Task<int> SaveAsync()
         {
