@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,41 +19,40 @@ builder.Services.AddDbContext<Context>(opts =>
 builder.Services.AddIdentity<AppUser, AppRole>(opts =>
 {
     opts.User.RequireUniqueEmail = true;
+    opts.Password.RequireNonAlphanumeric = false;
+    opts.Password.RequiredLength = 6;
 })
-    .AddEntityFrameworkStores<Context>()
-    .AddDefaultTokenProviders();
+.AddEntityFrameworkStores<Context>()
+.AddDefaultTokenProviders();
 
-// 2) Authentication & JWT: Default scheme olarak JWT'yi ayarla
-var jwt = builder.Configuration.GetSection("Jwt");
-builder.Services
-  .AddAuthentication(options =>
-  {
-      options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-      options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-  })
-  .AddJwtBearer(options =>
-  {
-      options.RequireHttpsMetadata = true;
-      options.SaveToken = true;
-      options.TokenValidationParameters = new TokenValidationParameters
-      {
-          ValidateIssuer = true,
-          ValidateAudience = true,
-          ValidateLifetime = true,
-          ValidateIssuerSigningKey = true,
+// 2) JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]))
+    };
+});
 
-          ValidIssuer = jwt["Issuer"],
-          ValidAudience = jwt["Audience"],
-          IssuerSigningKey = new SymmetricSecurityKey(
-                                        Encoding.UTF8.GetBytes(jwt["Key"])),
-      };
-  });
-
-// 3) Dependency Injection
-// Generic Repository (Tüm entity'ler için geçerli)
+// 3) Dependency Injection (DI)
+// Generic Repositories & Services
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 
-// Özel Repositories
+// Entity-Specific Repositories
+builder.Services.AddScoped<IAppointmentRepository, EfAppointmentRepository>();
 builder.Services.AddScoped<ICourseRepository, EfCourseRepository>();
 builder.Services.AddScoped<IDepartmentRepository, EfDepartmentRepository>();
 builder.Services.AddScoped<IMessageRepository, EfMessageRepository>();
@@ -62,24 +60,22 @@ builder.Services.AddScoped<INotificationRepository, EfNotificationRepository>();
 builder.Services.AddScoped<IRoomRepository, EfRoomRepository>();
 builder.Services.AddScoped<ISchoolRepository, EfSchoolRepository>();
 
-// Generic Service (Tüm entity'ler için geçerli)
-builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
-
-// Özel Services
+// Entity-Specific Services
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<ISchoolService, SchoolService>();
-builder.Services.AddScoped<IAppointmentService, AppointmentService>(); // AppointmentService eklenmeli
 
-// Diðer Servisler
+// Utility Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+// API Configuration
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -94,7 +90,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+app.UseCors(policy => policy
+    .AllowAnyOrigin()
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+);
 
 app.UseAuthentication();
 app.UseAuthorization();
