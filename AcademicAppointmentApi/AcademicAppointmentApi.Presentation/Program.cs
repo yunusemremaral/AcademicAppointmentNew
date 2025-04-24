@@ -8,65 +8,62 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Veritabaný baðlantýsý
-builder.Services.AddDbContext<Context>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddCors(options =>
+// 1) DbContext + Identity
+builder.Services.AddDbContext<Context>(opts =>
+    opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<AppUser, AppRole>(opts =>
 {
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
-var jwtSection = builder.Configuration.GetSection("Jwt");
-builder.Services
-    .AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = true;
-        options.SaveToken = true;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSection["Issuer"],
-            ValidAudience = jwtSection["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                                          Encoding.UTF8.GetBytes(jwtSection["Key"]))
-        };
-    });
-builder.Services.AddAuthorization();
-
-
-// Identity yapýlandýrmasý
-builder.Services.AddIdentity<AppUser, AppRole>()
+    opts.User.RequireUniqueEmail = true;
+})
     .AddEntityFrameworkStores<Context>()
     .AddDefaultTokenProviders();
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped<IAppointmentRepository, EfAppointmentRepository> ();
+
+// 2) Authentication & JWT: Default scheme olarak JWT'yi ayarla
+var jwt = builder.Configuration.GetSection("Jwt");
+builder.Services
+  .AddAuthentication(options =>
+  {
+      options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+      options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+  })
+  .AddJwtBearer(options =>
+  {
+      options.RequireHttpsMetadata = true;
+      options.SaveToken = true;
+      options.TokenValidationParameters = new TokenValidationParameters
+      {
+          ValidateIssuer = true,
+          ValidateAudience = true,
+          ValidateLifetime = true,
+          ValidateIssuerSigningKey = true,
+
+          ValidIssuer = jwt["Issuer"],
+          ValidAudience = jwt["Audience"],
+          IssuerSigningKey = new SymmetricSecurityKey(
+                                        Encoding.UTF8.GetBytes(jwt["Key"])),
+      };
+  });
+
+// 3) Dependency Injection
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAppointmentRepository, EfAppointmentRepository>();
 builder.Services.AddTransient<IEmailService, EmailService>();
-
-
-// Controller ve Swagger servisi
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Middleware pipeline
+// 4) Middleware Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -74,11 +71,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors();
+app.UseCors(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
-
-// Authentication ve Authorization
-app.UseAuthentication(); // <-- Bunu da eklemeyi unutma!
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

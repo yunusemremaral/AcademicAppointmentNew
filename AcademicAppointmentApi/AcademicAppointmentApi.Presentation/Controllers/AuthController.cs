@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,119 +13,83 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.Presentation.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly IEmailService _emailService; // Email servisi ekleniyor
+        private readonly IEmailService _emailService;
         private readonly IConfiguration _config;
+        private readonly ITokenService _tokenService;
 
-
-        public AuthController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IEmailService emailService, IConfiguration config)
+        public AuthController(
+            UserManager<AppUser> userMgr,
+            SignInManager<AppUser> signInMgr,
+            IEmailService emailSrv,
+            IConfiguration config,
+            ITokenService tokenService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _emailService = emailService; // Email servisinin yapılandırılması
+            _userManager = userMgr;
+            _signInManager = signInMgr;
+            _emailService = emailSrv;
             _config = config;
-
+            _tokenService = tokenService;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(string username, string email, string password)
+        public async Task<IActionResult> Register(RegisterDto dto)
         {
-            var user = new AppUser { UserName = username, Email = email };
+            var user = new AppUser { UserName = dto.UserName, Email = dto.Email };
+            var res = await _userManager.CreateAsync(user, dto.Password);
+            if (!res.Succeeded) return BadRequest(res.Errors);
 
-            // Kullanıcı oluşturuluyor
-            var result = await _userManager.CreateAsync(user, password);
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
+            // Add default role (e.g., "Student")
+            await _userManager.AddToRoleAsync(user, "Student");
 
-            // Kullanıcı oluşturulmuşsa, e-posta onay token'ı oluşturuluyor
+            // Email confirmation link
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var link = Url.Action("ConfirmEmail", "Auth", new { token, email = user.Email }, Request.Scheme);
+            await _emailService.SendConfirmationEmailAsync(user.Email, link);
 
-            // Kullanıcıya onay maili gönderiliyor
-            var confirmationLink = Url.Action("ConfirmEmail", "Auth", new { token, email = user.Email }, Request.Scheme);
-            await _emailService.SendConfirmationEmailAsync(user.Email, confirmationLink);
-
-            return Ok("Kayıt başarılı! E-posta adresinizi doğrulamak için e-posta gönderildi.");
+            return Ok("Registration successful, email confirmation link sent.");
         }
 
         [HttpGet("confirmemail")]
         public async Task<IActionResult> ConfirmEmail(string token, string email)
         {
             if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
-                return BadRequest("Geçersiz token veya e-posta.");
+                return BadRequest("Invalid token or email.");
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                return NotFound("Kullanıcı bulunamadı.");
+                return NotFound("User not found.");
 
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (!result.Succeeded)
-                return BadRequest("E-posta doğrulaması başarısız.");
+                return BadRequest("Email confirmation failed.");
 
-            return Ok("E-posta doğrulandı.");
+            return Ok("Email confirmed.");
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            // 1) Kullanıcı var mı, parola doğru mu?
-            var user = await _userManager.FindByNameAsync(dto.Username);
-            if (user == null)
-                return Unauthorized("Kullanıcı bulunamadı");
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null) return Unauthorized("User not found.");
 
-            var pwCheck = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-            if (!pwCheck.Succeeded)
-                return Unauthorized("Geçersiz kimlik bilgileri");
+            var pwRes = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
+            if (!pwRes.Succeeded) return Unauthorized("Invalid password.");
 
-            // 2) Claim’leri hazırla (id, email, username + roller)
-            var roles = await _userManager.GetRolesAsync(user);
-            var claims = new List<Claim>
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-        new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
-        new Claim(JwtRegisteredClaimNames.Email, user.Email),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
-            // rollerini de ekle
-            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
-
-            // 3) Secret key + signing credentials
-            var jwtSettings = _config.GetSection("Jwt");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            // 4) Token’ı oluştur
-            var expires = DateTime.UtcNow.AddMinutes(
-                              double.Parse(jwtSettings["ExpiresInMinutes"]));
-            var tokenDescriptor = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
-                claims: claims,
-                expires: expires,
-                signingCredentials: creds
-            );
-
-            var tokenString = new JwtSecurityTokenHandler()
-                                  .WriteToken(tokenDescriptor);
-
-            // 5) İstemciye dön
-            return Ok(new
-            {
-                token = tokenString,
-                expiresAt = expires
-            });
+            var token = await _tokenService.CreateAccessTokenAsync(user);
+            return Ok(new { token });
         }
-
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return Ok("Çıkış yapıldı");
+            return Ok("Logged out.");
         }
     }
 }

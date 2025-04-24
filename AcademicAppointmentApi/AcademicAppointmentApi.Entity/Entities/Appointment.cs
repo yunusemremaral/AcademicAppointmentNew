@@ -9,16 +9,10 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
     public class Appointment
     {
         public int Id { get; set; }
-
-        // Foreign key to the academic user
         public string AcademicUserId { get; set; }
-        public virtual AppUser AcademicUser { get; set; }
-
-        // Foreign key to the student user
+        public AppUser AcademicUser { get; set; }
         public string StudentUserId { get; set; }
-        public virtual AppUser StudentUser { get; set; }
-
-        // Appointment details
+        public AppUser StudentUser { get; set; }
         public DateTime ScheduledAt { get; set; }
         public string Subject { get; set; }
         public string Description { get; set; }
