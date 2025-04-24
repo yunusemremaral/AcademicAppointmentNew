@@ -1,6 +1,7 @@
 ﻿using AcademicAppointmentApi.DataAccessLayer.Abstract;
 using AcademicAppointmentApi.EntityLayer.Entities;
 using AcademicAppointmentApi.Presentation.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,8 +18,9 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             _appointmentRepository = appointmentRepository;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(AppointmentCreateDto dto)
+        [Authorize(Roles = "Student")]
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateAppointment(AppointmentCreateDto dto)
         {
             var appointment = new Appointment
             {

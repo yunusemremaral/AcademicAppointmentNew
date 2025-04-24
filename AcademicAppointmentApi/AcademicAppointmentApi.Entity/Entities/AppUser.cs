@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.EntityLayer.Entities
 {
-    public  class AppUser : IdentityUser // Remove the generic type parameter
+    public  class AppUser : IdentityUser 
     {
         // Akademisyen olarak katıldığı randevular
         public virtual ICollection<Appointment> AppointmentsAsAcademic { get; set; }

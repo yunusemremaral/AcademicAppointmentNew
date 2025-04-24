@@ -4,8 +4,11 @@ using AcademicAppointmentApi.DataAccessLayer.Abstract;
 using AcademicAppointmentApi.DataAccessLayer.Concrete;
 using AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore;
 using AcademicAppointmentApi.EntityLayer.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,31 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+var jwtSection = builder.Configuration.GetSection("Jwt");
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = true;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSection["Issuer"],
+            ValidAudience = jwtSection["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                                          Encoding.UTF8.GetBytes(jwtSection["Key"]))
+        };
+    });
+builder.Services.AddAuthorization();
+
 
 // Identity yapýlandýrmasý
 builder.Services.AddIdentity<AppUser, AppRole>()
@@ -44,9 +72,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors();
 
 app.UseHttpsRedirection();
+app.UseCors();
+
 
 // Authentication ve Authorization
 app.UseAuthentication(); // <-- Bunu da eklemeyi unutma!
