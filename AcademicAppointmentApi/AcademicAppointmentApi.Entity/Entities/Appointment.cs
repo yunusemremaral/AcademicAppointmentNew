@@ -17,13 +17,14 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
         public string Subject { get; set; }
         public string Description { get; set; }
         public AppointmentStatus Status { get; set; }
-
     }
+
     public enum AppointmentStatus
     {
-        Pending,
-        Confirmed,
-        Cancelled,
-        Completed
+        Pending = 0,    // Pending status
+        Confirmed = 1,  // Confirmed status
+        Cancelled = 2,  // Cancelled status
+        Completed = 3   // Completed status
     }
+
 }

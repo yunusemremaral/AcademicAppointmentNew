@@ -10,8 +10,13 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public string DepartmentId { get; set; }
+
+        // DepartmentId nullable yapıldı
+        public string? DepartmentId { get; set; }
         public Department Department { get; set; }
+
         public ICollection<AppUser> AssignedInstructors { get; set; }
     }
+
+
 }

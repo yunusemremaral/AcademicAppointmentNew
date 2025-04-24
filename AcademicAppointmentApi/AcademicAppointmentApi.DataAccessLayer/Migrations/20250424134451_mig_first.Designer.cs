@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AcademicAppointmentApi.DataAccessLayer.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250424101836_mig_secondtry")]
-    partial class mig_secondtry
+    [Migration("20250424134451_mig_first")]
+    partial class mig_first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,6 +64,13 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DepartmentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DepartmentId1")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -94,6 +101,10 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("SchoolId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -106,6 +117,10 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("DepartmentId1");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -113,6 +128,8 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("SchoolId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -154,6 +171,165 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                     b.HasIndex("StudentUserId");
 
                     b.ToTable("Appointments");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Course", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DepartmentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("InstructorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("InstructorId");
+
+                    b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Department", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SchoolId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SchoolId");
+
+                    b.ToTable("Departments");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Room", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DepartmentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.School", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Schools");
+                });
+
+            modelBuilder.Entity("AppUserRoom", b =>
+                {
+                    b.Property<string>("AssignedInstructorsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AssignedRoomsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AssignedInstructorsId", "AssignedRoomsId");
+
+                    b.HasIndex("AssignedRoomsId");
+
+                    b.ToTable("RoomInstructors", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -262,6 +438,29 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.AppUser", b =>
+                {
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.Department", null)
+                        .WithMany("FacultyMembers")
+                        .HasForeignKey("DepartmentId1");
+
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.School", "School")
+                        .WithMany()
+                        .HasForeignKey("SchoolId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+
+                    b.Navigation("School");
+                });
+
             modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Appointment", b =>
                 {
                     b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.AppUser", "AcademicUser")
@@ -279,6 +478,94 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                     b.Navigation("AcademicUser");
 
                     b.Navigation("StudentUser");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Course", b =>
+                {
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.AppUser", null)
+                        .WithMany("Courses")
+                        .HasForeignKey("AppUserId");
+
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.Department", "Department")
+                        .WithMany("Courses")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.AppUser", "Instructor")
+                        .WithMany()
+                        .HasForeignKey("InstructorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+
+                    b.Navigation("Instructor");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Department", b =>
+                {
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.School", "School")
+                        .WithMany("Departments")
+                        .HasForeignKey("SchoolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("School");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Message", b =>
+                {
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.AppUser", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.AppUser", "Sender")
+                        .WithMany("Messages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Notification", b =>
+                {
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Room", b =>
+                {
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.Department", "Department")
+                        .WithMany("Rooms")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("AppUserRoom", b =>
+                {
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("AssignedInstructorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.Room", null)
+                        .WithMany()
+                        .HasForeignKey("AssignedRoomsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -337,6 +624,24 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                     b.Navigation("AppointmentsAsAcademic");
 
                     b.Navigation("AppointmentsAsStudent");
+
+                    b.Navigation("Courses");
+
+                    b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Department", b =>
+                {
+                    b.Navigation("Courses");
+
+                    b.Navigation("FacultyMembers");
+
+                    b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.School", b =>
+                {
+                    b.Navigation("Departments");
                 });
 #pragma warning restore 612, 618
         }

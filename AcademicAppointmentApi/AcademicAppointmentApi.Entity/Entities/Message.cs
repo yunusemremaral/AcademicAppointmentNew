@@ -16,4 +16,6 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
         public string Content { get; set; }
         public DateTime SentAt { get; set; }
     }
+
+
 }

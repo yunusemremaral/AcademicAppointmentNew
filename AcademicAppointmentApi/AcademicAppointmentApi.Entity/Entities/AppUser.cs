@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.EntityLayer.Entities
 {
-    public  class AppUser : IdentityUser 
+    public class AppUser : IdentityUser
     {
         // Akademisyen olarak katıldığı randevular
         public virtual ICollection<Appointment> AppointmentsAsAcademic { get; set; }
 
         // Öğrenci olarak katıldığı randevular
         public virtual ICollection<Appointment> AppointmentsAsStudent { get; set; }
+
         // Kullanıcının okulu
         public string SchoolId { get; set; }
         public School School { get; set; }
@@ -26,7 +27,7 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
         public ICollection<Course> Courses { get; set; }
 
         // Mesajlar
-        public ICollection<Message> Messages { get; set; }
-
+        public virtual ICollection<Message> Messages { get; set; }
+        public virtual ICollection<Room> AssignedRooms { get; set; }
     }
 }

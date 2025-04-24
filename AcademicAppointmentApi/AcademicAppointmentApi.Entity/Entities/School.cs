@@ -12,4 +12,5 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
         public string Name { get; set; }
         public ICollection<Department> Departments { get; set; }
     }
+
 }

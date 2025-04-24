@@ -12,7 +12,16 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
         public string Name { get; set; }
         public string SchoolId { get; set; }
         public School School { get; set; }
-        public ICollection<AppUser> FacultyMembers { get; set; } // Hocalar
-        public ICollection<Course> Courses { get; set; } // Dersler
+
+        // Oda ilişkisi
+        public ICollection<Room> Rooms { get; set; }
+
+        // Hocalar
+        public ICollection<AppUser> FacultyMembers { get; set; }
+
+        // Dersler
+        public ICollection<Course> Courses { get; set; }
     }
+
+
 }
