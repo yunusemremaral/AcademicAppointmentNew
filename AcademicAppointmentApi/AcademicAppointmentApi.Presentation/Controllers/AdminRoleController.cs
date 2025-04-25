@@ -1,5 +1,4 @@
 ﻿using AcademicAppointmentApi.EntityLayer.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,16 +62,16 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         }
 
         // ✅ Kullanıcıya rol ata
-            [HttpPost("assignrole")]
-            public async Task<IActionResult> AssignRole(string email, string role)
-            {
-                var user = await _userManager.FindByEmailAsync(email);
-                if (user == null)
-                    return NotFound("Kullanıcı bulunamadı.");
+        [HttpPost("assignrole")]
+        public async Task<IActionResult> AssignRole(string email, string role)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return NotFound("Kullanıcı bulunamadı.");
 
-                var result = await _userManager.AddToRoleAsync(user, role);
-                return result.Succeeded ? Ok("Rol atandı.") : BadRequest(result.Errors);
-            }
+            var result = await _userManager.AddToRoleAsync(user, role);
+            return result.Succeeded ? Ok("Rol atandı.") : BadRequest(result.Errors);
+        }
 
         // ✅ Kullanıcıdan rol sil
         [HttpPost("removerole")]
@@ -98,5 +97,4 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             return Ok(roles);
         }
     }
-
 }

@@ -1,6 +1,5 @@
 ﻿using AcademicAppointmentApi.EntityLayer.Entities;
 using AcademicAppointmentApi.Presentation.Dtos;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +33,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             var result = await _userManager.DeleteAsync(user);
             return result.Succeeded ? Ok("Kullanıcı silindi") : BadRequest(result.Errors);
         }
+
         [HttpGet("users-with-roles")]
         public async Task<IActionResult> GetAllUsersWithRoles()
         {
@@ -54,6 +54,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 
             return Ok(userRoleList);
         }
+
         [HttpGet("byrole/{role}")]
         public async Task<IActionResult> GetUsersByRole(string role)
         {
@@ -67,8 +68,5 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 
             return Ok(userDtos);
         }
-
-
     }
-
 }
