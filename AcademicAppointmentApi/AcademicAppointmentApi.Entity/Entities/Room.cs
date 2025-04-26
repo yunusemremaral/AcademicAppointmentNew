@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.EntityLayer.Entities
 {
-    public class Room
+    public class Room   
     {
-        public string Id { get; set; }  // Odanın benzersiz ID'si
-        public string Name { get; set; }  // Oda adı
+        public int Id { get; set; }
+        public string Name { get; set; }
 
-        // Her odanın kesinlikle bir kullanıcısı olacak
         public string AppUserId { get; set; }
-        public AppUser AppUser { get; set; }  // Odaya atanmış kullanıcı
+        public AppUser AppUser { get; set; }
     }
 
 

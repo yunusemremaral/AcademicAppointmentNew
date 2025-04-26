@@ -9,33 +9,24 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
 {
     public class AppUser : IdentityUser
     {
-        // Akademisyen olarak katıldığı randevular
-        public virtual ICollection<Appointment> AppointmentsAsAcademic { get; set; }
+        public ICollection<Appointment> AppointmentsAsAcademic { get; set; }
+        public ICollection<Appointment> AppointmentsAsStudent { get; set; }
 
-        // Öğrenci olarak katıldığı randevular
-        public virtual ICollection<Appointment> AppointmentsAsStudent { get; set; }
-
-        // Kullanıcının okulu
-        public string SchoolId { get; set; }
+        public int? SchoolId { get; set; }
         public School School { get; set; }
 
-        // Kullanıcının bölümü
-        public string DepartmentId { get; set; }
+        public int? DepartmentId { get; set; }
         public Department Department { get; set; }
 
-        // Kullanıcının dersleri
         public ICollection<Course> Courses { get; set; }
 
-        // Kullanıcıya ait oda bilgisi (nullable)
-        public string? RoomId { get; set; }
-        public Room Room { get; set; }  // Nullable oda
+        public int? RoomId { get; set; }
+        public Room Room { get; set; }
 
-        // Mesajlar (Sender ve Receiver ilişkisi)
-        public virtual ICollection<Message> MessagesSent { get; set; }  // Gönderilen mesajlar
-        public virtual ICollection<Message> MessagesReceived { get; set; }  // Alınan mesajlar
+        public ICollection<Message> MessagesSent { get; set; }
+        public ICollection<Message> MessagesReceived { get; set; }
 
-        // AssignedRooms - kullanıcının atandığı odalar
-        public virtual ICollection<Room> AssignedRooms { get; set; }
+
     }
 
 

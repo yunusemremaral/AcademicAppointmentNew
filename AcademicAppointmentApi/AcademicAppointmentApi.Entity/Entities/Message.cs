@@ -8,13 +8,16 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
 {
     public class Message
     {
-        public string Id { get; set; }  // Mesajın benzersiz ID'si
-        public string SenderId { get; set; }  // Gönderen kullanıcı
-        public AppUser Sender { get; set; }  // Gönderen kullanıcı
-        public string ReceiverId { get; set; }  // Alıcı kullanıcı
-        public AppUser Receiver { get; set; }  // Alıcı kullanıcı
-        public string Content { get; set; }  // Mesaj içeriği
-        public DateTime SentAt { get; set; }  // Mesaj gönderilme tarihi
+        public int Id { get; set; }
+
+        public string SenderId { get; set; }
+        public AppUser Sender { get; set; }
+
+        public string ReceiverId { get; set; }
+        public AppUser Receiver { get; set; }
+
+        public string Content { get; set; }
+        public DateTime SentAt { get; set; }
     }
 
 

@@ -8,11 +8,13 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
 {
     public class Course
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
-        public string DepartmentId { get; set; }
+
+        public int DepartmentId { get; set; }
         public Department Department { get; set; }
-        public string InstructorId { get; set; } // Öğretim üyesi
+
+        public string InstructorId { get; set; }
         public AppUser Instructor { get; set; }
     }
 }

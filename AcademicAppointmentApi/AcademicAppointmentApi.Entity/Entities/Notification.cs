@@ -10,7 +10,6 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
     {
         public int Id { get; set; }
 
-        // UserId nullable yapıldı
         public string? UserId { get; set; }
         public AppUser User { get; set; }
 

@@ -6,9 +6,9 @@ namespace AcademicAppointmentApi.DataAccessLayer.Concrete
 {
     public class Context : IdentityDbContext<AppUser, AppRole, string>
     {
-        public Context(DbContextOptions<Context> opts) : base(opts) { }
+        public Context(DbContextOptions<Context> options) : base(options) { }
 
-        // DbSet'ler
+        // DbSets
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<School> Schools { get; set; }
         public DbSet<Department> Departments { get; set; }
@@ -21,81 +21,82 @@ namespace AcademicAppointmentApi.DataAccessLayer.Concrete
         {
             base.OnModelCreating(builder);
 
-            // Appointment ilişkisi
+            // Appointment - AcademicUser
             builder.Entity<Appointment>()
                    .HasOne(a => a.AcademicUser)
                    .WithMany(u => u.AppointmentsAsAcademic)
                    .HasForeignKey(a => a.AcademicUserId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Restrict);  // Randevu silindiğinde kullanıcıyı etkileme
 
+            // Appointment - StudentUser
             builder.Entity<Appointment>()
                    .HasOne(a => a.StudentUser)
                    .WithMany(u => u.AppointmentsAsStudent)
                    .HasForeignKey(a => a.StudentUserId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Restrict);  // Aynı şekilde
 
-            // School ve Department ilişkisi
+            // Department - School
             builder.Entity<Department>()
                    .HasOne(d => d.School)
                    .WithMany(s => s.Departments)
                    .HasForeignKey(d => d.SchoolId)
-                   .OnDelete(DeleteBehavior.Cascade); // Okul silindiğinde bölüm de silinsin.
+                   .OnDelete(DeleteBehavior.Cascade);  // Okul silindiğinde bölüm de silinsin
 
-            // Department ve Course ilişkisi
+            // Course - Department
             builder.Entity<Course>()
                    .HasOne(c => c.Department)
                    .WithMany(d => d.Courses)
                    .HasForeignKey(c => c.DepartmentId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Restrict);  // Bölüm silindiğinde kurslar silinmesin
 
-            // Course ve Instructor ilişkisi
+            // Course - Instructor (AppUser)
             builder.Entity<Course>()
                    .HasOne(c => c.Instructor)
                    .WithMany()
                    .HasForeignKey(c => c.InstructorId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Restrict);  // Öğretim üyesi silinirse kurs silinmesin
 
-            // Room ve AppUser ilişkisi (Her odanın kesinlikle bir kullanıcısı olacak, kullanıcının ise nullable odası olabilir)
+            // Room - AppUser (Her odanın bir kullanıcısı olacak)
             builder.Entity<Room>()
                    .HasOne(r => r.AppUser)
                    .WithOne(u => u.Room)
-                   .HasForeignKey<AppUser>(u => u.RoomId)
-                   .OnDelete(DeleteBehavior.NoAction);  // Oda silindiğinde kullanıcıyı etkilemez
+                   .HasForeignKey<Room>(r => r.AppUserId)
+                   .OnDelete(DeleteBehavior.SetNull);  // Oda silindiğinde kullanıcının oda ID'si null olabilir
 
-            // Message ve AppUser ilişkisi (sender ve receiver ilişkisi)
+            // Message - Sender (AppUser)
             builder.Entity<Message>()
                    .HasOne(m => m.Sender)
-                   .WithMany(u => u.MessagesSent)  // Gönderilen mesajları ilişkilendiriyoruz
+                   .WithMany(u => u.MessagesSent)
                    .HasForeignKey(m => m.SenderId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Restrict);  // Gönderen kullanıcı silinmesin
 
+            // Message - Receiver (AppUser)
             builder.Entity<Message>()
                    .HasOne(m => m.Receiver)
-                   .WithMany(u => u.MessagesReceived)  // Alınan mesajları ilişkilendiriyoruz
+                   .WithMany(u => u.MessagesReceived)
                    .HasForeignKey(m => m.ReceiverId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Restrict);  // Alıcı kullanıcı silinmesin
 
-            // Notification ve AppUser ilişkisi
+            // Notification - AppUser
             builder.Entity<Notification>()
                    .HasOne(n => n.User)
                    .WithMany()
                    .HasForeignKey(n => n.UserId)
-                   .OnDelete(DeleteBehavior.SetNull); // Kullanıcı silindiğinde bildirim null yapılabilir
+                   .OnDelete(DeleteBehavior.SetNull);  // Kullanıcı silindiğinde bildirim null yapılabilir
 
-            // AspNetUsers ve Department ilişkisi
+            // AppUser - Department
             builder.Entity<AppUser>()
                    .HasOne(u => u.Department)
                    .WithMany()
                    .HasForeignKey(u => u.DepartmentId)
-                   .OnDelete(DeleteBehavior.NoAction); // Kullanıcı silindiğinde departman silinmez.
+                   .OnDelete(DeleteBehavior.Restrict);  // Kullanıcı silindiğinde departman silinmesin
 
-            // AspNetUsers ve School ilişkisi
+            // AppUser - School
             builder.Entity<AppUser>()
                    .HasOne(u => u.School)
                    .WithMany()
                    .HasForeignKey(u => u.SchoolId)
-                   .OnDelete(DeleteBehavior.NoAction); // Kullanıcı silindiğinde okul silinmez.
-
+                   .OnDelete(DeleteBehavior.Restrict);  // Kullanıcı silindiğinde okul silinmesin
         }
     }
 }

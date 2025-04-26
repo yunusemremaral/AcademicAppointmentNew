@@ -1,0 +1,152 @@
+﻿namespace AcademicAppointmentApi.EntityLayer.Entities
+{
+    public class Appointment
+    {
+        public int Id { get; set; }
+        public string AcademicUserId { get; set; }
+        public AppUser AcademicUser { get; set; }
+        public string StudentUserId { get; set; }
+        public AppUser StudentUser { get; set; }
+        public DateTime ScheduledAt { get; set; }
+        public string Subject { get; set; }
+        public string Description { get; set; }
+        public AppointmentStatus Status { get; set; }
+    }
+
+    public enum AppointmentStatus
+    {
+        Pending = 0,    // Pending status
+        Confirmed = 1,  // Confirmed status
+        Cancelled = 2,  // Cancelled status
+        Completed = 3   // Completed status
+    }
+
+}namespace AcademicAppointmentApi.EntityLayer.Entities
+    {
+        public class AppRole:IdentityRole
+        {
+        }
+    }
+    namespace AcademicAppointmentApi.EntityLayer.Entities
+{
+    public class AppUser : IdentityUser
+    {
+        // Akademisyen olarak katıldığı randevular
+        public virtual ICollection<Appointment> AppointmentsAsAcademic { get; set; }
+
+        // Öğrenci olarak katıldığı randevular
+        public virtual ICollection<Appointment> AppointmentsAsStudent { get; set; }
+
+        // Kullanıcının okulu
+        public string SchoolId { get; set; }
+        public School School { get; set; }
+
+        // Kullanıcının bölümü
+        public string DepartmentId { get; set; }
+        public Department Department { get; set; }
+
+        // Kullanıcının dersleri
+        public ICollection<Course> Courses { get; set; }
+
+        // Kullanıcıya ait oda bilgisi (nullable)
+        public string? RoomId { get; set; }
+        public Room Room { get; set; }  // Nullable oda
+
+        // Mesajlar (Sender ve Receiver ilişkisi)
+        public virtual ICollection<Message> MessagesSent { get; set; }  // Gönderilen mesajlar
+        public virtual ICollection<Message> MessagesReceived { get; set; }  // Alınan mesajlar
+
+        // AssignedRooms - kullanıcının atandığı odalar
+        public virtual ICollection<Room> AssignedRooms { get; set; }
+    }
+
+
+}
+namespace AcademicAppointmentApi.EntityLayer.Entities
+{
+    public class Course
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string DepartmentId { get; set; }
+        public Department Department { get; set; }
+        public string InstructorId { get; set; } // Öğretim üyesi
+        public AppUser Instructor { get; set; }
+    }
+}
+namespace AcademicAppointmentApi.EntityLayer.Entities
+{
+    public class Department
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string SchoolId { get; set; }
+        public School School { get; set; }
+
+
+        // Hocalar
+        public ICollection<AppUser> FacultyMembers { get; set; }
+
+        // Dersler
+        public ICollection<Course> Courses { get; set; }
+    }
+
+
+}
+namespace AcademicAppointmentApi.EntityLayer.Entities
+{
+    public class Message
+    {
+        public string Id { get; set; }  // Mesajın benzersiz ID'si
+        public string SenderId { get; set; }  // Gönderen kullanıcı
+        public AppUser Sender { get; set; }  // Gönderen kullanıcı
+        public string ReceiverId { get; set; }  // Alıcı kullanıcı
+        public AppUser Receiver { get; set; }  // Alıcı kullanıcı
+        public string Content { get; set; }  // Mesaj içeriği
+        public DateTime SentAt { get; set; }  // Mesaj gönderilme tarihi
+    }
+
+
+}
+namespace AcademicAppointmentApi.EntityLayer.Entities
+{
+    public class Notification
+    {
+        public int Id { get; set; }
+
+        // UserId nullable yapıldı
+        public string? UserId { get; set; }
+        public AppUser User { get; set; }
+
+        public string Message { get; set; }
+        public bool IsRead { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+
+}
+namespace AcademicAppointmentApi.EntityLayer.Entities
+{
+    public class Room
+    {
+        public string Id { get; set; }  // Odanın benzersiz ID'si
+        public string Name { get; set; }  // Oda adı
+
+        // Her odanın kesinlikle bir kullanıcısı olacak
+        public string AppUserId { get; set; }
+        public AppUser AppUser { get; set; }  // Odaya atanmış kullanıcı
+    }
+
+
+}
+
+namespace AcademicAppointmentApi.EntityLayer.Entities
+{
+    public class School
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public ICollection<Department> Departments { get; set; }
+    }
+
+}

@@ -8,16 +8,13 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
 {
     public class Department
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
-        public string SchoolId { get; set; }
+
+        public int SchoolId { get; set; }
         public School School { get; set; }
 
-
-        // Hocalar
         public ICollection<AppUser> FacultyMembers { get; set; }
-
-        // Dersler
         public ICollection<Course> Courses { get; set; }
     }
 

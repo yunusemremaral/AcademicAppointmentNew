@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿    using Microsoft.AspNetCore.Identity;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
 
-namespace AcademicAppointmentApi.EntityLayer.Entities
-{
-    public class AppRole:IdentityRole
+    namespace AcademicAppointmentApi.EntityLayer.Entities
     {
+        public class AppRole:IdentityRole
+        {
+        }
     }
-}
