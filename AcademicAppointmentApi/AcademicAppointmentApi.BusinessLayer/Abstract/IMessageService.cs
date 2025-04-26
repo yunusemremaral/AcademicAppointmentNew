@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
-    public interface IMessageService : IGenericService<Message>
+    public interface IMessageService : ITGenericService<Message>
     {
-        Task<List<Message>> GetMessagesBySenderIdAsync(string senderId);
-        Task<List<Message>> GetMessagesByReceiverIdAsync(string receiverId);
-        Task<List<Message>> GetConversationAsync(string user1Id, string user2Id);
+        Task<List<Message>> TGetMessagesBySenderIdAsync(string senderId);
+        Task<List<Message>> TGetMessagesByReceiverIdAsync(string receiverId);
     }
 }

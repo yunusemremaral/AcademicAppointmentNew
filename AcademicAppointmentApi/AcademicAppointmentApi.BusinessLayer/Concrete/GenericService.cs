@@ -9,24 +9,46 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Concrete
 {
-    public class GenericService<T> : IGenericService<T> where T : class
+    public class TGenericService<T> : ITGenericService<T> where T : class
     {
         protected readonly IGenericRepository<T> _genericRepository;
 
-        public GenericService(IGenericRepository<T> genericRepository)
+        public TGenericService(IGenericRepository<T> genericRepository)
         {
             _genericRepository = genericRepository;
         }
 
-        public async Task<List<T>> TGetAllAsync() => await _genericRepository.GetAllAsync();
-        public async Task<T> TGetByIdAsync(int id) => await _genericRepository.GetByIdAsync(id);
-        public async Task<List<T>> TGetWhereAsync(Expression<Func<T, bool>> predicate) => await _genericRepository.GetWhereAsync(predicate);
-        public async Task TAddAsync(T entity) => await _genericRepository.AddAsync(entity);
-        public async Task TUpdateAsync(T entity) => _genericRepository.Update(entity);
-        public async Task TDeleteAsync(T entity) => _genericRepository.Delete(entity);
-        public async Task<int> TSaveAsync() => await _genericRepository.SaveAsync();
-        public async Task<T> TGetByIdWithStringAsync(string id) => await _genericRepository.GetByIdWithStringAsync(id);
+        public async Task<IReadOnlyList<T>> TGetAllAsync() 
+        {
+            return await _genericRepository.GetAllAsync();
+        }
+
+        public async Task<T?> TGetByIdAsync(params object[] keyValues)
+        {
+            return await _genericRepository.GetByIdAsync(keyValues);
+        }
+
+        public async Task<IReadOnlyList<T>> TGetWhereAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _genericRepository.GetWhereAsync(predicate);
+        }
+
+        public async Task<T> TAddAsync(T entity)
+        {
+            return await _genericRepository.AddAsync(entity);
+        }
+
+        public async Task TUpdateAsync(T entity)
+        {
+            await _genericRepository.UpdateAsync(entity);
+        }
+
+        public async Task TDeleteAsync(T entity)
+        {
+            await _genericRepository.DeleteAsync(entity);
+        }
     }
+
 }
 
 

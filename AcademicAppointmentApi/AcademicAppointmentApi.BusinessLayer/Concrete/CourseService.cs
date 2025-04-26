@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Concrete
 {
-    public class CourseService : GenericService<Course>, ICourseService
+    public class CourseService : TGenericService<Course>, ICourseService
     {
         private readonly ICourseRepository _courseRepository;
 
@@ -18,16 +18,14 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             _courseRepository = courseRepository;
         }
 
-        public async Task<List<Course>> GetCoursesByDepartmentIdAsync(string departmentId)
+        public async Task<List<Course>> TGetCoursesByDepartmentIdAsync(int departmentId)
         {
-            // İş mantığı eklenebilir (örneğin, departman aktif mi kontrolü)
             return await _courseRepository.GetCoursesByDepartmentIdAsync(departmentId);
         }
 
-        public async Task<List<Course>> GetCoursesByInstructorIdAsync(string instructorId)
+        public async Task<List<Course>> TGetCoursesByInstructorIdAsync(string instructorId)
         {
             return await _courseRepository.GetCoursesByInstructorIdAsync(instructorId);
         }
     }
-
 }

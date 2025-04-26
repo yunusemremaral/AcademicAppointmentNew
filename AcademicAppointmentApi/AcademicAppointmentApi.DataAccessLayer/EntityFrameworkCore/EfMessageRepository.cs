@@ -19,13 +19,6 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
             _context = context;
         }
 
-        public async Task<List<Message>> GetMessagesByReceiverIdAsync(string receiverId)
-        {
-            return await _context.Messages
-                .Where(m => m.ReceiverId == receiverId)
-                .ToListAsync();
-        }
-
         public async Task<List<Message>> GetMessagesBySenderIdAsync(string senderId)
         {
             return await _context.Messages
@@ -33,14 +26,11 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                 .ToListAsync();
         }
 
-        public async Task<List<Message>> GetConversationAsync(string user1Id, string user2Id)
+        public async Task<List<Message>> GetMessagesByReceiverIdAsync(string receiverId)
         {
             return await _context.Messages
-                .Where(m => (m.SenderId == user1Id && m.ReceiverId == user2Id) ||
-                            (m.SenderId == user2Id && m.ReceiverId == user1Id))
-                .OrderBy(m => m.SentAt)
+                .Where(m => m.ReceiverId == receiverId)
                 .ToListAsync();
         }
     }
-
 }

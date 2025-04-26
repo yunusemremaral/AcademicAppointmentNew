@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
-    public interface ICourseService : IGenericService<Course>
+    public interface ICourseService : ITGenericService<Course>
     {
-        Task<List<Course>> GetCoursesByDepartmentIdAsync(string departmentId);
-        Task<List<Course>> GetCoursesByInstructorIdAsync(string instructorId);
+        Task<List<Course>> TGetCoursesByDepartmentIdAsync(int departmentId);
+        Task<List<Course>> TGetCoursesByInstructorIdAsync(string instructorId);
     }
+
 }

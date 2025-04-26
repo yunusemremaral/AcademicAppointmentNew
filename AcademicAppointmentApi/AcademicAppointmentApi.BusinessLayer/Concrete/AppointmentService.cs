@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Concrete
 {
-    public class AppointmentService : GenericService<Appointment>, IAppointmentService
+    public class AppointmentService : TGenericService<Appointment>, IAppointmentService
     {
         private readonly IAppointmentRepository _appointmentRepository;
 
@@ -18,24 +18,14 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             _appointmentRepository = appointmentRepository;
         }
 
-        public async Task<List<Appointment>> GetAppointmentsByStudentIdAsync(string studentId)
+        public async Task<List<Appointment>> TGetAppointmentsByStudentIdAsync(string studentId)
         {
-            // İş mantığı eklenebilir (örneğin, öğrencinin aktif olup olmadığı kontrolü)
             return await _appointmentRepository.GetAppointmentsByStudentIdAsync(studentId);
         }
 
-        public async Task<List<Appointment>> GetAppointmentsByAcademicIdAsync(string academicId)
+        public async Task<List<Appointment>> TGetAppointmentsByAcademicIdAsync(string academicId)
         {
-            // Akademisyenin müsaitlik durumu kontrolü
             return await _appointmentRepository.GetAppointmentsByAcademicIdAsync(academicId);
         }
-
-        public async Task ValidateAppointmentTime(DateTime startTime, DateTime endTime)
-        {
-            if (startTime >= endTime)
-                throw new InvalidOperationException("Geçersiz randevu saati!");
-
-        }
     }
-
 }

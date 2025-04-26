@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
-    public interface IRoomService : IGenericService<Room>
+    public interface IRoomService : ITGenericService<Room>
     {
-        Task<List<Room>> GetRoomsByUserIdAsync(string userId);
+        Task<Room?> TGetRoomByUserIdAsync(string userId);
     }
+
 }

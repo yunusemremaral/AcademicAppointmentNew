@@ -19,12 +19,10 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
             _context = context;
         }
 
-        public async Task<List<Room>> GetRoomsByUserIdAsync(string userId)
+        public async Task<Room?> GetRoomByUserIdAsync(string userId)
         {
             return await _context.Rooms
-                .Where(r => r.AppUserId == userId)
-                .ToListAsync();
+                .FirstOrDefaultAsync(r => r.UserId == userId);
         }
     }
-
 }

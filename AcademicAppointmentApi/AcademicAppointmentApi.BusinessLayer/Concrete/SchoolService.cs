@@ -9,10 +9,18 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Concrete
 {
-    public class SchoolService : GenericService<School>, ISchoolService
+    public class SchoolService : TGenericService<School>, ISchoolService
     {
+        private readonly ISchoolRepository _schoolRepository;
+
         public SchoolService(ISchoolRepository schoolRepository) : base(schoolRepository)
         {
+            _schoolRepository = schoolRepository;
+        }
+
+        public async Task<List<School>> TGetSchoolsWithDepartmentsAsync()
+        {
+            return await _schoolRepository.GetSchoolsWithDepartmentsAsync();
         }
     }
 }

@@ -11,6 +11,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
     {
         Task<List<Appointment>> GetAppointmentsByStudentIdAsync(string studentId);
         Task<List<Appointment>> GetAppointmentsByAcademicIdAsync(string academicId);
+        Task<List<Appointment>> GetAppointmentsByDateAsync(DateTime date);
     }
 
 }

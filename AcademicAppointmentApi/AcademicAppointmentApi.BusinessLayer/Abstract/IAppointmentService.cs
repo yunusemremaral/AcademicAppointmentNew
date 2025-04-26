@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
-    public interface IAppointmentService : IGenericService<Appointment>
+    public interface IAppointmentService : ITGenericService<Appointment>
     {
-        Task<List<Appointment>> GetAppointmentsByStudentIdAsync(string studentId);
-        Task<List<Appointment>> GetAppointmentsByAcademicIdAsync(string academicId);
-        Task ValidateAppointmentTime(DateTime startTime, DateTime endTime); // Özel validasyon
+        Task<List<Appointment>> TGetAppointmentsByStudentIdAsync(string studentId);
+        Task<List<Appointment>> TGetAppointmentsByAcademicIdAsync(string academicId);
     }
+
 
 }

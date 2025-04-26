@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
-    public interface ISchoolService : IGenericService<School>
+    public interface ISchoolService : ITGenericService<School>
     {
+        Task<List<School>> TGetSchoolsWithDepartmentsAsync();
     }
+
 }

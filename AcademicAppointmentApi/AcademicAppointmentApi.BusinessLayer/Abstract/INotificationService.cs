@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
-    public interface INotificationService : IGenericService<Notification>
+    public interface INotificationService : ITGenericService<Notification>
     {
-        Task<List<Notification>> GetByUserIdAsync(string userId);
-        Task<List<Notification>> GetUnreadByUserIdAsync(string userId);
+        Task<List<Notification>> TGetNotificationsByUserIdAsync(string userId);
     }
+
 }

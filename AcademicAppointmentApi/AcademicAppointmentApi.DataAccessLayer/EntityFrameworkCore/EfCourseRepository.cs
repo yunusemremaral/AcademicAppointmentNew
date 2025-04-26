@@ -19,17 +19,18 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
             _context = context;
         }
 
-        public async Task<List<Course>> GetCoursesByDepartmentIdAsync(string departmentId)
+        public async Task<List<Course>> GetCoursesByDepartmentIdAsync(int departmentId)
         {
-            throw new NotImplementedException();
+            return await _context.Courses
+                .Where(c => c.DepartmentId == departmentId)
+                .ToListAsync();
         }
 
         public async Task<List<Course>> GetCoursesByInstructorIdAsync(string instructorId)
         {
             return await _context.Courses
-                .Where(c => c.InstructorId == instructorId)
+                .Where(c => c.InstructorUserId == instructorId)
                 .ToListAsync();
         }
     }
-
 }

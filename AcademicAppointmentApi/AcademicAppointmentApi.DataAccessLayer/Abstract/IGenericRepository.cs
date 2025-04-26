@@ -9,14 +9,12 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
 {
     public interface IGenericRepository<T> where T : class
     {
-        Task<List<T>> GetAllAsync();
-        Task<T> GetByIdWithStringAsync(string id);
-        Task<T> GetByIdAsync(int id);
-        Task<List<T>> GetWhereAsync(Expression<Func<T, bool>> predicate);
-        Task AddAsync(T entity);
-        void Update(T entity);
-        void Delete(T entity);
-        Task<int> SaveAsync();
+        Task<IReadOnlyList<T>> GetAllAsync();
+        Task<T?> GetByIdAsync(params object[] keyValues);
+        Task<IReadOnlyList<T>> GetWhereAsync(Expression<Func<T, bool>> predicate);
+        Task<T> AddAsync(T entity);
+        Task UpdateAsync(T entity);
+        Task DeleteAsync(T entity);
     }
 
 }

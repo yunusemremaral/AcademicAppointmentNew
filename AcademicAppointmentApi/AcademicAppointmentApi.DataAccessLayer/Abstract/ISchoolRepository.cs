@@ -9,5 +9,6 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
 {
     public interface ISchoolRepository : IGenericRepository<School>
     {
+        Task<List<School>> GetSchoolsWithDepartmentsAsync();
     }
 }

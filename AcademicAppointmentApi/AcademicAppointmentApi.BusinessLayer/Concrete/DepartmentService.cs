@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Concrete
 {
-    public class DepartmentService : GenericService<Department>, IDepartmentService
+    public class DepartmentService : TGenericService<Department>, IDepartmentService
     {
         private readonly IDepartmentRepository _departmentRepository;
 
@@ -18,10 +18,9 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             _departmentRepository = departmentRepository;
         }
 
-        public async Task<List<Department>> GetDepartmentsBySchoolIdAsync(string schoolId)
+        public async Task<List<Department>> TGetDepartmentsBySchoolIdAsync(int schoolId)
         {
             return await _departmentRepository.GetDepartmentsBySchoolIdAsync(schoolId);
         }
     }
-
 }

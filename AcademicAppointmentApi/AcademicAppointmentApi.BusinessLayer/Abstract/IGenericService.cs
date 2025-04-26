@@ -7,16 +7,14 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
-    public interface IGenericService<T> where T : class
+    public interface ITGenericService<T> where T : class
     {
-        Task<List<T>> TGetAllAsync();
-        Task<T> TGetByIdAsync(int id);
-        Task<T> TGetByIdWithStringAsync(string id);
-        Task<List<T>> TGetWhereAsync(Expression<Func<T, bool>> predicate);
-        Task TAddAsync(T entity);
+        Task<IReadOnlyList<T>> TGetAllAsync();
+        Task<T?> TGetByIdAsync(params object[] keyValues);
+        Task<IReadOnlyList<T>> TGetWhereAsync(Expression<Func<T, bool>> predicate);
+        Task<T> TAddAsync(T entity);
         Task TUpdateAsync(T entity);
         Task TDeleteAsync(T entity);
-        Task<int> TSaveAsync();
     }
 
 }

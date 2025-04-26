@@ -9,7 +9,6 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
 {
     public interface INotificationRepository : IGenericRepository<Notification>
     {
-        Task<List<Notification>> GetByUserIdAsync(string userId);
-        Task<List<Notification>> GetUnreadByUserIdAsync(string userId);
+        Task<List<Notification>> GetNotificationsByUserIdAsync(string userId);
     }
 }

@@ -32,6 +32,12 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                 .Where(a => a.AcademicUserId == academicId)
                 .ToListAsync();
         }
-    }
 
+        public async Task<List<Appointment>> GetAppointmentsByDateAsync(DateTime date)
+        {
+            return await _context.Appointments
+                .Where(a => a.Date.Date == date.Date)
+                .ToListAsync();
+        }
+    }
 }

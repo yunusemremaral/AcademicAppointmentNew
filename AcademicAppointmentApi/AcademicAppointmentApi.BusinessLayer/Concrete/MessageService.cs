@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Concrete
 {
-    public class MessageService : GenericService<Message>, IMessageService
+    public class MessageService : TGenericService<Message>, IMessageService
     {
         private readonly IMessageRepository _messageRepository;
 
@@ -18,20 +18,14 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             _messageRepository = messageRepository;
         }
 
-        public async Task<List<Message>> GetMessagesBySenderIdAsync(string senderId)
+        public async Task<List<Message>> TGetMessagesBySenderIdAsync(string senderId)
         {
             return await _messageRepository.GetMessagesBySenderIdAsync(senderId);
         }
 
-        public async Task<List<Message>> GetMessagesByReceiverIdAsync(string receiverId)
+        public async Task<List<Message>> TGetMessagesByReceiverIdAsync(string receiverId)
         {
             return await _messageRepository.GetMessagesByReceiverIdAsync(receiverId);
         }
-
-        public async Task<List<Message>> GetConversationAsync(string user1Id, string user2Id)
-        {
-            return await _messageRepository.GetConversationAsync(user1Id, user2Id);
-        }
     }
-
 }

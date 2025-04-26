@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Concrete
 {
-    public class NotificationService : GenericService<Notification>, INotificationService
+    public class NotificationService : TGenericService<Notification>, INotificationService
     {
         private readonly INotificationRepository _notificationRepository;
 
@@ -18,14 +18,9 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             _notificationRepository = notificationRepository;
         }
 
-        public async Task<List<Notification>> GetByUserIdAsync(string userId)
+        public async Task<List<Notification>> TGetNotificationsByUserIdAsync(string userId)
         {
-            return await _notificationRepository.GetByUserIdAsync(userId);
-        }
-
-        public async Task<List<Notification>> GetUnreadByUserIdAsync(string userId)
-        {
-            return await _notificationRepository.GetUnreadByUserIdAsync(userId);
+            return await _notificationRepository.GetNotificationsByUserIdAsync(userId);
         }
     }
 

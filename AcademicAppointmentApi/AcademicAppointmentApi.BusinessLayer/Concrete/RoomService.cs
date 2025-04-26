@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Concrete
 {
-    public class RoomService : GenericService<Room>, IRoomService
+    public class RoomService : TGenericService<Room>, IRoomService
     {
         private readonly IRoomRepository _roomRepository;
 
@@ -18,10 +18,9 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             _roomRepository = roomRepository;
         }
 
-        public async Task<List<Room>> GetRoomsByUserIdAsync(string userId)
+        public async Task<Room?> TGetRoomByUserIdAsync(string userId)
         {
-            return await _roomRepository.GetRoomsByUserIdAsync(userId);
+            return await _roomRepository.GetRoomByUserIdAsync(userId);
         }
     }
-
 }

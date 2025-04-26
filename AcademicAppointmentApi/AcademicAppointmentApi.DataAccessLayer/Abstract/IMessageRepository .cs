@@ -11,6 +11,5 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
     {
         Task<List<Message>> GetMessagesBySenderIdAsync(string senderId);
         Task<List<Message>> GetMessagesByReceiverIdAsync(string receiverId);
-        Task<List<Message>> GetConversationAsync(string user1Id, string user2Id);
     }
 }
