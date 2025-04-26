@@ -1,6 +1,7 @@
 ﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
 using AcademicAppointmentApi.EntityLayer.Entities;
 using AcademicAppointmentApi.Presentation.Dtos;
+using AcademicAppointmentApi.Presentation.Dtos.PasswordDtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,24 +38,21 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             {
                 UserName = dto.UserName,
                 Email = dto.Email,
-                SchoolId = null,  // Okul bilgisi eklendi
-                DepartmentId = null // Bölüm bilgisi eklendi
+                SchoolId = null,
+                DepartmentId = null
             };
 
             var res = await _userManager.CreateAsync(user, dto.Password);
             if (!res.Succeeded) return BadRequest(res.Errors);
 
-            // Add default role (e.g., "Student")
             await _userManager.AddToRoleAsync(user, "Student");
 
-            // Email confirmation link
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var link = Url.Action("ConfirmEmail", "Auth", new { token, email = user.Email }, Request.Scheme);
             await _emailService.SendConfirmationEmailAsync(user.Email, link);
 
             return Ok("Registration successful, email confirmation link sent.");
         }
-
 
         [HttpGet("confirmemail")]
         public async Task<IActionResult> ConfirmEmail(string token, string email)
@@ -82,16 +80,46 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             var pwRes = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
             if (!pwRes.Succeeded) return Unauthorized("Invalid password.");
 
-            var token = await _tokenService.CreateAccessTokenAsync(user);  // JWT token üretildi
+            var token = await _tokenService.CreateAccessTokenAsync(user);
             return Ok(new { token });
         }
-
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return Ok("Logged out.");
+        }
+
+        // --- Şifre Sıfırlama için eklenen kısım ---
+
+        [HttpPost("forgotpassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+                return BadRequest("User not found.");
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var link = Url.Action("ResetPassword", "Auth", new { token, email = user.Email }, Request.Scheme);
+
+            await _emailService.SendPasswordResetEmailAsync(user.Email, link);
+
+            return Ok("Password reset link sent to your email.");
+        }
+
+        [HttpPost("resetpassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+                return BadRequest("User not found.");
+
+            var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            return Ok("Password has been reset successfully.");
         }
     }
 }
