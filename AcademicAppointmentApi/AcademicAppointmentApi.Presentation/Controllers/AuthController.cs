@@ -33,7 +33,14 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
-            var user = new AppUser { UserName = dto.UserName, Email = dto.Email };
+            var user = new AppUser
+            {
+                UserName = dto.UserName,
+                Email = dto.Email,
+                SchoolId = null,  // Okul bilgisi eklendi
+                DepartmentId = null // Bölüm bilgisi eklendi
+            };
+
             var res = await _userManager.CreateAsync(user, dto.Password);
             if (!res.Succeeded) return BadRequest(res.Errors);
 
@@ -47,6 +54,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 
             return Ok("Registration successful, email confirmation link sent.");
         }
+
 
         [HttpGet("confirmemail")]
         public async Task<IActionResult> ConfirmEmail(string token, string email)
@@ -74,9 +82,10 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             var pwRes = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
             if (!pwRes.Succeeded) return Unauthorized("Invalid password.");
 
-            var token = await _tokenService.CreateAccessTokenAsync(user);
+            var token = await _tokenService.CreateAccessTokenAsync(user);  // JWT token üretildi
             return Ok(new { token });
         }
+
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()

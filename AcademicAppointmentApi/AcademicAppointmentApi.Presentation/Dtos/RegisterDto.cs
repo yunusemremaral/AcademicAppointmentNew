@@ -18,6 +18,9 @@ namespace AcademicAppointmentApi.Presentation.Dtos
         [Required(ErrorMessage = "Şifre tekrarı zorunludur")]
         [Compare("Password", ErrorMessage = "Şifreler uyuşmuyor")]
         public string ConfirmPassword { get; set; }
-    }
 
+        // Okul ve bölüm bilgilerini ekleyelim
+        public int? SchoolId { get; set; }
+        public int? DepartmentId { get; set; }
+    }
 }
