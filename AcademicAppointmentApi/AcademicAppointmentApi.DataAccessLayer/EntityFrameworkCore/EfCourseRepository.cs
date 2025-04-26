@@ -21,9 +21,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
 
         public async Task<List<Course>> GetCoursesByDepartmentIdAsync(string departmentId)
         {
-            return await _context.Courses
-                .Where(c => c.DepartmentId == departmentId)
-                .ToListAsync();
+            throw new NotImplementedException();
         }
 
         public async Task<List<Course>> GetCoursesByInstructorIdAsync(string instructorId)

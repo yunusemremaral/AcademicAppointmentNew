@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AcademicAppointmentApi.DataAccessLayer.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250424141755_mig_initial_create")]
-    partial class mig_initial_create
+    [Migration("20250426103615_mig_new_page")]
+    partial class mig_new_page
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,12 +64,11 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DepartmentId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("DepartmentId1")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("DepartmentId1")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -101,12 +100,11 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("RoomId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("SchoolId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("SchoolId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -131,10 +129,6 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("RoomId")
-                        .IsUnique()
-                        .HasFilter("[RoomId] IS NOT NULL");
 
                     b.HasIndex("SchoolId");
 
@@ -182,15 +176,17 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
 
             modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Course", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AppUserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("DepartmentId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("InstructorId")
                         .IsRequired()
@@ -213,16 +209,18 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
 
             modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Department", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SchoolId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("SchoolId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -233,8 +231,11 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
 
             modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Message", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -290,8 +291,11 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
 
             modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Room", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AppUserId")
                         .IsRequired()
@@ -303,15 +307,19 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
+                    b.HasIndex("AppUserId")
+                        .IsUnique();
 
                     b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.School", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -433,27 +441,18 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                     b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.Department", null)
                         .WithMany("FacultyMembers")
                         .HasForeignKey("DepartmentId1");
 
-                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.Room", "Room")
-                        .WithOne("AppUser")
-                        .HasForeignKey("AcademicAppointmentApi.EntityLayer.Entities.AppUser", "RoomId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.School", "School")
                         .WithMany()
                         .HasForeignKey("SchoolId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Department");
-
-                    b.Navigation("Room");
 
                     b.Navigation("School");
                 });
@@ -542,11 +541,13 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
 
             modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Room", b =>
                 {
-                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.AppUser", null)
-                        .WithMany("AssignedRooms")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("AcademicAppointmentApi.EntityLayer.Entities.AppUser", "AppUser")
+                        .WithOne("Room")
+                        .HasForeignKey("AcademicAppointmentApi.EntityLayer.Entities.Room", "AppUserId")
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
+
+                    b.Navigation("AppUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -606,13 +607,14 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
 
                     b.Navigation("AppointmentsAsStudent");
 
-                    b.Navigation("AssignedRooms");
-
                     b.Navigation("Courses");
 
                     b.Navigation("MessagesReceived");
 
                     b.Navigation("MessagesSent");
+
+                    b.Navigation("Room")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Department", b =>
@@ -620,12 +622,6 @@ namespace AcademicAppointmentApi.DataAccessLayer.Migrations
                     b.Navigation("Courses");
 
                     b.Navigation("FacultyMembers");
-                });
-
-            modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.Room", b =>
-                {
-                    b.Navigation("AppUser")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AcademicAppointmentApi.EntityLayer.Entities.School", b =>

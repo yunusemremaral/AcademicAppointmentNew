@@ -26,8 +26,8 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CourseCreateDto dto)
         {
-            await _courseService.TAddAsync(dto);
-            return Ok();
+            throw new NotImplementedException();
+
         }
 
         [HttpPut("{id}")]
