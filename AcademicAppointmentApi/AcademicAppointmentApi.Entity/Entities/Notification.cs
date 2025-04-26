@@ -8,9 +8,9 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
 {
     public class Notification
     {
-        public int Id { get; set; }
 
-        public string? UserId { get; set; }
+        public int Id { get; set; }
+        public string UserId { get; set; }
         public AppUser User { get; set; }
 
         public string Message { get; set; }

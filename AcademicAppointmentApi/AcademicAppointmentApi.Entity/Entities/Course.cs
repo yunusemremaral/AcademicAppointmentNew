@@ -14,7 +14,7 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
 
-        public string InstructorId { get; set; }
+        public string InstructorId { get; set; } 
         public AppUser Instructor { get; set; }
     }
 }

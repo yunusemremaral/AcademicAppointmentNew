@@ -9,9 +9,10 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
     public class Appointment
     {
         public int Id { get; set; }
-        public string AcademicUserId { get; set; }
+        public string AcademicUserId { get; set; } 
         public AppUser AcademicUser { get; set; }
-        public string StudentUserId { get; set; }
+
+        public string StudentUserId { get; set; } 
         public AppUser StudentUser { get; set; }
         public DateTime ScheduledAt { get; set; }
         public string Subject { get; set; }
