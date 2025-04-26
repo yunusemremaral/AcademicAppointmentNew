@@ -1,12 +1,12 @@
 ﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
-using AcademicAppointmentApi.Presentation.Dtos.CourseDtos;
-using Microsoft.AspNetCore.Http;
+using AcademicAppointmentApi.EntityLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.Presentation.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/admin/courses")]
     public class AdminCourseController : ControllerBase
     {
         private readonly ICourseService _courseService;
@@ -17,33 +17,44 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllCourses()
         {
             var courses = await _courseService.TGetAllAsync();
             return Ok(courses);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CourseCreateDto dto)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCourseById(int id)
         {
-            throw new NotImplementedException();
-
+            var course = await _courseService.TGetByIdAsync(id);
+            if (course == null)
+                return NotFound();
+            return Ok(course);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] CourseCreateDto dto)
+        [HttpPost]
+        public async Task<IActionResult> AddCourse(Course course)
         {
-            await _courseService.TUpdateAsync(await _courseService.TGetByIdWithStringAsync(id));
+            await _courseService.TAddAsync(course);
+            return Ok();
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateCourse(Course course)
+        {
+            await _courseService.TUpdateAsync(course);
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> DeleteCourse(int id)
         {
-            
-            await _courseService.TDeleteAsync(await _courseService.TGetByIdWithStringAsync(id));
+            var course = await _courseService.TGetByIdAsync(id);
+            if (course == null)
+                return NotFound();
+
+            await _courseService.TDeleteAsync(course);
             return Ok();
         }
     }
-
 }

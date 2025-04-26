@@ -1,41 +1,60 @@
-﻿//using AcademicAppointmentApi.BusinessLayer.Abstract;
-//using AcademicAppointmentApi.Presentation.Dtos.MessageDtos;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
+﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
+using AcademicAppointmentApi.EntityLayer.Entities;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
-//namespace AcademicAppointmentApi.Presentation.Controllers
-//{
-//    [ApiController]
-//    [Route("api/admin/messages")]
-//    public class AdminMessageController : ControllerBase
-//    {
-//        private readonly IMessageService _messageService;
+namespace AcademicAppointmentApi.Presentation.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AdminMessageController : ControllerBase
+    {
+        private readonly IMessageService _messageService;
 
-//        public AdminMessageController(IMessageService messageService)
-//        {
-//            _messageService = messageService;
-//        }
+        public AdminMessageController(IMessageService messageService)
+        {
+            _messageService = messageService;
+        }
 
-//        [HttpGet]
-//        public async Task<IActionResult> GetAll()
-//        {
-//            var messages = await _messageService.GetAllAsync();
-//            return Ok(messages);
-//        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllMessages()
+        {
+            var messages = await _messageService.TGetAllAsync();
+            return Ok(messages);
+        }
 
-//        [HttpPost]
-//        public async Task<IActionResult> Create([FromBody] MessageCreateDto dto)
-//        {
-//            await _messageService.CreateAsync(dto);
-//            return Ok();
-//        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetMessageById(int id)
+        {
+            var message = await _messageService.TGetByIdAsync(id);
+            if (message == null)
+                return NotFound();
+            return Ok(message);
+        }
 
-//        [HttpDelete("{id}")]
-//        public async Task<IActionResult> Delete(string id)
-//        {
-//            await _messageService.TDeleteAsync(id);
-//            return Ok();
-//        }
-//    }
+        [HttpPost]
+        public async Task<IActionResult> AddMessage(Message message)
+        {
+            await _messageService.TAddAsync(message);
+            return Ok();
+        }
 
-//}
+        [HttpPut]
+        public async Task<IActionResult> UpdateMessage(Message message)
+        {
+            await _messageService.TUpdateAsync(message);
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMessage(int id)
+        {
+            var message = await _messageService.TGetByIdAsync(id);
+            if (message == null)
+                return NotFound();
+
+            await _messageService.TDeleteAsync(message);
+            return Ok();
+        }
+    }
+}

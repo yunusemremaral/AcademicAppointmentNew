@@ -1,94 +1,60 @@
-﻿//// Presentation/Controllers/AdminSchoolController.cs
-//using System;
-//using System.Threading.Tasks;
-//using AcademicAppointmentApi.BusinessLayer.Abstract;
-//using AcademicAppointmentApi.EntityLayer.Entities;
-//using AcademicAppointmentApi.Presentation.Dtos;
-//using AcademicAppointmentApi.Presentation.Dtos.School;
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Mvc;
+﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
+using AcademicAppointmentApi.EntityLayer.Entities;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
-//namespace AcademicAppointmentApi.Presentation.Controllers
-//{
-//    //[Authorize(Roles = "Admin")]
-//    [ApiController]
-//    [Route("api/admin/schools")]
-//    public class AdminSchoolController : ControllerBase
-//    {
-//        private readonly IGenericService<School> _schoolService;
+namespace AcademicAppointmentApi.Presentation.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AdminSchoolController : ControllerBase
+    {
+        private readonly ISchoolService _schoolService;
 
-//        public AdminSchoolController(IGenericService<School> schoolService)
-//        {
-//            _schoolService = schoolService;
-//        }
+        public AdminSchoolController(ISchoolService schoolService)
+        {
+            _schoolService = schoolService;
+        }
 
-//        // GET: api/admin/schools
-//        [HttpGet]
-//        public async Task<IActionResult> GetAll()
-//        {
-//            var list = await _schoolService.TGetAllAsync();
-//            return Ok(list);
-//        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllSchools()
+        {
+            var schools = await _schoolService.TGetAllAsync();
+            return Ok(schools);
+        }
 
-//        // POST: api/admin/schools
-//        [HttpPost]
-//        public async Task<IActionResult> Create([FromBody] SchoolCreateDto dto)
-//        {
-//            var entity = new School
-//            {
-//                Id = Guid.NewGuid().ToString(),
-//                Name = dto.Name
-//            };
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetSchoolById(int id)
+        {
+            var school = await _schoolService.TGetByIdAsync(id);
+            if (school == null)
+                return NotFound();
+            return Ok(school);
+        }
 
-//            await _schoolService.TAddAsync(entity);
-//            await _schoolService.TSaveAsync();
+        [HttpPost]
+        public async Task<IActionResult> AddSchool(School school)
+        {
+            await _schoolService.TAddAsync(school);
+            return Ok();
+        }
 
-//            return CreatedAtAction(
-//                nameof(GetById),
-//                new { id = entity.Id },
-//                entity
-//            );
-//        }
+        [HttpPut]
+        public async Task<IActionResult> UpdateSchool(School school)
+        {
+            await _schoolService.TUpdateAsync(school);
+            return Ok();
+        }
 
-//        // PUT: api/admin/schools/{id}
-//        [HttpPut("{id}")]
-//        public async Task<IActionResult> Update(string id, [FromBody] SchoolUpdateDto dto)
-//        {
-//            var existing = await _schoolService.TGetByIdWithStringAsync(id);
-//            if (existing == null)
-//                return NotFound();
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSchool(int id)
+        {
+            var school = await _schoolService.TGetByIdAsync(id);
+            if (school == null)
+                return NotFound();
 
-//            existing.Name = dto.Name;
-//            await _schoolService.TUpdateAsync(existing);
-//            await _schoolService.TSaveAsync();
-
-//            return Ok(existing);
-//        }
-
-//        // GET: api/admin/schools/{id}
-//        [HttpGet("{id}")]
-//        public async Task<IActionResult> GetById(string id)
-//        {
-//            var school = await _schoolService.TGetByIdWithStringAsync(id);
-//            if (school == null)
-//                return NotFound();
-//            return Ok(school);
-//        }
-
-        
-
-//        // DELETE: api/admin/schools/{id}
-//        [HttpDelete("{id}")]
-//        public async Task<IActionResult> Delete(string id)
-//        {
-//            var existing = await _schoolService.TGetByIdWithStringAsync(id);
-//            if (existing == null)
-//                return NotFound();
-
-//            await _schoolService.TDeleteAsync(existing);
-//            await _schoolService.TSaveAsync();
-
-//            return NoContent();
-//        }
-//    }
-//}
+            await _schoolService.TDeleteAsync(school);
+            return Ok();
+        }
+    }
+}
