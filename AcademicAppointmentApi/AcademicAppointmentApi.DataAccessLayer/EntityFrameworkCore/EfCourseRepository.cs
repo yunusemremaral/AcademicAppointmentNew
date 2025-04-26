@@ -29,7 +29,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
         public async Task<List<Course>> GetCoursesByInstructorIdAsync(string instructorId)
         {
             return await _context.Courses
-                .Where(c => c.InstructorUserId == instructorId)
+                .Where(c => c.InstructorId == instructorId)
                 .ToListAsync();
         }
     }

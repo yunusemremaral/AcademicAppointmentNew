@@ -49,7 +49,7 @@ builder.Services.AddAuthentication(options =>
 // 3) Dependency Injection (DI)
 // Generic Repositories & Services
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
+builder.Services.AddScoped(typeof(ITGenericService<>), typeof(TGenericService<>));
 
 // Entity-Specific Repositories
 builder.Services.AddScoped<IAppointmentRepository, EfAppointmentRepository>();

@@ -1,11 +1,6 @@
 ﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Concrete
 {
@@ -21,6 +16,8 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
         public string? UserId => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
         public string? Email => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
         public string? Role => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
+        public string? UserName => _httpContextAccessor.HttpContext?.User?.FindFirstValue("username");
+        public string? SchoolId => _httpContextAccessor.HttpContext?.User?.FindFirstValue("schoolId");
+        public string? DepartmentId => _httpContextAccessor.HttpContext?.User?.FindFirstValue("departmentId");
     }
-
 }

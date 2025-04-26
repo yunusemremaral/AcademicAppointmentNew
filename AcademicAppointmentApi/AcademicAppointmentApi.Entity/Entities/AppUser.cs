@@ -12,11 +12,11 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
         public ICollection<Appointment> AppointmentsAsAcademic { get; set; }
         public ICollection<Appointment> AppointmentsAsStudent { get; set; }
 
-        public int SchoolId { get; set; } 
-        public School School { get; set; }
+        public int? SchoolId { get; set; }
+        public School? School { get; set; }
 
-        public int DepartmentId { get; set; } 
-        public Department Department { get; set; }
+        public int? DepartmentId { get; set; }
+        public Department? Department { get; set; }
 
         public ICollection<Course> Courses { get; set; }
 

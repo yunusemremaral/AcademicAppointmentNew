@@ -11,5 +11,9 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
         string? UserId { get; }
         string? Email { get; }
         string? Role { get; }
+        string? UserName { get; }
+        string? SchoolId { get; }
+        string? DepartmentId { get; }
     }
+
 }

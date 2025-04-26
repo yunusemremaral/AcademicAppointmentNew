@@ -22,7 +22,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
         public async Task<Room?> GetRoomByUserIdAsync(string userId)
         {
             return await _context.Rooms
-                .FirstOrDefaultAsync(r => r.UserId == userId);
+                .FirstOrDefaultAsync(r => r.AppUserId == userId);
         }
     }
 }

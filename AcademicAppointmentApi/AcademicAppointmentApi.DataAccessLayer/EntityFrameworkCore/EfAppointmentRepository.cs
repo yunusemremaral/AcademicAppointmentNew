@@ -36,7 +36,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
         public async Task<List<Appointment>> GetAppointmentsByDateAsync(DateTime date)
         {
             return await _context.Appointments
-                .Where(a => a.Date.Date == date.Date)
+                .Where(a => a.ScheduledAt.Date == date.Date)
                 .ToListAsync();
         }
     }
