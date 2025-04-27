@@ -90,6 +90,32 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 
             return Ok(result);
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(string id)
+        {
+            var user = await _userManager.Users
+                .Include(u => u.School)
+                .Include(u => u.Department)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+                return NotFound("Kullanıcı bulunamadı.");
+
+            var result = new
+            {
+                user.Id,
+                user.UserName,
+                user.Email,
+                School = user.School?.Name,
+                Department = user.Department?.Name,
+                user.SchoolId,
+                user.DepartmentId,
+                user.RoomId
+            };
+
+            return Ok(result);
+        }
+
 
         // ✅ Kullanıcının bilgilerini güncelle
         [HttpPut("update/{id}")]

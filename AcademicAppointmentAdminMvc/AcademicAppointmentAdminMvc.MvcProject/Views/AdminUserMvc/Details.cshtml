@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Kullanıcı Detay";
+
+}
+
+@model UserDto
+
+
+
+<div class="container mt-4">
+    <h2>Kullanıcı Detayları</h2>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-3">Kullanıcı Adı</dt>
+        <dd class="col-sm-9">@Model.UserName</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+
+    </dl>
+
+    <a href="@Url.Action("Index", "AdminUserMvc")" class="btn btn-secondary">Geri Dön</a>
+</div>
+
