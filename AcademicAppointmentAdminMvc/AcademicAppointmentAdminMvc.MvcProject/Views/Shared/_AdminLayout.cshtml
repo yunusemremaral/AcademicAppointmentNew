@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    @await Html.PartialAsync("_Head") <!-- Head Partial -->
+</head>
+<body>
+    <div class="container-scroller">
+        <vc:sidebar></vc:sidebar>
+
+        <div class="container-fluid page-body-wrapper">
+            <vc:navbar></vc:navbar>
+
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    @RenderBody()
+                </div>
+                <vc:footer></vc:footer>
+            </div>
+        </div>
+    </div>
+
+    @await Html.PartialAsync("_Scripts") <!-- Scripts Partial -->
+    @await RenderSectionAsync("Scripts", required: false) <!-- Sayfaya özel scriptler için -->
+</body>
+</html>
