@@ -1,0 +1,29 @@
+﻿
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="post">
+    <div>
+        <label>Email</label>
+        <input type="email" name="email" />
+    </div>
+    <div>
+        <label>Password</label>
+        <input type="password" name="password" />
+    </div>
+    <button type="submit">Login</button>
+</form>
+
+<script>
+    // Eğer token varsa localStorage'a kaydet
+    var token = '@ViewData["Token"]';
+    if (token) {
+        localStorage.setItem("JwtToken", token);
+    }
+</script>
