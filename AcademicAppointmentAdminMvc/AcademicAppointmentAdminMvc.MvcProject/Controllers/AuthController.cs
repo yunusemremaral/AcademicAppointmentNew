@@ -52,6 +52,13 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                 return View(model);
             }
 
+            if (!TokenHasAdminRole(token))
+            {
+                return RedirectToAction("AccessDenied", "Auth");
+            }
+
+
+
             // Token'ı cookie'ye kaydet
             Response.Cookies.Append("JwtToken", token, new CookieOptions
             {
@@ -88,7 +95,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
             return jwtToken.Claims
-                .Where(c => c.Type == "role")
+                .Where(c => c.Type == ClaimTypes.Role || c.Type == "role") // hem kısa hem uzun olanı kontrol et
                 .Select(c => c.Value)
                 .ToList();
         }
@@ -105,5 +112,11 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 
             return RedirectToAction("Login");
         }
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
     }
 }

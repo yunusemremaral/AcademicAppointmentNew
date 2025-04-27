@@ -1,0 +1,12 @@
+﻿
+@{
+    ViewData["Title"] = "AccessDenied";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div style="text-align: center; margin-top: 100px;">
+    <h1 style="font-size: 48px; color: red;">Erişim Reddedildi</h1>
+    <p style="font-size: 24px;">Bu panele erişim yetkiniz bulunmamaktadır.</p>
+    <a href="@Url.Action("Login", "Auth")" style="margin-top: 20px; display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; border-radius: 5px; text-decoration: none;">Giriş Sayfasına Dön</a>
+</div>
+

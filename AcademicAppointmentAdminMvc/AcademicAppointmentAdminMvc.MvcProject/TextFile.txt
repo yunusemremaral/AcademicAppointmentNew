@@ -1,0 +1,4 @@
+﻿Token süresi bitince logout yapan bir middleware ekleyebiliriz.
+
+Refresh Token sistemiyle daha uzun oturumlar sağlayabiliriz.
+
