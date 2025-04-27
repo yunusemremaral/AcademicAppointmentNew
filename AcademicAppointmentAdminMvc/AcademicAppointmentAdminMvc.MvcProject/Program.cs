@@ -4,47 +4,50 @@ using AcademicAppointmentAdminMvc.MvcProject.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC ve Cookie-Auth yapılandırması
+// 1. MVC Servislerini ekle
 builder.Services.AddControllersWithViews();
 
+// 2. Cookie Authentication yapılandırması
 builder.Services
-    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)  // Cookie Authentication kullanıyoruz
     .AddCookie(options =>
     {
-        options.LoginPath = "/Auth/Login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-        options.SlidingExpiration = true;
+        options.LoginPath = "/Auth/Login";  // Giriş yapılmadıysa bu URL'ye yönlendirme yapılacak
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);  // Token ve oturum süresi
+        options.SlidingExpiration = true;  // Oturum süresi sona ermeden önce aktivitelerle uzatılır
     });
 
-// IHttpContextAccessor'ı DI'ya ekleyin
-builder.Services.AddHttpContextAccessor();
+// 3. IHttpContextAccessor Servisini DI'ya ekle
+builder.Services.AddHttpContextAccessor();  // HTTP bağlamına erişmek için kullanılır
 
-// API çağrıları için HttpClient ve handler
+// 4. API çağrıları için HttpClient yapılandırması
 builder.Services.AddHttpClient("MyApi", client =>
 {
-    var apiBaseUrl = builder.Configuration["ApiBaseUrl"];  // ApiBaseUrl'i buradan alıyoruz
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"];  // ApiBaseUrl'i configuration'dan alıyoruz
     if (string.IsNullOrEmpty(apiBaseUrl))
     {
-        throw new ArgumentNullException("ApiBaseUrl", "API base URL is not configured properly.");
+        throw new ArgumentNullException("ApiBaseUrl", "API base URL is not configured properly.");  // Hata fırlatıyoruz
     }
-    client.BaseAddress = new Uri(apiBaseUrl);  // ApiBaseUrl'i kullanıyoruz
+    client.BaseAddress = new Uri(apiBaseUrl);  // API'nin ana adresini belirliyoruz
 })
-.AddHttpMessageHandler<JwtCookieHandler>();
+.AddHttpMessageHandler<JwtCookieHandler>();  // API isteklerine ek handler (JwtCookieHandler) ekliyoruz
 
-// JWT Cookie Handler'ı DI'ya ekleyin
-builder.Services.AddTransient<JwtCookieHandler>();
+// 5. JwtCookieHandler'ı DI'ya ekleyin
+builder.Services.AddTransient<JwtCookieHandler>();  // Bu handler, cookie'deki JWT token'ı otomatik olarak işlemek için kullanılır
 
 var app = builder.Build();
 
-// Middleware
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
+// 6. Middleware sırasını ayarla
+app.UseHttpsRedirection();  // HTTP'den HTTPS'ye yönlendirme
+app.UseStaticFiles();  // Statik dosyalar için middleware
+app.UseRouting();  // Yönlendirme işlemleri
+app.UseAuthentication();  // Kimlik doğrulama işlemi (cookie tabanlı)
+app.UseAuthorization();  // Yetkilendirme işlemi (rol ve izinler)
 
+// 7. Controller route yapılandırması
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");  // Varsayılan controller ve action
 
-app.Run();
+// 8. Uygulamayı başlat
+app.Run();  // Uygulama çalışmaya başlar

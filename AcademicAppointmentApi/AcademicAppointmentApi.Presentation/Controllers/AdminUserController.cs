@@ -1,6 +1,7 @@
 ﻿using AcademicAppointmentApi.EntityLayer.Entities;
 using AcademicAppointmentApi.Presentation.Dtos;
 using AcademicAppointmentApi.Presentation.Dtos.AdminUserDtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,8 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(Roles = "Admin")]
     public class AdminUserController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;

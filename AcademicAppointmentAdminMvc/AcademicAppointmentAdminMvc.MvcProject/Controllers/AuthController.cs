@@ -7,7 +7,6 @@ using System.Security.Claims;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 {
@@ -33,7 +32,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            // API'ye login isteği
+            // API'ye login isteği gönderiyoruz
             var client = _httpClientFactory.CreateClient("MyApi");
             var response = await client.PostAsJsonAsync("api/Auth/login", new { email = model.Email, password = model.Password });
 
@@ -43,7 +42,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                 return View(model);
             }
 
-            // 2. Token'ı ve claim'leri al
+            // Token'ı al
             var loginRes = await response.Content.ReadFromJsonAsync<LoginResponse>(); // LoginResponse modelinde Token var
             var token = loginRes?.Token;
 
@@ -53,21 +52,21 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                 return View(model);
             }
 
-            // 3. Token'ı cookie'ye yaz
+            // Token'ı cookie'ye kaydet
             Response.Cookies.Append("JwtToken", token, new CookieOptions
             {
-                HttpOnly = true,
-                Secure = true,
+                HttpOnly = true, // JavaScript erişemez
+                Secure = true,   // HTTPS ile çalışır
                 Expires = DateTimeOffset.UtcNow.AddMinutes(60) // 60 dk geçerli
             });
 
-            // 4. Kullanıcı claim'lerinden ClaimsPrincipal oluştur
+            // Kullanıcı claim'lerinden ClaimsPrincipal oluştur
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
             var identity = new ClaimsIdentity(jwtToken.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var userPrincipal = new ClaimsPrincipal(identity);
 
-            // 5. Cookie-based oturum başlat
+            // Cookie-based oturum başlat
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 userPrincipal,
@@ -92,6 +91,19 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                 .Where(c => c.Type == "role")
                 .Select(c => c.Value)
                 .ToList();
+        }
+
+        // Logout işlemi
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            // Cookie'yi temizle
+            Response.Cookies.Delete("JwtToken");
+
+            // Oturumdan çık
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return RedirectToAction("Login");
         }
     }
 }
