@@ -34,15 +34,22 @@ public class AdminUserController : ControllerBase
         }
 
         // Materialize the query with ToListAsync()
-        var userDtos = await query.Select(u => new AdminUserListDto
+        var users = await query.ToListAsync(); // Önce kullanıcıları çek
+
+        var userDtos = new List<AdminUserListDto>();
+        foreach (var user in users)
         {
-            Id = u.Id,
-            UserName = u.UserName,
-            Email = u.Email,
-            SchoolName = u.School != null ? u.School.Name : "",
-            DepartmentName = u.Department != null ? u.Department.Name : "",
-            Roles = _userManager.GetRolesAsync(u).Result.ToList()
-        }).ToListAsync(); // ✅ ToListAsync() ekleyin
+            var roles = await _userManager.GetRolesAsync(user); // Her kullanıcı için roller
+            userDtos.Add(new AdminUserListDto
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                SchoolName = user.School?.Name ?? "",
+                DepartmentName = user.Department?.Name ?? "",
+                Roles = roles.ToList()
+            });
+        }
 
         return Ok(userDtos);
     }
