@@ -2,3 +2,74 @@
 
 Refresh Token sistemiyle daha uzun oturumlar sağlayabiliriz.
 
+
+
+1. Teknik Altyapı:
+Backend: .NET 8 API (Katmanlı Mimari: Presentation, Business, DataAccess, EntityLayer).
+
+Authentication:
+
+API: JWT + Identity (Custom AppUser ve AppRole).
+
+MVC: Cookie-Based Authentication (JWT, cookie'de saklanır).
+
+Database: Entity Framework Core (Code-First) + MSSQL.
+
+İletişim: MVC projesi, API ile HttpClientFactory ve JwtCookieHandler üzerinden iletişim kurar.
+
+2. Temel Entity'ler & İlişkiler:
+Entity	Özellikler	İlişkiler
+AppUser	SchoolId, DepartmentId, RoomId	School, Department, Room, Courses, Appointments, Messages
+Appointment	AcademicUser, StudentUser, ScheduledAt, Status (Pending/Confirmed)	İki yönlü ilişki: AppUser (Academic ve Student)
+Course	Name, DepartmentId, InstructorId	Department (1-M), AppUser (Eğitmen)
+Department	Name, SchoolId	School (1-M), Courses (1-M), FacultyMembers (AppUser)
+School	Name	Departments (1-M)
+Message	Sender, Receiver, Content, SentAt	İki yönlü ilişki: AppUser (Sender ve Receiver)
+Notification	UserId, Message, IsRead, CreatedAt	AppUser (1-M)
+Room	Name, AppUserId	AppUser (1-1, Oda sorumlusu)
+
+4. Güvenlik & Konfigürasyon:
+API Tarafında:
+
+JWT Key: 512-bit (Güçlü, ancak production'da environment variable ile yönetilmeli).
+
+CORS: AllowAll yerine sadece MVC URL'sine izin verilmeli.
+
+Risk: EmailService'de hardcoded SMTP bilgileri (appsettings.json'a taşınmalı).
+
+MVC Tarafında:
+
+Cookie: HttpOnly, Secure ve 60 dk expire süresi.
+
+Eksik: Token süresi dolunca otomatik logout veya refresh mekanizması.
+
+3. Admin Panel Özellikleri:
+Kullanıcı Yönetimi:
+
+Tüm kullanıcıları listele/filtrele (Öğrenci, Eğitmen, Admin).
+
+Kullanıcıya rol ata (Admin/Teacher/Student).
+
+Kullanıcıyı okul, bölüm veya oda ile ilişkilendir.
+
+Rol Yönetimi: Rol CRUD işlemleri.
+
+Akademik Yönetim:
+
+Okul/Bölüm/Ders ekleme-düzenleme-silme.
+
+Randevu (Appointment) durumlarını görüntüleme ve yönetme (Onaylama/İptal).
+
+Loglama & İzleme:
+
+Kullanıcı aktivite logları (Login, Rol değişikliği).
+
+Sistem hata logları.
+
+Dashboard:
+
+Aktif randevular, son mesajlar, sistem istatistikleri.
+
+Grafiklerle kullanım analizi (Örn: Aylık randevu sayıları).
+
+	

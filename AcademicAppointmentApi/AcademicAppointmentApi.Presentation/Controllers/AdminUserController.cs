@@ -5,154 +5,98 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace AcademicAppointmentApi.Presentation.Controllers
+[Route("api/admin/[controller]")]
+[ApiController]
+[Authorize(AuthenticationSchemes = "Bearer")]
+[Authorize(Roles = "Admin")]
+public class AdminUserController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
-    public class AdminUserController : ControllerBase
+    private readonly UserManager<AppUser> _userManager;
+
+    public AdminUserController(UserManager<AppUser> userManager)
     {
-        private readonly UserManager<AppUser> _userManager;
+        _userManager = userManager;
+    }
 
-        public AdminUserController(UserManager<AppUser> userManager)
+    // API: AdminUserController.cs (GetAllUsers Metodu)
+    [HttpGet]
+    public async Task<IActionResult> GetAllUsers([FromQuery] string role = null)
+    {
+        var query = _userManager.Users
+            .Include(u => u.School)
+            .Include(u => u.Department)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(role))
         {
-            _userManager = userManager;
+            var usersInRole = await _userManager.GetUsersInRoleAsync(role);
+            query = query.Where(u => usersInRole.Contains(u));
         }
 
-        // ✅ Tüm kullanıcıları listele
-        [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
+        // Materialize the query with ToListAsync()
+        var userDtos = await query.Select(u => new AdminUserListDto
         {
-            var users = await _userManager.Users
-                .Include(u => u.School)
-                .Include(u => u.Department)
-                .ToListAsync();
+            Id = u.Id,
+            UserName = u.UserName,
+            Email = u.Email,
+            SchoolName = u.School != null ? u.School.Name : "",
+            DepartmentName = u.Department != null ? u.Department.Name : "",
+            Roles = _userManager.GetRolesAsync(u).Result.ToList()
+        }).ToListAsync(); // ✅ ToListAsync() ekleyin
 
-            var userDtos = users.Select(u => new AdminUserListDto
-            {
-                Id = u.Id,
-                UserName = u.UserName,
-                Email = u.Email,
-                SchoolName = u.School?.Name,
-                DepartmentName = u.Department?.Name
-            }).ToList();
+        return Ok(userDtos);
+    }
+    // Kullanıcı detayları
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetUserById(string id)
+    {
+        var user = await _userManager.Users
+            .Include(u => u.School)
+            .Include(u => u.Department)
+            .FirstOrDefaultAsync(u => u.Id == id);
 
-            return Ok(userDtos);
-        }
+        if (user == null)
+            return NotFound();
 
-        // ✅ ID'ye göre kullanıcı getir
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(string id)
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var userDto = new AdminUserDetailDto
         {
-            var user = await _userManager.Users
-                .Include(u => u.School)
-                .Include(u => u.Department)
-                .FirstOrDefaultAsync(u => u.Id == id);
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            SchoolId = user.SchoolId,
+            DepartmentId = user.DepartmentId,
+            RoomId = user.RoomId,
+            SchoolName = user.School?.Name,
+            DepartmentName = user.Department?.Name,
+            Roles = roles.ToList()
+        };
 
-            if (user == null)
-                return NotFound("Kullanıcı bulunamadı.");
+        return Ok(userDto);
+    }
 
-            var userDto = new AdminUserDetailDto
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                SchoolId = user.SchoolId,
-                DepartmentId = user.DepartmentId,
-                RoomId = user.RoomId,
-                SchoolName = user.School?.Name,
-                DepartmentName = user.Department?.Name
-            };
+    // Kullanıcıya rol ata
+    [HttpPost("{id}/roles")]
+    public async Task<IActionResult> AssignRole(string id, AssignRoleDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+            return NotFound();
 
-            return Ok(userDto);
-        }
+        var result = await _userManager.AddToRoleAsync(user, dto.Role);
+        return result.Succeeded ? Ok() : BadRequest(result.Errors);
+    }
 
-        // ✅ Yeni kullanıcı oluştur
-        [HttpPost]
-        public async Task<IActionResult> CreateUser(CreateUserDto dto)
-        {
-            var user = new AppUser
-            {
-                UserName = dto.UserName,
-                Email = dto.Email,
-                SchoolId = dto.SchoolId,
-                DepartmentId = dto.DepartmentId,
-                RoomId = dto.RoomId
-            };
+    // Kullanıcıdan rol kaldır
+    [HttpDelete("{id}/roles")]
+    public async Task<IActionResult> RemoveRole(string id, AssignRoleDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+            return NotFound();
 
-            var result = await _userManager.CreateAsync(user, dto.Password);
-
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
-
-            // Eğer rol atanacaksa
-            if (!string.IsNullOrEmpty(dto.Role))
-            {
-                await _userManager.AddToRoleAsync(user, dto.Role);
-            }
-
-            return Ok("Kullanıcı başarıyla oluşturuldu.");
-        }
-
-        // ✅ Kullanıcı güncelle
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(string id, UpdateUserDto dto)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound("Kullanıcı bulunamadı.");
-
-            user.UserName = dto.UserName ?? user.UserName;
-            user.Email = dto.Email ?? user.Email;
-            user.SchoolId = dto.SchoolId ?? user.SchoolId;
-            user.DepartmentId = dto.DepartmentId ?? user.DepartmentId;
-            user.RoomId = dto.RoomId ?? user.RoomId;
-
-            var result = await _userManager.UpdateAsync(user);
-
-            return result.Succeeded ? Ok("Kullanıcı güncellendi.") : BadRequest(result.Errors);
-        }
-
-        // ✅ Kullanıcıyı sil
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound("Kullanıcı bulunamadı.");
-
-            var result = await _userManager.DeleteAsync(user);
-
-            return result.Succeeded ? Ok("Kullanıcı silindi.") : BadRequest(result.Errors);
-        }
-
-        // ✅ Belirli role sahip kullanıcıları getir
-        [HttpGet("role/{roleName}")]
-        public async Task<IActionResult> GetUsersByRole(string roleName)
-        {
-            var users = await _userManager.GetUsersInRoleAsync(roleName);
-
-            var userDtos = users.Select(u => new AdminUserListDto
-            {
-                Id = u.Id,
-                UserName = u.UserName,
-                Email = u.Email
-            }).ToList();
-
-            return Ok(userDtos);
-        }
-
-        // ✅ Kullanıcıya rol ata
-        [HttpPost("{id}/role")]
-        public async Task<IActionResult> AssignRole(string id, AssignRoleDto dto)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound("Kullanıcı bulunamadı.");
-
-            var result = await _userManager.AddToRoleAsync(user, dto.Role);
-
-            return result.Succeeded ? Ok("Rol atandı.") : BadRequest(result.Errors);
-        }
+        var result = await _userManager.RemoveFromRoleAsync(user, dto.Role);
+        return result.Succeeded ? Ok() : BadRequest(result.Errors);
     }
 }

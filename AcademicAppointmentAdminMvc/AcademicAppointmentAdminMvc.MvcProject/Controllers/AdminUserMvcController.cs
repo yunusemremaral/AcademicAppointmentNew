@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AcademicAppointmentAdminMvc.MvcProject.Dtos.UserMvcDtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
-using AcademicAppointmentAdminMvc.MvcProject.Dtos.UserMvcDtos;
 
 namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 {
@@ -12,17 +10,25 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
     public class AdminUserMvcController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _config;
         private readonly ILogger<AdminUserMvcController> _logger;
+        private readonly string _apiBaseUrl;
 
-        public AdminUserMvcController(IHttpClientFactory httpClientFactory, ILogger<AdminUserMvcController> logger)
+        public AdminUserMvcController(
+            IHttpClientFactory httpClientFactory,
+            IConfiguration config,
+            ILogger<AdminUserMvcController> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _config = config;
             _logger = logger;
+            _apiBaseUrl = _config["ApiBaseUrl"]?.TrimEnd('/'); // URL'deki son '/' karakterini kaldır
         }
 
-        private HttpClient CreateClientWithToken()
+        // HttpClient oluştur ve token'ı header'a ekle (JwtCookieHandler ile entegre)
+        private HttpClient CreateClient()
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("MyApi"); // Program.cs'de tanımlanan MyApi client'ını kullan
             var token = Request.Cookies["JwtToken"];
             if (!string.IsNullOrEmpty(token))
             {
@@ -31,125 +37,101 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             return client;
         }
 
-        // Tüm kullanıcıları listele
-        public async Task<IActionResult> Index()
+        // Kullanıcı Listeleme (Rol Filtreli)
+        public async Task<IActionResult> Index(string roleFilter = null)
         {
-            var client = CreateClientWithToken(); 
-
-            var response = await client.GetAsync("https://localhost:7214/api/AdminUser");
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var json = await response.Content.ReadAsStringAsync();
-                var users = JsonSerializer.Deserialize<List<UserDto>>(json);
+                var client = CreateClient();
+                var url = $"{_apiBaseUrl}/api/admin/AdminUser";
+
+                // Rol filtresi ekle (boş değilse)
+                if (!string.IsNullOrWhiteSpace(roleFilter))
+                {
+                    url += $"?role={roleFilter}";
+                }
+
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode(); // 200-299 dışındaki kodlarda hata fırlatır
+
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("API Response: {jsonResponse}", jsonResponse);
+
+                var users = await response.Content.ReadFromJsonAsync<List<AdminUserListMvcDto>>();
                 return View(users);
             }
-            else
+            catch (HttpRequestException ex)
             {
-                _logger.LogError("Failed to load users. Status code: {StatusCode}", response.StatusCode);
-                ModelState.AddModelError("", "Kullanıcılar alınamadı.");
-                return View(new List<UserDto>());
+                _logger.LogError(ex, "API isteği başarısız. URL: {url}", $"{_apiBaseUrl}/api/admin/adminuser");
+                TempData["Error"] = "API ile iletişim kurulamadı!";
+                return View(new List<AdminUserListMvcDto>());
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON deserializasyon hatası!");
+                TempData["Error"] = "Veri okunamadı!";
+                return View(new List<AdminUserListMvcDto>());
             }
         }
 
-        // Yeni kullanıcı ekleme GET
-        [HttpGet]
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // Yeni kullanıcı ekleme POST
-        [HttpPost]
-        public async Task<IActionResult> Create(UserCreateDto model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var client = CreateClientWithToken();
-            var response = await client.PostAsJsonAsync("https://localhost:7214/api/AdminUser/create", model);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            _logger.LogError("Failed to create user. Status code: {StatusCode}", response.StatusCode);
-            ModelState.AddModelError("", "Kullanıcı oluşturulamadı.");
-            return View(model);
-        }
-
-        // Kullanıcı silme
-        public async Task<IActionResult> Delete(string id)
-        {
-            var client = CreateClientWithToken();
-            var response = await client.DeleteAsync($"https://localhost:7214/api/AdminUser/{id}");
-
-            if (response.IsSuccessStatusCode)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            _logger.LogError("Failed to delete user with ID {UserId}. Status code: {StatusCode}", id, response.StatusCode);
-            ModelState.AddModelError("", "Kullanıcı silinemedi.");
-            return RedirectToAction(nameof(Index));
-        }
-
-        // Kullanıcı detaylarını gösterme
+        // Kullanıcı Detayları
         public async Task<IActionResult> Details(string id)
         {
-            var client = CreateClientWithToken();
-            var response = await client.GetAsync($"https://localhost:7214/api/AdminUser/{id}");
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var json = await response.Content.ReadAsStringAsync();
-                var user = JsonSerializer.Deserialize<UserDto>(json);
+                var client = CreateClient();
+                var response = await client.GetAsync($"{_apiBaseUrl}/api/admin/adminuser/{id}");
+                response.EnsureSuccessStatusCode();
+
+                var user = await response.Content.ReadFromJsonAsync<AdminUserDetailMvcDto>();
                 return View(user);
             }
-
-            _logger.LogError("Failed to fetch user details for ID {UserId}. Status code: {StatusCode}", id, response.StatusCode);
-            ModelState.AddModelError("", "Kullanıcı bilgileri alınamadı.");
-            return RedirectToAction(nameof(Index));
-        }
-
-        // Kullanıcı güncelleme GET
-        [HttpGet]
-        public async Task<IActionResult> Edit(string id)
-        {
-            var client = CreateClientWithToken();
-            var response = await client.GetAsync($"https://localhost:7214/api/AdminUser/{id}");
-
-            if (response.IsSuccessStatusCode)
+            catch (HttpRequestException)
             {
-                var json = await response.Content.ReadAsStringAsync();
-                var user = JsonSerializer.Deserialize<UserUpdateDto>(json);
-                return View(user);
-            }
-
-            _logger.LogError("Failed to fetch user details for editing, User ID: {UserId}", id);
-            ModelState.AddModelError("", "Kullanıcı bilgileri alınamadı.");
-            return RedirectToAction(nameof(Index));
-        }
-
-        // Kullanıcı güncelleme POST
-        [HttpPost]
-        public async Task<IActionResult> Edit(UserUpdateDto model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var client = CreateClientWithToken();
-            var response = await client.PutAsJsonAsync($"https://localhost:7214/api/AdminUser/update/{model.Id}", model);
-
-            if (response.IsSuccessStatusCode)
-            {
+                TempData["Error"] = "Kullanıcı bulunamadı!";
                 return RedirectToAction(nameof(Index));
             }
+        }
 
-            _logger.LogError("Failed to update user. Status code: {StatusCode}", response.StatusCode);
-            ModelState.AddModelError("", "Kullanıcı güncellenemedi.");
-            return View(model);
+        // Rol Ata
+        [HttpPost]
+        public async Task<IActionResult> AssignRole(string userId, string role)
+        {
+            try
+            {
+                var client = CreateClient();
+                var response = await client.PostAsJsonAsync(
+                    $"{_apiBaseUrl}/api/admin/adminuser/{userId}/roles",
+                    new AssignRoleMvcDto { Role = role });
+
+                response.EnsureSuccessStatusCode();
+                TempData["Success"] = "Rol başarıyla atandı!";
+            }
+            catch (HttpRequestException)
+            {
+                TempData["Error"] = "Rol atama başarısız!";
+            }
+            return RedirectToAction(nameof(Details), new { id = userId });
+        }
+
+        // Rol Kaldır
+        [HttpPost]
+        public async Task<IActionResult> RemoveRole(string userId, string role)
+        {
+            try
+            {
+                var client = CreateClient();
+                var response = await client.DeleteAsync(
+                    $"{_apiBaseUrl}/api/admin/adminuser/{userId}/roles?role={role}");
+
+                response.EnsureSuccessStatusCode();
+                TempData["Success"] = "Rol başarıyla kaldırıldı!";
+            }
+            catch (HttpRequestException)
+            {
+                TempData["Error"] = "Rol kaldırma başarısız!";
+            }
+            return RedirectToAction(nameof(Details), new { id = userId });
         }
     }
 }

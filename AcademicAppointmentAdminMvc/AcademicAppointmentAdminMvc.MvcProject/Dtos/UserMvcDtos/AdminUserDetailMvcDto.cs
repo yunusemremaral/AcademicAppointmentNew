@@ -1,6 +1,7 @@
-﻿namespace AcademicAppointmentApi.Presentation.Dtos.AdminUserDtos
+﻿namespace AcademicAppointmentAdminMvc.MvcProject.Dtos.UserMvcDtos
+
 {
-    public class AdminUserDetailDto
+    public class AdminUserDetailMvcDto
     {
         public string Id { get; set; }
         public string UserName { get; set; }

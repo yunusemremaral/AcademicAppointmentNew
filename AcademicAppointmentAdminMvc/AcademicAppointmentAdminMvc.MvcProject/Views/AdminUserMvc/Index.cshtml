@@ -1,50 +1,50 @@
-﻿@using AcademicAppointmentAdminMvc.MvcProject.Dtos.UserMvcDtos
-@model List<UserDto>
+﻿@model List<AdminUserListMvcDto>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Kullanıcı Listesi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    ViewBag.Title = "Kullanıcı Listesi";
-
 }
 
 
+<h1>Kullanıcı Yönetimi</h1>
 
-
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Kullanıcı Listesi</h2>
-        <a href="@Url.Action("Create", "AdminUserMvc")" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Yeni Kullanıcı Ekle
-        </a>
+<!-- Rol Filtreleme -->
+<form method="get" class="mb-3">
+    <div class="input-group">
+        <select class="form-select" name="roleFilter" onchange="this.form.submit()">
+            <option value="">Tüm Roller</option>
+            <option value="Admin">Admin</option>
+            <option value="Teacher">Öğretmen</option>
+            <option value="Student">Öğrenci</option>
+        </select>
     </div>
+</form>
 
-    <table class="table table-bordered table-striped table-hover">
-        <thead class="table-dark">
+<!-- Kullanıcı Listesi Tablosu -->
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Kullanıcı Adı</th>
+            <th>Email</th>
+            <th>Okul</th>
+            <th>Bölüm</th>
+            <th>Roller</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
             <tr>
-                <th>Kullanıcı Adı</th>
-                <th>Email</th>
-                <th>Roller</th>
-                <th>İşlemler</th>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>@user.SchoolName</td>
+                <td>@user.DepartmentName</td>
+                <td>@string.Join(", ", user.Roles)</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-info">Detay</a>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
-                <tr>
-                    <td>@user.UserName</td>
-                    <td>@user.Email</td>
-
-                    <td>
-                        <a href="@Url.Action("Details", "AdminUserMvc", new { id = user.Id })" class="btn btn-info btn-sm">Detay</a>
-                        <a href="@Url.Action("Edit", "AdminUserMvc", new { id = user.Id })" class="btn btn-warning btn-sm">Düzenle</a>
-                        <a href="@Url.Action("Delete", "AdminUserMvc", new { id = user.Id })" class="btn btn-danger btn-sm"
-                           onclick="return confirm('Kullanıcıyı silmek istediğinize emin misiniz?');">Sil</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-
+        }
+    </tbody>
+</table>

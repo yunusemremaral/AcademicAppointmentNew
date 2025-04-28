@@ -5,10 +5,12 @@
     using AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore;
     using AcademicAppointmentApi.EntityLayer.Entities;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
-    using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.IdentityModel.Tokens;
     using System.Text;
+using System.Text.Json;
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -99,8 +101,27 @@ builder.Services.AddDbContext<Context>(opts =>
         app.UseSwagger();
         app.UseSwaggerUI();
     }
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        var error = context.Features.Get<IExceptionHandlerFeature>();
+        if (error != null)
+        {
+            var ex = error.Error;
+            await context.Response.WriteAsync(JsonSerializer.Serialize(new
+            {
+                error = ex.Message,
+                stackTrace = ex.StackTrace
+            }));
+        }
+    });
+});
 
-    app.UseHttpsRedirection();
+
+app.UseHttpsRedirection();
 
     app.UseCors("AllowAll");
 

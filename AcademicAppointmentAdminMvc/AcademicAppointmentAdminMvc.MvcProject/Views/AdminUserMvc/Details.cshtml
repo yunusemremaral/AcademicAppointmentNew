@@ -1,5 +1,4 @@
-﻿@using AcademicAppointmentAdminMvc.MvcProject.Dtos.UserMvcDtos
-
+﻿
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -7,11 +6,73 @@
 
 }
 
-@model UserDto
-
-
+@model AdminUserDetailMvcDto
 
 <div class="container mt-4">
+    <h2>@Model.UserName Detayları</h2>
+    <hr />
+
+    <!-- Kullanıcı Bilgileri -->
+    <dl class="row">
+        <dt class="col-sm-3">Email:</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+
+        <dt class="col-sm-3">Okul:</dt>
+        <dd class="col-sm-9">@Model.SchoolName</dd>
+
+        <dt class="col-sm-3">Bölüm:</dt>
+        <dd class="col-sm-9">@Model.DepartmentName</dd>
+
+        <dt class="col-sm-3">Roller:</dt>
+        <dd class="col-sm-9">@string.Join(", ", Model.Roles)</dd>
+    </dl>
+
+    <!-- Rol Atama Formu -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Rol Ata</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="AssignRole" method="post">
+                <input type="hidden" name="userId" value="@Model.Id" />
+                <div class="input-group">
+                    <select class="form-select" name="role">
+                        <option value="Admin">Admin</option>
+                        <option value="Teacher">Öğretmen</option>
+                        <option value="Student">Öğrenci</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Ata</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rol Kaldırma Formu -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Rol Kaldır</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="RemoveRole" method="post">
+                <input type="hidden" name="userId" value="@Model.Id" />
+                <div class="input-group">
+                    <select class="form-select" name="role">
+                        @foreach (var role in Model.Roles)
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    </select>
+                    <button type="submit" class="btn btn-danger">Kaldır</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Geri Dön Butonu -->
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
+    </div>
+</div>
     <h2>Kullanıcı Detayları</h2>
     <hr />
 

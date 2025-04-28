@@ -2,7 +2,7 @@
 {
     public class AssignRoleDto
     {
-        public string Role { get; set; }
+        public string Role { get; set; } // Tek rol atama (basit tutalım)
 
     }
 }
