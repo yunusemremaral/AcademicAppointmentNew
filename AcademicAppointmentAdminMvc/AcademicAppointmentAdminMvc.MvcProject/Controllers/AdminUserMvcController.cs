@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Newtonsoft.Json;
-using AcademicAppointmentAdminMvc.MvcProject.Models;
-using AcademicAppointmentAdminMvc.MvcProject.Dtos;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using AcademicAppointmentAdminMvc.MvcProject.Dtos.UserMvcDtos;
 
 namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 {
@@ -12,10 +12,12 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
     public class AdminUserMvcController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ILogger<AdminUserMvcController> _logger;
 
-        public AdminUserMvcController(IHttpClientFactory httpClientFactory)
+        public AdminUserMvcController(IHttpClientFactory httpClientFactory, ILogger<AdminUserMvcController> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
 
         private HttpClient CreateClientWithToken()
@@ -32,17 +34,19 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
         // Tüm kullanıcıları listele
         public async Task<IActionResult> Index()
         {
-            var client = CreateClientWithToken();
-            var response = await client.GetAsync("https://localhost:7214/api/AdminUser/all");
+            var client = CreateClientWithToken(); 
+
+            var response = await client.GetAsync("https://localhost:7214/api/AdminUser");
 
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-                var users = JsonConvert.DeserializeObject<List<UserDto>>(json);
+                var users = JsonSerializer.Deserialize<List<UserDto>>(json);
                 return View(users);
             }
             else
             {
+                _logger.LogError("Failed to load users. Status code: {StatusCode}", response.StatusCode);
                 ModelState.AddModelError("", "Kullanıcılar alınamadı.");
                 return View(new List<UserDto>());
             }
@@ -70,6 +74,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            _logger.LogError("Failed to create user. Status code: {StatusCode}", response.StatusCode);
             ModelState.AddModelError("", "Kullanıcı oluşturulamadı.");
             return View(model);
         }
@@ -78,13 +83,14 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var client = CreateClientWithToken();
-            var response = await client.DeleteAsync($"https://localhost:7214/api/AdminUser/delete/{id}");
+            var response = await client.DeleteAsync($"https://localhost:7214/api/AdminUser/{id}");
 
             if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction(nameof(Index));
             }
 
+            _logger.LogError("Failed to delete user with ID {UserId}. Status code: {StatusCode}", id, response.StatusCode);
             ModelState.AddModelError("", "Kullanıcı silinemedi.");
             return RedirectToAction(nameof(Index));
         }
@@ -98,10 +104,11 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-                var user = JsonConvert.DeserializeObject<UserDto>(json);
+                var user = JsonSerializer.Deserialize<UserDto>(json);
                 return View(user);
             }
 
+            _logger.LogError("Failed to fetch user details for ID {UserId}. Status code: {StatusCode}", id, response.StatusCode);
             ModelState.AddModelError("", "Kullanıcı bilgileri alınamadı.");
             return RedirectToAction(nameof(Index));
         }
@@ -116,10 +123,11 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-                var user = JsonConvert.DeserializeObject<UserUpdateDto>(json);
+                var user = JsonSerializer.Deserialize<UserUpdateDto>(json);
                 return View(user);
             }
 
+            _logger.LogError("Failed to fetch user details for editing, User ID: {UserId}", id);
             ModelState.AddModelError("", "Kullanıcı bilgileri alınamadı.");
             return RedirectToAction(nameof(Index));
         }
@@ -139,6 +147,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            _logger.LogError("Failed to update user. Status code: {StatusCode}", response.StatusCode);
             ModelState.AddModelError("", "Kullanıcı güncellenemedi.");
             return View(model);
         }

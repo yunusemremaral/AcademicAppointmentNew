@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using AcademicAppointmentAdminMvc.MvcProject.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using AcademicAppointmentAdminMvc.MvcProject.Dtos;
+using AcademicAppointmentAdminMvc.MvcProject.Dtos.UserMvcDtos;
 
 namespace AcademicAppointmentMvc.MvcProject.Controllers
 {

@@ -1,14 +1,15 @@
 ﻿namespace AcademicAppointmentApi.Presentation.Dtos.AdminUserDtos
 {
-    public class CreateUserDto
+    public class AdminUserDetailDto
     {
+        public string Id { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; }
         public int? SchoolId { get; set; }
         public int? DepartmentId { get; set; }
         public int? RoomId { get; set; }
-        public string? Role { get; set; } // Admin isterse rol de atar
-    }
+        public string? SchoolName { get; set; }
+        public string? DepartmentName { get; set; }
 
+    }
 }

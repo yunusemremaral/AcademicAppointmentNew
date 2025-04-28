@@ -1,5 +1,4 @@
 ﻿using AcademicAppointmentApi.EntityLayer.Entities;
-using AcademicAppointmentApi.Presentation.Dtos;
 using AcademicAppointmentApi.Presentation.Dtos.AdminUserDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -10,8 +9,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
     public class AdminUserController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
@@ -22,7 +20,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         }
 
         // ✅ Tüm kullanıcıları listele
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userManager.Users
@@ -30,20 +28,47 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 .Include(u => u.Department)
                 .ToListAsync();
 
-            var result = users.Select(u => new
+            var userDtos = users.Select(u => new AdminUserListDto
             {
-                u.Id,
-                u.UserName,
-                u.Email,
-                School = u.School?.Name,
-                Department = u.Department?.Name
-            });
+                Id = u.Id,
+                UserName = u.UserName,
+                Email = u.Email,
+                SchoolName = u.School?.Name,
+                DepartmentName = u.Department?.Name
+            }).ToList();
 
-            return Ok(result);
+            return Ok(userDtos);
         }
 
-        // ✅ Kullanıcı oluştur
-        [HttpPost("create")]
+        // ✅ ID'ye göre kullanıcı getir
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(string id)
+        {
+            var user = await _userManager.Users
+                .Include(u => u.School)
+                .Include(u => u.Department)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+                return NotFound("Kullanıcı bulunamadı.");
+
+            var userDto = new AdminUserDetailDto
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                SchoolId = user.SchoolId,
+                DepartmentId = user.DepartmentId,
+                RoomId = user.RoomId,
+                SchoolName = user.School?.Name,
+                DepartmentName = user.Department?.Name
+            };
+
+            return Ok(userDto);
+        }
+
+        // ✅ Yeni kullanıcı oluştur
+        [HttpPost]
         public async Task<IActionResult> CreateUser(CreateUserDto dto)
         {
             var user = new AppUser
@@ -60,65 +85,17 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
+            // Eğer rol atanacaksa
+            if (!string.IsNullOrEmpty(dto.Role))
+            {
+                await _userManager.AddToRoleAsync(user, dto.Role);
+            }
+
             return Ok("Kullanıcı başarıyla oluşturuldu.");
         }
 
-        // ✅ Kullanıcıyı id ile sil
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound("Kullanıcı bulunamadı.");
-
-            var result = await _userManager.DeleteAsync(user);
-
-            return result.Succeeded ? Ok("Kullanıcı silindi.") : BadRequest(result.Errors);
-        }
-
-        // ✅ Belirli bir role sahip kullanıcıları getir
-        [HttpGet("byrole/{roleName}")]
-        public async Task<IActionResult> GetUsersByRole(string roleName)
-        {
-            var users = await _userManager.GetUsersInRoleAsync(roleName);
-            var result = users.Select(u => new
-            {
-                u.Id,
-                u.UserName,
-                u.Email
-            });
-
-            return Ok(result);
-        }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(string id)
-        {
-            var user = await _userManager.Users
-                .Include(u => u.School)
-                .Include(u => u.Department)
-                .FirstOrDefaultAsync(u => u.Id == id);
-
-            if (user == null)
-                return NotFound("Kullanıcı bulunamadı.");
-
-            var result = new
-            {
-                user.Id,
-                user.UserName,
-                user.Email,
-                School = user.School?.Name,
-                Department = user.Department?.Name,
-                user.SchoolId,
-                user.DepartmentId,
-                user.RoomId
-            };
-
-            return Ok(result);
-        }
-
-
-        // ✅ Kullanıcının bilgilerini güncelle
-        [HttpPut("update/{id}")]
+        // ✅ Kullanıcı güncelle
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(string id, UpdateUserDto dto)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -134,6 +111,48 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             var result = await _userManager.UpdateAsync(user);
 
             return result.Succeeded ? Ok("Kullanıcı güncellendi.") : BadRequest(result.Errors);
+        }
+
+        // ✅ Kullanıcıyı sil
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound("Kullanıcı bulunamadı.");
+
+            var result = await _userManager.DeleteAsync(user);
+
+            return result.Succeeded ? Ok("Kullanıcı silindi.") : BadRequest(result.Errors);
+        }
+
+        // ✅ Belirli role sahip kullanıcıları getir
+        [HttpGet("role/{roleName}")]
+        public async Task<IActionResult> GetUsersByRole(string roleName)
+        {
+            var users = await _userManager.GetUsersInRoleAsync(roleName);
+
+            var userDtos = users.Select(u => new AdminUserListDto
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                Email = u.Email
+            }).ToList();
+
+            return Ok(userDtos);
+        }
+
+        // ✅ Kullanıcıya rol ata
+        [HttpPost("{id}/role")]
+        public async Task<IActionResult> AssignRole(string id, AssignRoleDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound("Kullanıcı bulunamadı.");
+
+            var result = await _userManager.AddToRoleAsync(user, dto.Role);
+
+            return result.Succeeded ? Ok("Rol atandı.") : BadRequest(result.Errors);
         }
     }
 }
