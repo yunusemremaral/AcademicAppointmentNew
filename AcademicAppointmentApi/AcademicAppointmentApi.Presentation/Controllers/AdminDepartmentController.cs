@@ -37,6 +37,23 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         }
 
 
+        [HttpGet("get")]
+        public async Task<IActionResult> GetJustDepartments()
+        {
+            var departments = await _departmentService.TGetAllAsync();
+
+            var departmentDtos = departments.Select(x => new GetDepartments
+            {
+                Id = x.Id,
+                Name = x.Name,
+                
+            }).ToList();
+
+            return Ok(departmentDtos);
+        }
+
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {

@@ -1,5 +1,6 @@
 ﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
 using AcademicAppointmentApi.EntityLayer.Entities;
+using AcademicAppointmentApi.Presentation.Dtos.CourseDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -24,8 +25,19 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var result = await _courseService.TGetAllAsync();
-            return Ok(result);
+            var courses = await _courseService.TGetCoursesWithDepartmentAndInstructorAsync();
+
+            var dtoList = courses.Select(c => new GetCourseDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                DepartmentId = c.DepartmentId,
+                DepartmentName = c.Department?.Name,
+                InstructorId = c.InstructorId,
+                InstructorName = $"{c.Instructor?.UserName}"
+            }).ToList();
+
+            return Ok(dtoList);
         }
 
         // ID ile ders getir

@@ -1,4 +1,4 @@
-﻿namespace AcademicAppointmentAdminMvc.MvcProject.Dtos.CourseDtos
+﻿namespace AcademicAppointmentApi.Presentation.Dtos.CourseDtos
 {
     public class GetCourseDto
     {
