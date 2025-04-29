@@ -1,11 +1,12 @@
 ﻿namespace AcademicAppointmentApi.Presentation.Dtos.DepartmentDtos
 {
-    public class DepartmentCreateDto
+    public class GetDepartmentDto
     {
-        // Bölüm adı
+        public int Id { get; set; }
         public string Name { get; set; }
 
-        // Hangi okula ait
         public int SchoolId { get; set; }
+        public string SchoolName { get; set; }
+
     }
 }

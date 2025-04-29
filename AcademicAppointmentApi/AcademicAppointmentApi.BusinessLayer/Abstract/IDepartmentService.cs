@@ -10,6 +10,8 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
     public interface IDepartmentService : ITGenericService<Department>
     {
         Task<List<Department>> TGetDepartmentsBySchoolIdAsync(int schoolId);
+        Task<List<Department>> TGetDepartmentsWithSchoolAsync();
+
     }
 
 }

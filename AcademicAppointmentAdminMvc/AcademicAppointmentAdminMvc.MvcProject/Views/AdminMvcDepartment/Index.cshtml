@@ -3,9 +3,12 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-@model List<GetDepartmentDto>
+@model List<AcademicAppointmentAdminMvc.MvcProject.Dtos.DepartmentDtos.GetDepartmentDto>
 
-<h2>Bölüm Listesi</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Bölüm Listesi</h2>
+    <a asp-action="AddDepartment" asp-route-schoolId="@Model.FirstOrDefault()?.SchoolId" class="btn btn-success">Yeni Bölüm Ekle</a>
+</div>
 
 <table class="table table-bordered table-striped">
     <thead>

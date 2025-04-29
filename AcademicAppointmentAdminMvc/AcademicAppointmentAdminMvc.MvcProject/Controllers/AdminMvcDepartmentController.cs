@@ -79,7 +79,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             var response = await client.PostAsync("api/admin/AdminDepartment", content);
 
             if (response.IsSuccessStatusCode)
-                return RedirectToAction("SchoolDepartments", "AdminMvcSchool", new { id = dto.SchoolId });
+                return RedirectToAction("Index", "AdminMvcDepartment");
 
             // Okullar tekrar yüklenmeli, hata durumunda da dropdown dolu olsun
             var schoolResponse = await client.GetAsync("api/admin/AdminSchool");
@@ -129,7 +129,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             var response = await client.PutAsync("api/admin/AdminDepartment", content);
 
             if (response.IsSuccessStatusCode)
-                return RedirectToAction("SchoolDepartments", "AdminMvcSchool", new { id = dto.SchoolId });
+                return RedirectToAction("Index", "AdminMvcDepartment");
 
             // Hata durumunda tekrar okul listesi yüklenmeli
             var schoolResponse = await client.GetAsync("api/admin/AdminSchool");
@@ -146,7 +146,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             var client = CreateClient();
             var response = await client.DeleteAsync($"api/admin/AdminDepartment/{id}");
 
-            return RedirectToAction("SchoolDepartments", "AdminMvcSchool", new { id = schoolId });
+            return RedirectToAction("Index", "AdminMvcDepartment");
         }
     }
 }
