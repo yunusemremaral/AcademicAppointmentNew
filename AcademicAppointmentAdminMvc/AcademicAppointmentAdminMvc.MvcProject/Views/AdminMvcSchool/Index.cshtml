@@ -31,7 +31,16 @@
                 <tr>
                     <td>@index</td>
                     <td>@item.Name</td>
-                    <td>@item.Departments?.Count ?? 0</td>
+                   
+
+                        @if (item.Departments == null || !item.Departments.Any())
+                        {
+                        <td>Bölüm bulunmamaktadır</td>
+                        }
+                        else
+                        {
+                        <td>@item.Departments?.Count</td>
+                        }
                     <td>
                         <a href="/AdminMvcSchool/SchoolDepartments/@item.Id" class="btn btn-sm btn-primary">
                             Bölümleri Göster

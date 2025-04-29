@@ -1,6 +1,7 @@
 ﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
 using AcademicAppointmentApi.EntityLayer.Entities;
 using AcademicAppointmentApi.Presentation.Dtos.School;
+using AcademicAppointmentApi.Presentation.Dtos.SchoolDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -71,7 +72,20 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         public async Task<IActionResult> GetAllSchoolsWithDepartments()
         {
             var schools = await _schoolService.TGetSchoolsWithDepartmentsAsync();
-            return Ok(schools);
+
+            // DTO'ya manuel mapleme
+            var dtoList = schools.Select(s => new SchoolWithDepartmentsDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Departments = s.Departments?.Select(d => new DepartmentDto
+                {
+                    Id = d.Id,
+                    Name = d.Name
+                }).ToList()
+            }).ToList();
+
+            return Ok(dtoList);
         }
 
     }
