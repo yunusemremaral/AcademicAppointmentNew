@@ -33,5 +33,13 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                 .ToListAsync();
 
         }
+        public async Task<List<Course>> GetCoursesByDepartmentIdAsync(int departmentId)
+        {
+            return await _context.Courses
+                .Where(c => c.DepartmentId == departmentId)
+                .Include(c => c.Instructor) // İstersen eğitmen bilgisini de getir
+                .ToListAsync();
+        }
+
     }
 }

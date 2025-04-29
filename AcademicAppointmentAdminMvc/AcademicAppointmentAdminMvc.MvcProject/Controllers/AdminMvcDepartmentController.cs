@@ -56,19 +56,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 
             return View();
         }
-        [HttpGet]
-        public async Task<IActionResult> SchoolDepartments(int schoolId)
-        {
-            var client = CreateClient();
-            var response = await client.GetAsync($"api/admin/AdminDepartment/by-school/{schoolId}");
-
-            if (!response.IsSuccessStatusCode)
-                return View(new List<GetDepartmentDto>());
-
-            var jsonData = await response.Content.ReadAsStringAsync();
-            var departments = JsonConvert.DeserializeObject<List<GetDepartmentDto>>(jsonData);
-            return View(departments);
-        }
+      
 
         [HttpPost]
         public async Task<IActionResult> AddDepartment(AddDepartmentDto dto)
@@ -111,13 +99,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 
             return View(value);
         }
-        private async Task<List<GetSchoolDto>> GetSchoolsAsync()
-        {
-            var client = CreateClient();
-            var schoolResponse = await client.GetAsync("api/admin/AdminSchool");
-            var schoolJson = await schoolResponse.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<List<GetSchoolDto>>(schoolJson);
-        }
+        
 
 
         [HttpPost]
@@ -148,5 +130,18 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 
             return RedirectToAction("Index", "AdminMvcDepartment");
         }
+        public async Task<IActionResult> GetCoursesByDepartment(int departmentId)
+        {
+            var client = CreateClient();
+            var response = await client.GetAsync($"api/admin/AdminDepartment/{departmentId}/courses");
+
+            if (!response.IsSuccessStatusCode)
+                return View(new List<CourseDto>()); // CourseDto’yu aşağıda tanımlarız
+
+            var jsonData = await response.Content.ReadAsStringAsync();
+            var courses = JsonConvert.DeserializeObject<List<CourseDto>>(jsonData);
+            return View(courses);
+        }
+
     }
 }

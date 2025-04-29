@@ -10,6 +10,8 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
     public interface IDepartmentRepository : IGenericRepository<Department>
     {
         Task<List<Department>> GetDepartmentsBySchoolIdAsync(int schoolId);
+        Task<List<Course>> GetCoursesByDepartmentIdAsync(int departmentId);
+
         Task<List<Department>> GetDepartmentsWithSchoolAsync();
     }
 }

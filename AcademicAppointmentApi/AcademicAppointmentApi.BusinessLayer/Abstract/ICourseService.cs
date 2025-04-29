@@ -11,6 +11,9 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
     {
         Task<List<Course>> TGetCoursesByDepartmentIdAsync(int departmentId);
         Task<List<Course>> TGetCoursesByInstructorIdAsync(string instructorId);
+        Task<List<Course>> TGetCoursesWithDepartmentAndInstructorAsync();
+        Task<Course> TGetCourseWithDetailsByIdAsync(int id);
+
     }
 
 }

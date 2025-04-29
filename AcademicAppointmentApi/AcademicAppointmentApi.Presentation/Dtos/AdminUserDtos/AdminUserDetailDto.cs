@@ -10,7 +10,7 @@
         public int? RoomId { get; set; }
         public string? SchoolName { get; set; }
         public string? DepartmentName { get; set; }
-        public List<string> Roles { get; set; } // ✅ Yeni eklenen alan
+        public List<string> Roles { get; set; } 
 
     }
 }

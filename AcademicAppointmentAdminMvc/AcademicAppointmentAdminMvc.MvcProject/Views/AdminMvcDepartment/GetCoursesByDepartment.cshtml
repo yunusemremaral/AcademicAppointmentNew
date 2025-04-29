@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewData["Title"] = "Bölüme Ait Dersler";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@model List<CourseDto>
+
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Ders Adı</th>
+            <th>Öğretim Görevlisi</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model)
+        {
+            <tr>
+                <td>@course.Name</td>
+                <td>@course.InstructorName</td>
+            </tr>
+        }
+    </tbody>
+</table>

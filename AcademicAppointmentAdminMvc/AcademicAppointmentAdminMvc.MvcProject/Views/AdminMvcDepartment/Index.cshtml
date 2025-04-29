@@ -25,6 +25,7 @@
                 <td>@department.Name</td>
                 <td>@department.SchoolName</td>
                 <td>
+                    <a asp-action="GetCoursesByDepartment" asp-route-departmentId="@department.Id" class="btn btn-sm btn-info">Dersleri Gör</a>
                     <a asp-action="UpdateDepartment" asp-route-id="@department.Id" class="btn btn-sm btn-warning">Güncelle</a>
                     <a asp-action="DeleteDepartment" asp-route-id="@department.Id" asp-route-schoolId="@department.SchoolId" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?');">Sil</a>
                 </td>

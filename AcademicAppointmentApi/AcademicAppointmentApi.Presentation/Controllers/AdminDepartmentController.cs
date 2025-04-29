@@ -103,6 +103,25 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 
             return Ok(departments);
         }
+        [HttpGet("{departmentId}/courses")]
+        public async Task<IActionResult> GetCoursesByDepartmentId(int departmentId)
+        {
+            var courses = await _departmentService.TGetCoursesByDepartmentIdAsync(departmentId);
+
+            if (courses == null || !courses.Any())
+                return NotFound();
+
+            var result = courses.Select(c => new
+            {
+                c.Id,
+                c.Name,
+                InstructorName = c.Instructor?.UserName // AppUser'da varsa
+            });
+
+            return Ok(result);
+        }
+
+
 
 
     }
