@@ -56,5 +56,16 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             await _departmentService.TDeleteAsync(department);
             return Ok();
         }
+        [HttpGet("by-school/{schoolId}")]
+        public async Task<IActionResult> GetDepartmentsBySchoolId(int schoolId)
+        {
+            var departments = await _departmentService.TGetDepartmentsBySchoolIdAsync(schoolId);
+            if (departments == null || !departments.Any())
+                return NotFound();
+
+            return Ok(departments);
+        }
+
+
     }
 }

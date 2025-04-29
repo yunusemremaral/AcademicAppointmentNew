@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Bölüm Ekle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@model AddDepartmentDto
+
+@{
+    var schools = ViewBag.Schools as List<GetSchoolDto>;
+}
+
+<h2>Bölüm Ekle</h2>
+
+<form asp-action="AddDepartment" method="post">
+    <div class="form-group">
+        <label asp-for="Name">Bölüm Adı</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SchoolId">Okul</label>
+        <select asp-for="SchoolId" class="form-control">
+            @if (schools != null)
+            {
+                foreach (var school in schools)
+                {
+                    <option value="@school.Id" selected="@(school.Id == ViewBag.SchoolId ? "selected" : null)">
+                        @school.Name
+                    </option>
+                }
+            }
+        </select>
+        <span asp-validation-for="SchoolId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a asp-action="SchoolDepartments" asp-controller="AdminMvcSchool" asp-route-id="@ViewBag.SchoolId" class="btn btn-secondary">Geri Dön</a>
+</form>

@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewData["Title"] = "Yeni Okul Ekle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@model SchoolCreateDto
+
+
+<h2 class="mb-4">Yeni Okul Ekle</h2>
+
+<form asp-action="AddSchool" method="post">
+    <div class="form-group mb-3">
+        <label for="Name">Okul Adı</label>
+        <input asp-for="Name" class="form-control form-control-lg" placeholder="Okul adını giriniz" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success btn-rounded">Kaydet</button>
+    <a href="/AdminMvcSchool/Index" class="btn btn-secondary btn-rounded">İptal</a>
+</form>
