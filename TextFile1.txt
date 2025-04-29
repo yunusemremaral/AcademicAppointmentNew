@@ -1,0 +1,6 @@
+Düzene çekmek  için metodlar tek tek bakýlacak api tarafýnda önce crud metodlarý ardýndan iliþkili metodlar tek tek 
+düzenlenecek  metodlarýn her türlüsü yazýlacak tekrar ugrasmamak için iliþkilere göre metodlarý yazacagýz
+ardýndan dtolar cok karýstý dtolarý ayrý bir class libraride 1 kere yazýcaz sonra 2 projeyi referans verecegiz 
+ardýndan bütün entityler için admin panelini yazacagýz a dan z ye ardýdnan paneli düzenleyecegiz ama öncelik 
+þuanda  api tarafýný bi baþtan refactor etme refatorleri unutma mvc tarafýndada token göndermeleri dtolarý falan servisleri
+ayrý bir yere cekecegiz gereksiz kodlarý kaldýracagýz düzenleyecegiz ! 
