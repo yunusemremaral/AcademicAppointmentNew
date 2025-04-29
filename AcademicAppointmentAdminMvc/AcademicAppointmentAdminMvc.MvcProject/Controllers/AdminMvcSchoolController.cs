@@ -29,12 +29,13 @@ public class AdminMvcSchoolController : Controller
 
     public async Task<IActionResult> Index()
     {
-    var client = CreateClient();
-    var response = await client.GetAsync("api/admin/AdminSchool/with-departments"); // burası önemli
-    var jsonData = await response.Content.ReadAsStringAsync();
-    var values = JsonConvert.DeserializeObject<List<SchoolWithDepartmentsDto>>(jsonData);
-    return View(values);
+        var client = CreateClient();
+        var response = await client.GetAsync("api/admin/AdminSchool/with-departments");
+        var jsonData = await response.Content.ReadAsStringAsync();
+        var values = JsonConvert.DeserializeObject<List<SchoolWithDepartmentsDto>>(jsonData);
+        return View(values);
     }
+
 
     [HttpGet]
     public IActionResult AddSchool()

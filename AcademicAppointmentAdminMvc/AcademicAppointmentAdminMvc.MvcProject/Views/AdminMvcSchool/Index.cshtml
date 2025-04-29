@@ -8,32 +8,49 @@
 
 
 
-<h2 class="mb-4">Okul Listesi</h2>
 
-<a href="/AdminMvcSchool/AddSchool" class="btn btn-primary btn-rounded mb-3">Yeni Okul Ekle</a>
+<h2>Okullar</h2>
 
-<table class="table table-striped table-hover">
+<a href="/AdminMvcSchool/AddSchool" class="btn btn-success mb-3">Yeni Okul Ekle</a>
+
+<table class="table table-bordered table-striped">
     <thead>
         <tr>
             <th>#</th>
             <th>Okul Adı</th>
+            <th>Bölüm Sayısı</th>
             <th>İşlemler</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var school in Model)
+        @if (Model != null && Model.Any())
+        {
+            int index = 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@index</td>
+                    <td>@item.Name</td>
+                    <td>@item.Departments?.Count ?? 0</td>
+                    <td>
+                        <a href="/AdminMvcSchool/SchoolDepartments/@item.Id" class="btn btn-sm btn-primary">
+                            Bölümleri Göster
+                        </a>
+                        <a href="/AdminMvcSchool/UpdateSchool/@item.Id" class="btn btn-sm btn-warning">
+                            Güncelle
+                        </a>
+                        <a href="/AdminMvcSchool/DeleteSchool/@item.Id" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?');">
+                            Sil
+                        </a>
+                    </td>
+                </tr>
+                index++;
+            }
+        }
+        else
         {
             <tr>
-                <td>@school.Id</td>
-                <td>@school.Name</td>
-                <td>
-                    <a href="/AdminMvcSchool/SchoolDepartments/@school.Id"
-                       class="btn btn-sm btn-outline-info">
-                        Bölümleri Göster (@school.Departments?.Count)
-                    </a>
-                    <a href="/AdminMvcSchool/UpdateSchool/@school.Id" class="btn btn-sm btn-outline-warning">Güncelle</a>
-                    <a href="/AdminMvcSchool/DeleteSchool/@school.Id" class="btn btn-sm btn-outline-danger" onclick="return confirm('Silmek istediğinize emin misiniz?');">Sil</a>
-                </td>
+                <td colspan="4" class="text-center">Kayıtlı okul bulunamadı.</td>
             </tr>
         }
     </tbody>
