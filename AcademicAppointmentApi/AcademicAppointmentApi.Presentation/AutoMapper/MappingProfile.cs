@@ -10,14 +10,25 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
     {
         public MappingProfile()
         {
-            // SCHOOL MAPPINGS
+            #region OKUL 
+            // School <-> SchoolListDto
             CreateMap<School, SchoolListDto>().ReverseMap();
-            CreateMap<School, SchoolCreateDto>().ReverseMap();
-            CreateMap<School, SchoolUpdateDto>().ReverseMap();
+
+            // School <-> SchoolCreateDto (sadece tek yönlü map gerekli)
+            CreateMap<SchoolCreateDto, School>();
+
+            // School <-> SchoolUpdateDto (Update için iki yönlü map mantıklı)
+            CreateMap<SchoolUpdateDto, School>().ReverseMap();
+
+            // Department <-> DepartmentSchoolDto
+            CreateMap<Department, SDepartmentSchoolDto>().ReverseMap();
+
+            // School <-> SchoolDetailDto (nested mapping için önemli)
             CreateMap<School, SchoolDetailDto>()
-                .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => src.Departments))
-                .ReverseMap();
-            CreateMap<School, DepartmentSchoolDto>().ReverseMap();
+                .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => src.Departments));
+
+            #endregion
+
 
             // DEPARTMENT MAPPINGS
             CreateMap<DepartmentCreateDto, Department>()

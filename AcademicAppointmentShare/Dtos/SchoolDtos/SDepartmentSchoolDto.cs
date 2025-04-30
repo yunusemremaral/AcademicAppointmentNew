@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentShare.Dtos.SchoolDtos
 {
-    public class DepartmentSchoolDto
+    public class SDepartmentSchoolDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

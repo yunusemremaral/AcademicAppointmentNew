@@ -22,7 +22,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 _schoolService = schoolService;
                 _mapper = mapper;
             }
-
+            // SCHOOLU ID VE NAMELER OLARAK GETİRİYOR 
             [HttpGet]
             public async Task<IActionResult> GetAll()
             {
@@ -30,7 +30,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 var dtoList = _mapper.Map<List<SchoolListDto>>(schools);
                 return Ok(dtoList);
             }
-
+            //1 SCHOOLU GETİRME ID VE NAME OLARAK GETİRİR
             [HttpGet("{id}")]
             public async Task<IActionResult> GetById(int id)
             {
@@ -39,7 +39,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 var dto = _mapper.Map<SchoolListDto>(school);
                 return Ok(dto);
             }
-
+            //EKLEME 
             [HttpPost]
             public async Task<IActionResult> Add([FromBody] SchoolCreateDto dto)
             {
@@ -48,7 +48,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 var responseDto = _mapper.Map<SchoolListDto>(result);
                 return CreatedAtAction(nameof(GetById), new { id = responseDto.Id }, responseDto);
             }
-
+            //GÜNCELLEME
             [HttpPut("{id}")]
             public async Task<IActionResult> Update(int id, [FromBody] SchoolUpdateDto dto)
             {
@@ -59,7 +59,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 await _schoolService.TUpdateAsync(school);
                 return NoContent();
             }
-
+            // SİLME 
             [HttpDelete("{id}")]
             public async Task<IActionResult> Delete(int id)
             {
@@ -68,7 +68,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 await _schoolService.TDeleteAsync(school);
                 return NoContent();
             }
-
+            // OKULLARIN VE DEPARTMANLARIDA BİRLİKTE DÖNÜYOR 
             [HttpGet("with-departments")]
             public async Task<IActionResult> GetAllWithDepartments()
             {
@@ -78,20 +78,22 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 {
                     Id = s.Id,
                     Name = s.Name,
-                    Departments = s.Departments?.Select(d => _mapper.Map<DepartmentSchoolDto>(d)).ToList() ?? new List<DepartmentSchoolDto>()
+                    Departments = s.Departments?.Select(d => _mapper.Map<SDepartmentSchoolDto>(d)).ToList() ?? new List<SDepartmentSchoolDto>()
                 }).ToList();
 
                 return Ok(dtoList);
             }
 
+            //OKULUN ID SI İLE EŞLEŞEN BÜTÜN DEPARTMANLARI DÖNÜYOR 
             [HttpGet("{schoolId}/departments")]
             public async Task<IActionResult> GetDepartmentsBySchoolId(int schoolId)
             {
                 var departments = await _schoolService.TGetDepartmentsBySchoolIdAsync(schoolId);
-                var dtoList = _mapper.Map<List<DepartmentSchoolDto>>(departments);
+                var dtoList = _mapper.Map<List<SDepartmentSchoolDto>>(departments);
                 return Ok(dtoList);
             }
 
+            //OKULUN ID SINE GÖRE O OKULDAKİ BULUNAN BÖLÜM SAYISINI DÖNÜYOR 
             [HttpGet("{schoolId}/department-count")]
             public async Task<IActionResult> GetDepartmentCount(int schoolId)
             {

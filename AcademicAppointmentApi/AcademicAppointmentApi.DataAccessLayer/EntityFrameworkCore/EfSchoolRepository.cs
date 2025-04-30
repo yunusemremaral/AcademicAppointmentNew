@@ -24,14 +24,13 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
 
         public async Task<List<Department>> GetDepartmentsBySchoolIdAsync(int schoolId)
         {
-            var school = await _context.Schools
-                .Include(s => s.Departments)
-                .FirstOrDefaultAsync(s => s.Id == schoolId);
-
-            return school?.Departments?.ToList() ?? new List<Department>();
+            return await _context.Departments
+                .Where(d => d.SchoolId == schoolId)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
-       
+
 
         public async Task<int> GetDepartmentCountAsync(int schoolId)
         {

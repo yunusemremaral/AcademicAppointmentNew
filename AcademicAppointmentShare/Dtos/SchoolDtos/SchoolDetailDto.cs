@@ -11,7 +11,7 @@ namespace AcademicAppointmentShare.Dtos.SchoolDtos
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public List<DepartmentSchoolDto> Departments { get; set; }
+        public List<SDepartmentSchoolDto> Departments { get; set; }
     }
 
 }
