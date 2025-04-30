@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AcademicAppointmentApi.DataAccessLayer.Repositories
+namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
 {
     public class EfDepartmentRepository : GenericRepository<Department>, IDepartmentRepository
     {
@@ -20,40 +20,17 @@ namespace AcademicAppointmentApi.DataAccessLayer.Repositories
 
         public async Task<IReadOnlyList<Department>> GetAllWithCoursesAsync()
         {
-            return await _context.Departments
-                .Include(d => d.Courses)
-                .ToListAsync();
+                return await _context.Departments
+        .Include(d => d.Courses)
+        .Include(d => d.School) // School'u ekledik
+        .AsNoTracking()
+        .ToListAsync();
+
         }
 
-        public async Task<IReadOnlyList<Department>> GetAllWithFacultyMembersAsync()
-        {
-            var instructorIds = await _context.UserRoles
-                .Where(ur => _context.Roles
-                    .Where(r => r.Name == "Instructor")
-                    .Select(r => r.Id)
-                    .Contains(ur.RoleId))
-                .Select(ur => ur.UserId)
-                .ToListAsync();
+       
 
-            return await _context.Departments
-                .Include(d => d.FacultyMembers.Where(u => instructorIds.Contains(u.Id)))
-                .ToListAsync();
-        }
-
-        public async Task<IReadOnlyList<Department>> GetAllWithStudentsAsync()
-        {
-            var studentIds = await _context.UserRoles
-                .Where(ur => _context.Roles
-                    .Where(r => r.Name == "Student")
-                    .Select(r => r.Id)
-                    .Contains(ur.RoleId))
-                .Select(ur => ur.UserId)
-                .ToListAsync();
-
-            return await _context.Departments
-                .Include(d => d.FacultyMembers.Where(u => studentIds.Contains(u.Id)))
-                .ToListAsync();
-        }
+        
 
         public async Task<IReadOnlyList<Department>> GetDepartmentsBySchoolIdAsync(int schoolId)
         {
@@ -62,17 +39,14 @@ namespace AcademicAppointmentApi.DataAccessLayer.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyList<Department>> SearchDepartmentsByNameAsync(string name)
-        {
-            return await _context.Departments
-                .Where(d => d.Name.Contains(name))
-                .ToListAsync();
-        }
+
 
         public async Task<IReadOnlyList<Course>> GetCoursesByDepartmentIdAsync(int departmentId)
         {
             return await _context.Courses
                 .Where(c => c.DepartmentId == departmentId)
+                .Include(c => c.Department) // Department ile olan ilişkiyi dahil et
+                .Include(c => c.Instructor) // Instructor ile olan ilişkiyi dahil et
                 .ToListAsync();
         }
 
@@ -91,18 +65,6 @@ namespace AcademicAppointmentApi.DataAccessLayer.Repositories
                 .CountAsync(c => c.DepartmentId == departmentId);
         }
 
-        public async Task<int> GetFacultyMemberCountAsync(int departmentId)
-        {
-            var instructorIds = await _context.UserRoles
-                .Where(ur => _context.Roles
-                    .Where(r => r.Name == "Instructor")
-                    .Select(r => r.Id)
-                    .Contains(ur.RoleId))
-                .Select(ur => ur.UserId)
-                .ToListAsync();
-
-            return await _context.Users
-                .CountAsync(u => u.DepartmentId == departmentId && instructorIds.Contains(u.Id));
-        }
+    
     }
 }

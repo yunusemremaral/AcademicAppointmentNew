@@ -9,31 +9,39 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
     {
         public MappingProfile()
         {
-            // School <-> Dto eşleşmeleri
+            // SCHOOL MAPPINGS
             CreateMap<School, SchoolListDto>().ReverseMap();
             CreateMap<School, SchoolCreateDto>().ReverseMap();
             CreateMap<School, SchoolUpdateDto>().ReverseMap();
-            CreateMap<School, SchoolDetailDto>().ReverseMap();
+            CreateMap<School, SchoolDetailDto>()
+                .ForMember(dest => dest.Departments, opt => opt.MapFrom(src => src.Departments))
+                .ReverseMap();
+            CreateMap<School, DepartmentSchoolDto>().ReverseMap();
 
-            // Department
-            CreateMap<Department, DepartmentSchoolDto>().ReverseMap();
-            // Department Entity to DTO
-            CreateMap<Department, DepartmentDto>()
-                .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.School.Name));
+            // DEPARTMENT MAPPINGS
+            CreateMap<DepartmentCreateDto, Department>()
+                .ForMember(dest => dest.School, opt => opt.Ignore()) // Eğer School'ı ayrıca eklemek gerekiyorsa
+                .ForMember(dest => dest.Courses, opt => opt.Ignore()); // Eğer Courses ayrıca eklenmeli
 
-            CreateMap<Department, DepartmentWithCoursesDto>()
-                .ForMember(dest => dest.Courses, opt => opt.MapFrom(src => src.Courses));
+            CreateMap<Department, DepartmentListDto>().ReverseMap();
+            CreateMap<Department, DepartmentUpdateDto>().ReverseMap();
+            CreateMap<Department, DepartmentDetailDto>()
+                .ForMember(dest => dest.School, opt => opt.MapFrom(src => src.School))
+                .ForMember(dest => dest.Courses, opt => opt.MapFrom(src => src.Courses))
+                .ReverseMap();
+            CreateMap<Department, DepartmentListWithCoursesDto>()
+                .ForMember(dest => dest.Courses, opt => opt.MapFrom(src => src.Courses))
+                .ReverseMap();
 
-            CreateMap<Department, DepartmentWithFacultyMembersDto>()
-                .ForMember(dest => dest.FacultyMembers, opt => opt.MapFrom(src => src.FacultyMembers));
+            // COURSE MAPPINGS
+            CreateMap<Course, CourseDepartmentDto>().ReverseMap();
 
-            CreateMap<Department, DepartmentWithStudentsDto>()
-                .ForMember(dest => dest.Students, opt => opt.MapFrom(src => src.StudentMembers));
-
-            // DTO to Entity
-            CreateMap<DepartmentCreateDto, Department>();
-            CreateMap<DepartmentUpdateDto, Department>();
-
+            // COURSE WITH DETAILS MAPPING
+            CreateMap<Course, CourseWithDetailsDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name)) // DepartmentName için ilişkili isim
+                .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor.UserName)) // InstructorName için ilişkili isim
+                .ForMember(dest => dest.InstructorId, opt => opt.MapFrom(src => src.Instructor.Id.ToString())) // InstructorId
+                .ReverseMap();
         }
     }
 }
