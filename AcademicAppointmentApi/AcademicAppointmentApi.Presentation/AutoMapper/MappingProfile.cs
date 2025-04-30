@@ -16,7 +16,24 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
             CreateMap<School, SchoolDetailDto>().ReverseMap();
 
             // Department
-            CreateMap<Department, DepartmentDto>().ReverseMap();
+            CreateMap<Department, DepartmentSchoolDto>().ReverseMap();
+            // Department Entity to DTO
+            CreateMap<Department, DepartmentDto>()
+                .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.School.Name));
+
+            CreateMap<Department, DepartmentWithCoursesDto>()
+                .ForMember(dest => dest.Courses, opt => opt.MapFrom(src => src.Courses));
+
+            CreateMap<Department, DepartmentWithFacultyMembersDto>()
+                .ForMember(dest => dest.FacultyMembers, opt => opt.MapFrom(src => src.FacultyMembers));
+
+            CreateMap<Department, DepartmentWithStudentsDto>()
+                .ForMember(dest => dest.Students, opt => opt.MapFrom(src => src.StudentMembers));
+
+            // DTO to Entity
+            CreateMap<DepartmentCreateDto, Department>();
+            CreateMap<DepartmentUpdateDto, Department>();
+
         }
     }
 }

@@ -2,11 +2,6 @@
 using AcademicAppointmentApi.DataAccessLayer.Concrete;
 using AcademicAppointmentApi.EntityLayer.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
 {
@@ -35,10 +30,12 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
 
             return school?.Departments?.ToList() ?? new List<Department>();
         }
+
+       
+
         public async Task<int> GetDepartmentCountAsync(int schoolId)
         {
             return await _context.Departments.CountAsync(d => d.SchoolId == schoolId);
         }
     }
 }
-

@@ -15,7 +15,9 @@ namespace AcademicAppointmentApi.EntityLayer.Entities
         public School School { get; set; }
 
         public ICollection<AppUser> FacultyMembers { get; set; } 
-        public ICollection<Course> Courses { get; set; } 
+        public ICollection<Course> Courses { get; set; }
+        public ICollection<AppUser> StudentMembers { get; set; }
+
     }
 
 

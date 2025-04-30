@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AcademicAppointmentShare.Dtos.DepartmentDtos
+namespace AcademicAppointmentShare.Dtos.SchoolDtos
 {
-    public class DepartmentDto
+    public class DepartmentSchoolDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

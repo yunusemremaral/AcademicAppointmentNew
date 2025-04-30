@@ -1,145 +1,131 @@
-﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
-using AcademicAppointmentApi.EntityLayer.Entities;
-using AcademicAppointmentApi.Presentation.Dtos.DepartmentDtos;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+﻿//using AcademicAppointmentApi.BusinessLayer.Abstract;
+//using AcademicAppointmentApi.EntityLayer.Entities;
+//using Microsoft.AspNetCore.Authorization;
+//using Microsoft.AspNetCore.Mvc;
+//using System.Threading.Tasks;
 
-namespace AcademicAppointmentApi.Presentation.Controllers
-{
-    [Route("api/admin/[controller]")]
-    [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [Authorize(Roles = "Admin")]
-    public class AdminDepartmentController : ControllerBase
-    {
-        private readonly IDepartmentService _departmentService;
+//namespace AcademicAppointmentApi.Presentation.Controllers
+//{
+//    [Route("api/admin/[controller]")]
+//    [ApiController]
+//    [Authorize(AuthenticationSchemes = "Bearer")]
+//    [Authorize(Roles = "Admin")]
+//    public class AdminDepartmentController : ControllerBase
+//    {
+//        private readonly IDepartmentService _departmentService;
 
-        public AdminDepartmentController(IDepartmentService departmentService)
-        {
-            _departmentService = departmentService;
-        }
+//        public AdminDepartmentController(IDepartmentService departmentService)
+//        {
+//            _departmentService = departmentService;
+//        }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllDepartments()
-        {
-            var departments = await _departmentService.TGetDepartmentsWithSchoolAsync();
+//        // ---------- GENERIC METOTLAR ----------
 
-            var departmentDtos = departments.Select(x => new GetDepartmentDto
-            {
-                Id = x.Id,
-                Name = x.Name,
-                SchoolId = x.SchoolId,
-                SchoolName = x.School?.Name
-            }).ToList();
+//        [HttpGet("get-all")]
+//        public async Task<IActionResult> GetAll()
+//        {
+//            var departments = await _departmentService.TGetAllAsync();
+//            return Ok(departments);
+//        }
 
-            return Ok(departmentDtos);
-        }
+//        [HttpGet("get-by-id/{id}")]
+//        public async Task<IActionResult> GetById(int id)
+//        {
+//            var department = await _departmentService.TGetByIdAsync(id);
+//            if (department == null) return NotFound();
+//            return Ok(department);
+//        }
 
+//        [HttpPost("add")]
+//        public async Task<IActionResult> Add([FromBody] Department department)
+//        {
+//            var result = await _departmentService.TAddAsync(department);
+//            return Created("", result);
+//        }
 
-        [HttpGet("get")]
-        public async Task<IActionResult> GetJustDepartments()
-        {
-            var departments = await _departmentService.TGetAllAsync();
+//        [HttpPut("update")]
+//        public async Task<IActionResult> Update([FromBody] Department department)
+//        {
+//            await _departmentService.TUpdateAsync(department);
+//            return NoContent();
+//        }
 
-            var departmentDtos = departments.Select(x => new GetDepartments
-            {
-                Id = x.Id,
-                Name = x.Name,
-                
-            }).ToList();
+//        [HttpDelete("delete/{id}")]
+//        public async Task<IActionResult> Delete(int id)
+//        {
+//            var department = await _departmentService.TGetByIdAsync(id);
+//            if (department == null) return NotFound();
 
-            return Ok(departmentDtos);
-        }
+//            await _departmentService.TDeleteAsync(department);
+//            return NoContent();
+//        }
 
+//        // ---------- SPESİFİK METOTLAR ----------
 
+//        [HttpGet("get-all-with-courses")]
+//        public async Task<IActionResult> GetAllWithCourses()
+//        {
+//            var result = await _departmentService.TGetAllWithCoursesAsync();
+//            return Ok(result);
+//        }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetDepartmentById(int id)
-        {
-            var department = await _departmentService.TGetByIdAsync(id);
-            if (department == null)
-                return NotFound();
+//        [HttpGet("get-all-with-faculty-members")]
+//        public async Task<IActionResult> GetAllWithFacultyMembers()
+//        {
+//            var result = await _departmentService.TGetAllWithFacultyMembersAsync();
+//            return Ok(result);
+//        }
 
-            var dto = new UpdateDepartmentDto
-            {
-                Id = department.Id,
-                Name = department.Name,
-                SchoolId = department.SchoolId
-            };
+//        [HttpGet("get-all-with-students")]
+//        public async Task<IActionResult> GetAllWithStudents()
+//        {
+//            var result = await _departmentService.TGetAllWithStudentsAsync();
+//            return Ok(result);
+//        }
 
-            return Ok(dto);
-        }
+//        [HttpGet("get-by-school-id/{schoolId}")]
+//        public async Task<IActionResult> GetDepartmentsBySchoolId(int schoolId)
+//        {
+//            var result = await _departmentService.TGetDepartmentsBySchoolIdAsync(schoolId);
+//            return Ok(result);
+//        }
 
+//        [HttpGet("search-by-name")]
+//        public async Task<IActionResult> SearchByName([FromQuery] string name)
+//        {
+//            var result = await _departmentService.TSearchDepartmentsByNameAsync(name);
+//            return Ok(result);
+//        }
 
-        [HttpPost]
-        public async Task<IActionResult> AddDepartment(DepartmentCreateDto dto)
-        {
-            var department = new Department
-            {
-                Name = dto.Name,
-                SchoolId = dto.SchoolId
-            };
+//        [HttpGet("{departmentId}/courses")]
+//        public async Task<IActionResult> GetCoursesByDepartmentId(int departmentId)
+//        {
+//            var result = await _departmentService.TGetCoursesByDepartmentIdAsync(departmentId);
+//            return Ok(result);
+//        }
 
-            await _departmentService.TAddAsync(department);
-            return Ok();
-        }
+//        [HttpGet("get-details-by-id/{id}")]
+//        public async Task<IActionResult> GetByIdWithDetails(int id)
+//        {
+//            var result = await _departmentService.TGetByIdWithDetailsAsync(id);
+//            if (result == null) return NotFound();
+//            return Ok(result);
+//        }
 
+//        [HttpGet("course-count/{departmentId}")]
+//        public async Task<IActionResult> GetCourseCount(int departmentId)
+//        {
+//            var result = await _departmentService.TGetCourseCountAsync(departmentId);
+//            return Ok(result);
+//        }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateDepartment(UpdateDepartmentDto dto)
-        {
-            var department = await _departmentService.TGetByIdAsync(dto.Id);
-            if (department == null)
-                return NotFound();
-
-            department.Name = dto.Name;
-            department.SchoolId = dto.SchoolId;
-
-            await _departmentService.TUpdateAsync(department);
-            return Ok();
-        }
-
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDepartment(int id)
-        {
-            var department = await _departmentService.TGetByIdAsync(id);
-            if (department == null)
-                return NotFound();
-
-            await _departmentService.TDeleteAsync(department);
-            return Ok();
-        }
-        [HttpGet("by-school/{schoolId}")]
-        public async Task<IActionResult> GetDepartmentsBySchoolId(int schoolId)
-        {
-            var departments = await _departmentService.TGetDepartmentsBySchoolIdAsync(schoolId);
-            if (departments == null || !departments.Any())
-                return NotFound();
-
-            return Ok(departments);
-        }
-        [HttpGet("{departmentId}/courses")]
-        public async Task<IActionResult> GetCoursesByDepartmentId(int departmentId)
-        {
-            var courses = await _departmentService.TGetCoursesByDepartmentIdAsync(departmentId);
-
-            if (courses == null || !courses.Any())
-                return NotFound();
-
-            var result = courses.Select(c => new
-            {
-                c.Id,
-                c.Name,
-                InstructorName = c.Instructor?.UserName // AppUser'da varsa
-            });
-
-            return Ok(result);
-        }
+//        [HttpGet("faculty-count/{departmentId}")]
+//        public async Task<IActionResult> GetFacultyMemberCount(int departmentId)
+//        {
+//            var result = await _departmentService.TGetFacultyMemberCountAsync(departmentId);
+//            return Ok(result);
+//        }
 
 
-
-
-    }
-}
+//    }
+//}

@@ -1,7 +1,7 @@
 ﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
 using AcademicAppointmentApi.EntityLayer.Entities;
-using AcademicAppointmentShare.Dtos.DepartmentDtos;
 using AcademicAppointmentShare.Dtos.SchoolDtos;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,138 +11,93 @@ namespace AcademicAppointmentApi.Presentation.Controllers
     [ApiController]
     [Authorize(AuthenticationSchemes = "Bearer")]
     [Authorize(Roles = "Admin")]
-    public class AdminSchoolController : ControllerBase
-    {
-        private readonly ISchoolService _schoolService;
 
-        public AdminSchoolController(ISchoolService schoolService)
+        public class AdminSchoolController : ControllerBase
         {
-            _schoolService = schoolService;
-        }
+            private readonly ISchoolService _schoolService;
+            private readonly IMapper _mapper;
 
-        // GET: api/admin/AdminSchool
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var schools = await _schoolService.TGetAllAsync();
-
-            var dtoList = schools.Select(s => new SchoolListDto
+            public AdminSchoolController(ISchoolService schoolService, IMapper mapper)
             {
-                Id = s.Id,
-                Name = s.Name
-            }).ToList();
+                _schoolService = schoolService;
+                _mapper = mapper;
+            }
 
-            return Ok(dtoList);
-        }
-
-        // GET: api/admin/AdminSchool/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var school = await _schoolService.TGetByIdAsync(id);
-            if (school == null)
-                return NotFound();
-
-            var dto = new SchoolListDto
+            [HttpGet]
+            public async Task<IActionResult> GetAll()
             {
-                Id = school.Id,
-                Name = school.Name
-            };
+                var schools = await _schoolService.TGetAllAsync();
+                var dtoList = _mapper.Map<List<SchoolListDto>>(schools);
+                return Ok(dtoList);
+            }
 
-            return Ok(dto);
-        }
-
-        // POST: api/admin/AdminSchool
-        [HttpPost]
-        public async Task<IActionResult> Add([FromBody] SchoolCreateDto dto)
-        {
-            var school = new School
+            [HttpGet("{id}")]
+            public async Task<IActionResult> GetById(int id)
             {
-                Name = dto.Name
-            };
+                var school = await _schoolService.TGetByIdAsync(id);
+                if (school == null) return NotFound();
+                var dto = _mapper.Map<SchoolListDto>(school);
+                return Ok(dto);
+            }
 
-            var result = await _schoolService.TAddAsync(school);
-
-            var responseDto = new SchoolListDto
+            [HttpPost]
+            public async Task<IActionResult> Add([FromBody] SchoolCreateDto dto)
             {
-                Id = result.Id,
-                Name = result.Name
-            };
+                var school = _mapper.Map<School>(dto);
+                var result = await _schoolService.TAddAsync(school);
+                var responseDto = _mapper.Map<SchoolListDto>(result);
+                return CreatedAtAction(nameof(GetById), new { id = responseDto.Id }, responseDto);
+            }
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, responseDto);
-        }
-
-        // PUT: api/admin/AdminSchool/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] SchoolUpdateDto dto)
-        {
-            if (id != dto.Id)
-                return BadRequest("ID uyuşmuyor.");
-
-            var school = await _schoolService.TGetByIdAsync(id);
-            if (school == null)
-                return NotFound();
-
-            school.Name = dto.Name;
-
-            await _schoolService.TUpdateAsync(school);
-
-            return NoContent();
-        }
-
-        // DELETE: api/admin/AdminSchool/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var school = await _schoolService.TGetByIdAsync(id);
-            if (school == null)
-                return NotFound();
-
-            await _schoolService.TDeleteAsync(school);
-            return NoContent();
-        }
-
-        // GET: api/admin/AdminSchool/with-departments
-        [HttpGet("with-departments")]
-        public async Task<IActionResult> GetAllWithDepartments()
-        {
-            var schools = await _schoolService.TGetAllWithDepartmentsAsync();
-
-            var dtoList = schools.Select(s => new SchoolDetailDto
+            [HttpPut("{id}")]
+            public async Task<IActionResult> Update(int id, [FromBody] SchoolUpdateDto dto)
             {
-                Id = s.Id,
-                Name = s.Name,
-                Departments = s.Departments?.Select(d => new DepartmentDto
+                if (id != dto.Id) return BadRequest("ID uyuşmuyor.");
+                var school = await _schoolService.TGetByIdAsync(id);
+                if (school == null) return NotFound();
+                _mapper.Map(dto, school);
+                await _schoolService.TUpdateAsync(school);
+                return NoContent();
+            }
+
+            [HttpDelete("{id}")]
+            public async Task<IActionResult> Delete(int id)
+            {
+                var school = await _schoolService.TGetByIdAsync(id);
+                if (school == null) return NotFound();
+                await _schoolService.TDeleteAsync(school);
+                return NoContent();
+            }
+
+            [HttpGet("with-departments")]
+            public async Task<IActionResult> GetAllWithDepartments()
+            {
+                var schools = await _schoolService.TGetAllWithDepartmentsAsync();
+
+                var dtoList = schools.Select(s => new SchoolDetailDto
                 {
-                    Id = d.Id,
-                    Name = d.Name
-                }).ToList() ?? new List<DepartmentDto>()
-            }).ToList();
+                    Id = s.Id,
+                    Name = s.Name,
+                    Departments = s.Departments?.Select(d => _mapper.Map<DepartmentSchoolDto>(d)).ToList() ?? new List<DepartmentSchoolDto>()
+                }).ToList();
 
-            return Ok(dtoList);
-        }
+                return Ok(dtoList);
+            }
 
-        // GET: api/admin/AdminSchool/{schoolId}/departments
-        [HttpGet("{schoolId}/departments")]
-        public async Task<IActionResult> GetDepartmentsBySchoolId(int schoolId)
-        {
-            var departments = await _schoolService.TGetDepartmentsBySchoolIdAsync(schoolId);
-
-            var dtoList = departments.Select(d => new DepartmentDto
+            [HttpGet("{schoolId}/departments")]
+            public async Task<IActionResult> GetDepartmentsBySchoolId(int schoolId)
             {
-                Id = d.Id,
-                Name = d.Name
-            }).ToList();
+                var departments = await _schoolService.TGetDepartmentsBySchoolIdAsync(schoolId);
+                var dtoList = _mapper.Map<List<DepartmentSchoolDto>>(departments);
+                return Ok(dtoList);
+            }
 
-            return Ok(dtoList);
-        }
-
-        // GET: api/admin/AdminSchool/{schoolId}/department-count
-        [HttpGet("{schoolId}/department-count")]
-        public async Task<IActionResult> GetDepartmentCount(int schoolId)
-        {
-            var count = await _schoolService.TGetDepartmentCountAsync(schoolId);
-            return Ok(new { SchoolId = schoolId, DepartmentCount = count });
+            [HttpGet("{schoolId}/department-count")]
+            public async Task<IActionResult> GetDepartmentCount(int schoolId)
+            {
+                var count = await _schoolService.TGetDepartmentCountAsync(schoolId);
+                return Ok(new { SchoolId = schoolId, DepartmentCount = count });
+            }
         }
     }
-}
+
