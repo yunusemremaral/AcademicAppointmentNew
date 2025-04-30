@@ -19,11 +19,25 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
             _context = context;
         }
 
-        public async Task<List<School>> GetSchoolsWithDepartmentsAsync()
+        public async Task<List<School>> GetAllWithDepartmentsAsync()
         {
             return await _context.Schools
                 .Include(s => s.Departments)
+                .AsNoTracking()
                 .ToListAsync();
+        }
+
+        public async Task<List<Department>> GetDepartmentsBySchoolIdAsync(int schoolId)
+        {
+            var school = await _context.Schools
+                .Include(s => s.Departments)
+                .FirstOrDefaultAsync(s => s.Id == schoolId);
+
+            return school?.Departments?.ToList() ?? new List<Department>();
+        }
+        public async Task<int> GetDepartmentCountAsync(int schoolId)
+        {
+            return await _context.Departments.CountAsync(d => d.SchoolId == schoolId);
         }
     }
 }

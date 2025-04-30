@@ -9,7 +9,9 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
     public interface ISchoolService : ITGenericService<School>
     {
-        Task<List<School>> TGetSchoolsWithDepartmentsAsync();
+        Task<List<School>> TGetAllWithDepartmentsAsync();
+        Task<List<Department>> TGetDepartmentsBySchoolIdAsync(int schoolId);
+        Task<int> TGetDepartmentCountAsync(int schoolId);
     }
 
 }

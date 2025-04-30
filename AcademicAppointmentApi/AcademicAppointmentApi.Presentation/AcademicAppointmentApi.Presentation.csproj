@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.15" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.15" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.15" />
@@ -23,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\AcademicAppointmentShare\AcademicAppointmentShare.csproj" />
     <ProjectReference Include="..\AcademicAppointmentApi.BusinessLayer\AcademicAppointmentApi.BusinessLayer.csproj" />
     <ProjectReference Include="..\AcademicAppointmentApi.DataAccessLayer\AcademicAppointmentApi.DataAccessLayer.csproj" />
     <ProjectReference Include="..\AcademicAppointmentApi.Entity\AcademicAppointmentApi.EntityLayer.csproj" />

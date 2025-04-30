@@ -22,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcademicAppointmentApi.Busi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcademicAppointmentAdminMvc.MvcProject", "AcademicAppointmentAdminMvc\AcademicAppointmentAdminMvc.MvcProject\AcademicAppointmentAdminMvc.MvcProject.csproj", "{B94CE315-8754-463D-B26B-E480404E0CF1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{3A8FB853-E96B-412B-94E0-E6BBB8390600}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcademicAppointmentShare", "AcademicAppointmentShare\AcademicAppointmentShare.csproj", "{F6CBB2CA-7F85-4879-B1D9-611F87D65C6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +50,10 @@ Global
 		{B94CE315-8754-463D-B26B-E480404E0CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B94CE315-8754-463D-B26B-E480404E0CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B94CE315-8754-463D-B26B-E480404E0CF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6CBB2CA-7F85-4879-B1D9-611F87D65C6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6CBB2CA-7F85-4879-B1D9-611F87D65C6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6CBB2CA-7F85-4879-B1D9-611F87D65C6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6CBB2CA-7F85-4879-B1D9-611F87D65C6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,7 +64,6 @@ Global
 		{6281E96E-B04B-45FD-8D5E-0CCFB5A4522A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{3F7E6564-148C-4398-8C6D-7BC8C97830D6} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{B94CE315-8754-463D-B26B-E480404E0CF1} = {7F236793-E096-4455-AE96-AF6BD8F90720}
-		{3A8FB853-E96B-412B-94E0-E6BBB8390600} = {7AE96CEF-E831-4E08-80AE-8E5BF392A233}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13D56716-92BB-4480-A6D1-7AC02A049084}

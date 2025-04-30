@@ -1,18 +1,24 @@
-    using AcademicAppointmentApi.BusinessLayer.Abstract;
-    using AcademicAppointmentApi.BusinessLayer.Concrete;
-    using AcademicAppointmentApi.DataAccessLayer.Abstract;
-    using AcademicAppointmentApi.DataAccessLayer.Concrete;
-    using AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore;
-    using AcademicAppointmentApi.EntityLayer.Entities;
-    using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AcademicAppointmentApi.BusinessLayer.Abstract;
+using AcademicAppointmentApi.BusinessLayer.Concrete;
+using AcademicAppointmentApi.DataAccessLayer.Abstract;
+using AcademicAppointmentApi.DataAccessLayer.Concrete;
+using AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore;
+using AcademicAppointmentApi.EntityLayer.Entities;
+using AcademicAppointmentApi.Presentation.AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.IdentityModel.Tokens;
-    using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 
-    var builder = WebApplication.CreateBuilder(args);
+
+
+
+
+var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddCors(options =>
@@ -59,9 +65,13 @@ builder.Services.AddDbContext<Context>(opts =>
         };
     });
 
-    // 3) Dependency Injection (DI)
-    // Generic Repositories & Services
-    builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+// 3) Dependency Injection (DI)
+// Generic Repositories & Services
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<MappingProfile>();
+});
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
     builder.Services.AddScoped(typeof(ITGenericService<>), typeof(TGenericService<>));
 
     // Entity-Specific Repositories
