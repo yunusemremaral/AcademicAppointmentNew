@@ -19,34 +19,31 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
             _context = context;
         }
 
-        public async Task<List<Course>> GetCoursesByDepartmentIdAsync(int departmentId)
+        // DepartmentId'ye göre Course'ları al
+        public async Task<IReadOnlyList<Course>> GetByDepartmentIdAsync(int departmentId)
         {
             return await _context.Courses
                 .Where(c => c.DepartmentId == departmentId)
                 .ToListAsync();
         }
 
-        public async Task<List<Course>> GetCoursesByInstructorIdAsync(string instructorId)
+        // InstructorId'ye göre Course'ları al
+        public async Task<IReadOnlyList<Course>> GetByInstructorIdAsync(string instructorId)
         {
             return await _context.Courses
                 .Where(c => c.InstructorId == instructorId)
                 .ToListAsync();
         }
-        public async Task<List<Course>> GetCoursesWithDepartmentAndInstructorAsync()
+
+        // Course'u detaylarıyla birlikte al
+        public async Task<Course> GetCourseWithDetailsAsync(int courseId)
         {
             return await _context.Courses
                 .Include(c => c.Department)
                 .Include(c => c.Instructor)
-                .ToListAsync();
+                .FirstOrDefaultAsync(c => c.Id == courseId);
         }
 
-        public async Task<Course> GetCourseWithDetailsByIdAsync(int id)
-        {
-            return await _context.Courses
-                .Include(c => c.Department)
-                .Include(c => c.Instructor)
-                .FirstOrDefaultAsync(c => c.Id == id);
-        }
 
     }
 }

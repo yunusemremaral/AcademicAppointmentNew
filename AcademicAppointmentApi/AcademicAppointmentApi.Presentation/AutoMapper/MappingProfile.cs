@@ -1,4 +1,5 @@
 ﻿using AcademicAppointmentApi.EntityLayer.Entities;
+using AcademicAppointmentShare.Dtos.CourseDtos;
 using AcademicAppointmentShare.Dtos.DepartmentDtos;
 using AcademicAppointmentShare.Dtos.SchoolDtos;
 using AutoMapper;
@@ -34,14 +35,31 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
                 .ReverseMap();
 
             // COURSE MAPPINGS
-            CreateMap<Course, CourseDepartmentDto>().ReverseMap();
-
-            // COURSE WITH DETAILS MAPPING
-            CreateMap<Course, CourseWithDetailsDto>()
-                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name)) // DepartmentName için ilişkili isim
-                .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor.UserName)) // InstructorName için ilişkili isim
-                .ForMember(dest => dest.InstructorId, opt => opt.MapFrom(src => src.Instructor.Id.ToString())) // InstructorId
+            CreateMap<Course, CourseDepartmentDto>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty)) // Null kontrolü ekleyin
                 .ReverseMap();
+
+            CreateMap<Course, CourseDepartmentWithDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty)) // Null kontrolü ekleyin
+                .ReverseMap();
+
+            CreateMap<Course, CourseListDto>()
+    .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty))
+    .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.UserName : string.Empty));
+
+            CreateMap<Course, CourseWithDetailsDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty)) // Null kontrolü ekleyin
+                .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.UserName : string.Empty)) // Null kontrolü ekleyin
+                .ForMember(dest => dest.InstructorId, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.Id.ToString() : string.Empty)) // Null kontrolü ekleyin
+                .ReverseMap();
+
+            CreateMap<Course, CourseWithDetailsWithDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty)) // Null kontrolü ekleyin
+                .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.UserName : string.Empty)) // Null kontrolü ekleyin
+                .ForMember(dest => dest.InstructorId, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.Id.ToString() : string.Empty)) // Null kontrolü ekleyin
+                .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.Email : string.Empty)) // Null kontrolü ekleyin
+                .ReverseMap();
+
         }
     }
 }
