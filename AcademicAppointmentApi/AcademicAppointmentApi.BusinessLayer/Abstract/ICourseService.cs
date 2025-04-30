@@ -9,9 +9,9 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
     public interface ICourseService : ITGenericService<Course>
     {
-        Task<IReadOnlyList<Course>> TGetByDepartmentIdAsync(int departmentId);
-        Task<IReadOnlyList<Course>> TGetByInstructorIdAsync(string instructorId);
-        Task<Course> TGetCourseWithDetailsAsync(int courseId);
+        Task<Course?> GetByIdWithDetailsAsync(int id);
+        Task<List<Course>> GetAllWithDetailsAsync();
+        Task<List<Course>> GetAllByInstructorIdWithDetailsAsync(string instructorId);
 
     }
 

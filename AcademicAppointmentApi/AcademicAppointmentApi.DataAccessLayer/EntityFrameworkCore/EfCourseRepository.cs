@@ -19,31 +19,96 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
             _context = context;
         }
 
-        // DepartmentId'ye göre Course'ları al
-        public async Task<IReadOnlyList<Course>> GetByDepartmentIdAsync(int departmentId)
+        public async Task<Course?> GetByIdWithDetailsAsync(int id)
         {
             return await _context.Courses
-                .Where(c => c.DepartmentId == departmentId)
+                .Where(c => c.Id == id)
+                .Select(c => new Course
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    DepartmentId = c.DepartmentId,
+                    Department = new Department
+                    {
+                        Id = c.Department.Id,
+                        Name = c.Department.Name,
+                        SchoolId = c.Department.SchoolId,
+                        School = new School
+                        {
+                            Id = c.Department.School.Id,
+                            Name = c.Department.School.Name
+                        }
+                    },
+                    InstructorId = c.InstructorId,
+                    Instructor = new AppUser
+                    {
+                        Id = c.Instructor.Id,
+                        UserName = c.Instructor.UserName,
+                        Email = c.Instructor.Email
+                    }
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Course>> GetAllWithDetailsAsync()
+        {
+            return await _context.Courses
+                .Select(c => new Course
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    DepartmentId = c.DepartmentId,
+                    Department = new Department
+                    {
+                        Id = c.Department.Id,
+                        Name = c.Department.Name,
+                        SchoolId = c.Department.SchoolId,
+                        School = new School
+                        {
+                            Id = c.Department.School.Id,
+                            Name = c.Department.School.Name
+                        }
+                    },
+                    InstructorId = c.InstructorId,
+                    Instructor = new AppUser
+                    {
+                        Id = c.Instructor.Id,
+                        UserName = c.Instructor.UserName,
+                        Email = c.Instructor.Email
+                    }
+                })
                 .ToListAsync();
         }
 
-        // InstructorId'ye göre Course'ları al
-        public async Task<IReadOnlyList<Course>> GetByInstructorIdAsync(string instructorId)
+        public async Task<List<Course>> GetAllByInstructorIdWithDetailsAsync(string instructorId)
         {
             return await _context.Courses
                 .Where(c => c.InstructorId == instructorId)
+                .Select(c => new Course
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    DepartmentId = c.DepartmentId,
+                    Department = new Department
+                    {
+                        Id = c.Department.Id,
+                        Name = c.Department.Name,
+                        SchoolId = c.Department.SchoolId,
+                        School = new School
+                        {
+                            Id = c.Department.School.Id,
+                            Name = c.Department.School.Name
+                        }
+                    },
+                    InstructorId = c.InstructorId,
+                    Instructor = new AppUser
+                    {
+                        Id = c.Instructor.Id,
+                        UserName = c.Instructor.UserName,
+                        Email = c.Instructor.Email
+                    }
+                })
                 .ToListAsync();
         }
-
-        // Course'u detaylarıyla birlikte al
-        public async Task<Course> GetCourseWithDetailsAsync(int courseId)
-        {
-            return await _context.Courses
-                .Include(c => c.Department)
-                .Include(c => c.Instructor)
-                .FirstOrDefaultAsync(c => c.Id == courseId);
-        }
-
-
     }
 }

@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentShare.Dtos.CourseDtos
 {
-    public class CourseDepartmentWithDto
+    public class CourseWithInstructorAndDepartmentDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int DepartmentId { get; set; }
+
         public string DepartmentName { get; set; }
+        public string SchoolName { get; set; }
+
+        public string InstructorUserName { get; set; }
+        public string InstructorEmail { get; set; }
     }
 }

@@ -18,21 +18,19 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             _courseRepository = courseRepository;
         }
 
-        public async Task<IReadOnlyList<Course>> TGetByDepartmentIdAsync(int departmentId)
+        public async Task<Course?> GetByIdWithDetailsAsync(int id)
         {
-            return await _courseRepository.GetByDepartmentIdAsync(departmentId);
+            return await _courseRepository.GetByIdWithDetailsAsync(id);
         }
 
-        // InstructorId'ye göre Course'ları al
-        public async Task<IReadOnlyList<Course>> TGetByInstructorIdAsync(string instructorId)
+        public async Task<List<Course>> GetAllWithDetailsAsync()
         {
-            return await _courseRepository.GetByInstructorIdAsync(instructorId);
+            return await _courseRepository.GetAllWithDetailsAsync();
         }
 
-        // Course'u detaylarıyla birlikte al
-        public async Task<Course> TGetCourseWithDetailsAsync(int courseId)
+        public async Task<List<Course>> GetAllByInstructorIdWithDetailsAsync(string instructorId)
         {
-            return await _courseRepository.GetCourseWithDetailsAsync(courseId);
+            return await _courseRepository.GetAllByInstructorIdWithDetailsAsync(instructorId);
         }
 
     }

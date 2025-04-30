@@ -11,97 +11,92 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 {
     [Route("api/admin/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(AuthenticationSchemes = "Bearer")]
+    //[Authorize(Roles = "Admin")]
     public class AdminCourseController : ControllerBase
     {
         private readonly ICourseService _courseService;
         private readonly IMapper _mapper;
 
-        // Constructor dependency injection for both CourseService and AutoMapper
         public AdminCourseController(ICourseService courseService, IMapper mapper)
         {
             _courseService = courseService;
             _mapper = mapper;
         }
 
-        // GET: api/admin/course
+        // GET: api/admin/AdminCourse
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var courses = await _courseService.TGetAllAsync();
-            var courseDtos = _mapper.Map<List<CourseListDto>>(courses);
-            return Ok(courseDtos);
+            var dto = _mapper.Map<List<CourseListDto>>(courses);
+            return Ok(dto);
         }
 
-        // GET: api/admin/course/{id}
+        // GET: api/admin/AdminCourse/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var course = await _courseService.TGetByIdAsync(id);
             if (course == null) return NotFound();
-            var courseDto = _mapper.Map<CourseDetailDto>(course);
-            return Ok(courseDto);
+            var dto = _mapper.Map<CourseListDto>(course);
+            return Ok(dto);
         }
 
-        // GET: api/admin/course/by-department/{departmentId}
-        [HttpGet("by-department/{departmentId}")]
-        public async Task<IActionResult> GetByDepartmentId(int departmentId)
+        // GET: api/admin/AdminCourse/WithDetails
+        [HttpGet("WithDetails")]
+        public async Task<IActionResult> GetAllWithDetails()
         {
-            var courses = await _courseService.TGetByDepartmentIdAsync(departmentId);
-            var courseDtos = _mapper.Map<List<CourseListDto>>(courses);
-            return Ok(courseDtos);
+            var courses = await _courseService.GetAllWithDetailsAsync();
+            var dto = _mapper.Map<List<CourseWithInstructorAndDepartmentDto>>(courses);
+            return Ok(dto);
         }
 
-        // GET: api/admin/course/by-instructor/{instructorId}
-        [HttpGet("by-instructor/{instructorId}")]
-        public async Task<IActionResult> GetByInstructorId(string instructorId)
+        // GET: api/admin/AdminCourse/WithDetails/5
+        [HttpGet("WithDetails/{id}")]
+        public async Task<IActionResult> GetByIdWithDetails(int id)
         {
-            var courses = await _courseService.TGetByInstructorIdAsync(instructorId);
-            var courseDtos = _mapper.Map<List<CourseListDto>>(courses);
-            return Ok(courseDtos);
-        }
-
-        // GET: api/admin/course/details/{courseId}
-        [HttpGet("details/{courseId}")]
-        public async Task<IActionResult> GetCourseWithDetails(int courseId)
-        {
-            var course = await _courseService.TGetCourseWithDetailsAsync(courseId);
+            var course = await _courseService.GetByIdWithDetailsAsync(id);
             if (course == null) return NotFound();
-            var courseDto = _mapper.Map<CourseDetailDto>(course);
-            return Ok(courseDto);
+            var dto = _mapper.Map<CourseDetailDto>(course);
+            return Ok(dto);
         }
 
-        // POST: api/admin/course
+        // GET: api/admin/AdminCourse/ByInstructor/{instructorId}
+        [HttpGet("ByInstructor/{instructorId}")]
+        public async Task<IActionResult> GetAllByInstructor(string instructorId)
+        {
+            var courses = await _courseService.GetAllByInstructorIdWithDetailsAsync(instructorId);
+            var dto = _mapper.Map<List<CourseWithInstructorAndDepartmentDto>>(courses);
+            return Ok(dto);
+        }
+
+        // POST: api/admin/AdminCourse
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CourseCreateDto dto)
+        public async Task<IActionResult> Create(CourseCreateDto dto)
         {
             var course = _mapper.Map<Course>(dto);
-            var createdCourse = await _courseService.TAddAsync(course);
-            var createdCourseDto = _mapper.Map<CourseDetailDto>(createdCourse);
-            return CreatedAtAction(nameof(GetById), new { id = createdCourse.Id }, createdCourseDto);
+            await _courseService.TAddAsync(course);
+            return Ok(course);
         }
 
-        // PUT: api/admin/course/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CourseUpdateDto dto)
+        // PUT: api/admin/AdminCourse
+        [HttpPut]
+        public async Task<IActionResult> Update(CourseUpdateDto dto)
         {
-            if (id != dto.Id) return BadRequest("ID mismatch.");
-
             var course = _mapper.Map<Course>(dto);
             await _courseService.TUpdateAsync(course);
-            return NoContent();
+            return Ok();
         }
 
-        // DELETE: api/admin/course/{id}
+        // DELETE: api/admin/AdminCourse/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var course = await _courseService.TGetByIdAsync(id);
             if (course == null) return NotFound();
-
             await _courseService.TDeleteAsync(course);
-            return NoContent();
+            return Ok();
         }
     }
 }

@@ -53,7 +53,24 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
 
             #endregion
 
+            #region COURSE
 
+            CreateMap<Course, CourseListDto>().ReverseMap();
+            CreateMap<Course, CourseCreateDto>().ReverseMap();
+            CreateMap<Course, CourseUpdateDto>().ReverseMap();
+
+            CreateMap<Course, CourseDetailDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
+                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserName))
+                .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor.Email));
+
+            CreateMap<Course, CourseWithInstructorAndDepartmentDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
+                .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.Department.School.Name))
+                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserName))
+                .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor.Email));
+
+            #endregion
 
 
         }

@@ -9,9 +9,10 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
 {
     public interface ICourseRepository : IGenericRepository<Course>
     {
-        Task<IReadOnlyList<Course>> GetByDepartmentIdAsync(int departmentId);
-        Task<IReadOnlyList<Course>> GetByInstructorIdAsync(string instructorId);
-        Task<Course> GetCourseWithDetailsAsync(int courseId);
+        Task<Course?> GetByIdWithDetailsAsync(int id);
+        Task<List<Course>> GetAllWithDetailsAsync();
+        Task<List<Course>> GetAllByInstructorIdWithDetailsAsync(string instructorId);
+
 
     }
 }

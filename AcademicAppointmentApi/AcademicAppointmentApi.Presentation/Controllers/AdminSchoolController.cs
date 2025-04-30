@@ -9,8 +9,8 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 {
     [Route("api/admin/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(AuthenticationSchemes = "Bearer")]
+    //[Authorize(Roles = "Admin")]
 
         public class AdminSchoolController : ControllerBase
         {
