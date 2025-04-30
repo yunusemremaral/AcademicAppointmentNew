@@ -28,16 +28,8 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
 
         }
 
-       
 
-        
 
-        public async Task<IReadOnlyList<Department>> GetDepartmentsBySchoolIdAsync(int schoolId)
-        {
-            return await _context.Departments
-                .Where(d => d.SchoolId == schoolId)
-                .ToListAsync();
-        }
 
 
 
@@ -45,19 +37,35 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
         {
             return await _context.Courses
                 .Where(c => c.DepartmentId == departmentId)
-                .Include(c => c.Department) // Department ile olan ilişkiyi dahil et
-                .Include(c => c.Instructor) // Instructor ile olan ilişkiyi dahil et
+                .Select(c => new Course
+                {
+                    Id = c.Id,
+                    Name = c.Name
+                })
                 .ToListAsync();
         }
+
 
         public async Task<Department?> GetByIdWithDetailsAsync(int id)
         {
             return await _context.Departments
-                .Include(d => d.School)
-                .Include(d => d.Courses)
-                .Include(d => d.FacultyMembers)
-                .FirstOrDefaultAsync(d => d.Id == id);
+                .Where(d => d.Id == id)
+                .Select(d => new Department
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    SchoolId = d.SchoolId,
+                    School = new School
+                    {
+                        Id = d.School.Id,
+                        Name = d.School.Name
+                    },
+                    FacultyMembers = d.FacultyMembers,  // İhtiyaç varsa eklenebilir
+                    Courses = d.Courses // İhtiyaç varsa eklenebilir
+                })
+                .FirstOrDefaultAsync();
         }
+
 
         public async Task<int> GetCourseCountAsync(int departmentId)
         {

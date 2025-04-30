@@ -6,13 +6,9 @@ using System.Threading.Tasks;
 
 namespace AcademicAppointmentShare.Dtos.DepartmentDtos
 {
-    public class DepartmentListWithCoursesDto
+    public class FacultyMemberDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<DepartmentCourseDto> Courses { get; set; }
-
-
     }
-
 }

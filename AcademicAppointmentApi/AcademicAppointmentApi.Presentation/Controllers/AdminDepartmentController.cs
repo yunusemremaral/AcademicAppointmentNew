@@ -11,8 +11,8 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 {
     [Route("api/admin/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(AuthenticationSchemes = "Bearer")]
+    // [Authorize(Roles = "Admin")]
     public class AdminDepartmentController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;
@@ -24,87 +24,95 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             _mapper = mapper;
         }
 
+        // Get all departments
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllDepartments()
         {
             var departments = await _departmentService.TGetAllAsync();
-            var dto = _mapper.Map<List<DepartmentListDto>>(departments);
-            return Ok(dto);
+            var departmentDtos = _mapper.Map<List<DepartmentListDto>>(departments);
+            return Ok(departmentDtos); 
         }
 
+        // Get all departments with their courses
         [HttpGet("with-courses")]
-        public async Task<IActionResult> GetAllWithCourses()
+        public async Task<IActionResult> GetAllDepartmentsWithCourses()
         {
             var departments = await _departmentService.TGetAllWithCoursesAsync();
-            var dto = _mapper.Map<List<DepartmentListWithCoursesDto>>(departments);
-            return Ok(dto);
-        }
+            var departmentDtos = _mapper.Map<List<DepartmentListWithCoursesDto>>(departments);
+            return Ok(departmentDtos);
 
-        [HttpGet("by-school/{schoolId}")]
-        public async Task<IActionResult> GetDepartmentsBySchoolId(int schoolId)
-        {
-            var departments = await _departmentService.TGetDepartmentsBySchoolIdAsync(schoolId);
-            var dto = _mapper.Map<List<DepartmentListDto>>(departments);
-            return Ok(dto);
         }
-
+        // Get courses by department ID
         [HttpGet("courses/{departmentId}")]
         public async Task<IActionResult> GetCoursesByDepartmentId(int departmentId)
         {
             var courses = await _departmentService.TGetCoursesByDepartmentIdAsync(departmentId);
-
-            // AutoMapper kullanarak Course listesini DTO'ya dönüştürme
-            var courseDtos = _mapper.Map<List<CourseWithDetailsDto>>(courses);
-
+            var courseDtos = _mapper.Map<List<DepartmentCourseDto>>(courses); 
             return Ok(courseDtos);
         }
 
-
+        // Get department details by ID
         [HttpGet("details/{id}")]
-        public async Task<IActionResult> GetByIdWithDetails(int id)
+        public async Task<IActionResult> GetDepartmentDetailsById(int id)
         {
             var department = await _departmentService.TGetByIdWithDetailsAsync(id);
-            if (department == null) return NotFound();
-            var dto = _mapper.Map<DepartmentDetailDto>(department);
-            return Ok(dto);
+            if (department == null)
+                return NotFound(); 
+
+            var departmentDto = _mapper.Map<DepartmentDetailDto>(department);
+            return Ok(departmentDto); 
         }
 
-        // GET: api/admin/department/course-count/5
+        // Get the number of courses in a department
         [HttpGet("course-count/{departmentId}")]
         public async Task<IActionResult> GetCourseCount(int departmentId)
         {
-            var count = await _departmentService.TGetCourseCountAsync(departmentId);
-            return Ok(count);
+            var courseCount = await _departmentService.TGetCourseCountAsync(departmentId);
+            return Ok(courseCount);
         }
 
+        // Create a new department
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] DepartmentCreateDto dto)
+        public async Task<IActionResult> CreateDepartment([FromBody] DepartmentCreateDto departmentCreateDto)
         {
-            var entity = _mapper.Map<Department>(dto);
-            var created = await _departmentService.TAddAsync(entity);
-            var createdDto = _mapper.Map<DepartmentUpdateDto>(created);
-            return CreatedAtAction(nameof(GetByIdWithDetails), new { id = created.Id }, createdDto);
+            if (departmentCreateDto == null)
+                return BadRequest(); 
+
+            var department = _mapper.Map<Department>(departmentCreateDto);
+            var createdDepartment = await _departmentService.TAddAsync(department);
+            var createdDepartmentDto = _mapper.Map<DepartmentCreateDto>(createdDepartment);
+
+            return CreatedAtAction(nameof(GetDepartmentDetailsById), new { id = createdDepartment.Id }, createdDepartmentDto);
         }
 
-
-        // PUT: api/admin/department/5
+        // Update an existing department
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] DepartmentUpdateDto dto)
+        public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentUpdateDto departmentUpdateDto)
         {
-            if (id != dto.Id) return BadRequest();
-            var entity = _mapper.Map<Department>(dto);
-            await _departmentService.TUpdateAsync(entity);
+            if (id != departmentUpdateDto.Id)
+                return BadRequest("ID uyuşmuyor.");
+
+            var existingDepartment = await _departmentService.TGetByIdAsync(id);
+            if (existingDepartment == null)
+                return NotFound("Böyle bir bölüm bulunamadı.");
+
+            _mapper.Map(departmentUpdateDto, existingDepartment);
+            await _departmentService.TUpdateAsync(existingDepartment);
+
             return NoContent();
         }
 
-        // DELETE: api/admin/department/5
+        // Delete a department
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteDepartment(int id)
         {
             var department = await _departmentService.TGetByIdAsync(id);
-            if (department == null) return NotFound();
+            if (department == null)
+                return NotFound(); 
+
             await _departmentService.TDeleteAsync(department);
-            return NoContent();
+            return NoContent(); 
         }
     }
+
 }

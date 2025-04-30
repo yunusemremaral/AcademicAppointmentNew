@@ -29,47 +29,32 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
 
             #endregion
 
-
-            // DEPARTMENT MAPPINGS
-            CreateMap<DepartmentCreateDto, Department>()
-                .ForMember(dest => dest.School, opt => opt.Ignore()) // Eğer School'ı ayrıca eklemek gerekiyorsa
-                .ForMember(dest => dest.Courses, opt => opt.Ignore()); // Eğer Courses ayrıca eklenmeli
-
-            CreateMap<Department, DepartmentListDto>().ReverseMap();
-            CreateMap<Department, DepartmentUpdateDto>().ReverseMap();
+            #region DEPARTMENT
+            // Department Entity to Department DTO
+            CreateMap<Department, DepartmentListDto>();
             CreateMap<Department, DepartmentDetailDto>()
-                .ForMember(dest => dest.School, opt => opt.MapFrom(src => src.School))
-                .ForMember(dest => dest.Courses, opt => opt.MapFrom(src => src.Courses))
-                .ReverseMap();
+                .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.School.Name)); // Custom mapping for SchoolName
             CreateMap<Department, DepartmentListWithCoursesDto>()
-                .ForMember(dest => dest.Courses, opt => opt.MapFrom(src => src.Courses))
-                .ReverseMap();
+                .ForMember(dest => dest.Courses, opt => opt.MapFrom(src => src.Courses));
 
-            // COURSE MAPPINGS
-            CreateMap<Course, CourseDepartmentDto>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty)) // Null kontrolü ekleyin
-                .ReverseMap();
+            // Department DTO to Department Entity
+            CreateMap<DepartmentCreateDto, Department>().ReverseMap();
+            CreateMap<DepartmentUpdateDto, Department>(); // This was missing, it should be added to resolve the error
 
-            CreateMap<Course, CourseDepartmentWithDto>()
-                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty)) // Null kontrolü ekleyin
-                .ReverseMap();
+            // DepartmentCourse DTO and Entity
+            CreateMap<Course, DepartmentCourseDto>();
 
-            CreateMap<Course, CourseListDto>()
-    .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty))
-    .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.UserName : string.Empty));
+            // Map AppUser to DepartmentAppUserDto
+            CreateMap<AppUser, DepartmentAppUserDto>();  // Map AppUser to DepartmentAppUserDto
 
-            CreateMap<Course, CourseWithDetailsDto>()
-                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty)) // Null kontrolü ekleyin
-                .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.UserName : string.Empty)) // Null kontrolü ekleyin
-                .ForMember(dest => dest.InstructorId, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.Id.ToString() : string.Empty)) // Null kontrolü ekleyin
-                .ReverseMap();
+            // Map Faculty Members (AppUser) to DepartmentAppUserDto
+            CreateMap<Department, DepartmentDetailDto>()
+                .ForMember(dest => dest.FacultyMembers, opt => opt.MapFrom(src => src.FacultyMembers));  // Map FacultyMembers to DepartmentAppUserDto
 
-            CreateMap<Course, CourseWithDetailsWithDto>()
-                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : string.Empty)) // Null kontrolü ekleyin
-                .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.UserName : string.Empty)) // Null kontrolü ekleyin
-                .ForMember(dest => dest.InstructorId, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.Id.ToString() : string.Empty)) // Null kontrolü ekleyin
-                .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.Email : string.Empty)) // Null kontrolü ekleyin
-                .ReverseMap();
+            #endregion
+
+
+
 
         }
     }
