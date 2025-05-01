@@ -1,10 +1,7 @@
 ﻿using AcademicAppointmentApi.BusinessLayer.Abstract;
 using AcademicAppointmentApi.DataAccessLayer.Abstract;
 using AcademicAppointmentApi.EntityLayer.Entities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.BusinessLayer.Concrete
@@ -18,14 +15,24 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             _messageRepository = messageRepository;
         }
 
-        public async Task<List<Message>> TGetMessagesBySenderIdAsync(string senderId)
+        public async Task<IReadOnlyList<Message>> TGetMessagesByUserIdAsync(string userId)
         {
-            return await _messageRepository.GetMessagesBySenderIdAsync(senderId);
+            return await _messageRepository.GetMessagesByUserIdAsync(userId);
         }
 
-        public async Task<List<Message>> TGetMessagesByReceiverIdAsync(string receiverId)
+        public async Task<IReadOnlyList<Message>> TGetConversationAsync(string userId1, string userId2)
         {
-            return await _messageRepository.GetMessagesByReceiverIdAsync(receiverId);
+            return await _messageRepository.GetConversationAsync(userId1, userId2);
+        }
+
+        public async Task<IReadOnlyList<Message>> TGetSentMessagesAsync(string senderId)
+        {
+            return await _messageRepository.GetSentMessagesAsync(senderId);
+        }
+
+        public async Task<IReadOnlyList<Message>> TGetReceivedMessagesAsync(string receiverId)
+        {
+            return await _messageRepository.GetReceivedMessagesAsync(receiverId);
         }
     }
 }
