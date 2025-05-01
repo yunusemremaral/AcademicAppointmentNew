@@ -9,9 +9,15 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
 {
     public interface IAppointmentRepository : IGenericRepository<Appointment>
     {
-        Task<List<Appointment>> GetAppointmentsByStudentIdAsync(string studentId);
-        Task<List<Appointment>> GetAppointmentsByAcademicIdAsync(string academicId);
+        Task<List<Appointment>> GetAllAppointmentsWithUsersAsync();
+        Task<List<Appointment>> GetAppointmentsByAcademicIdAsync(string academicUserId);
+        Task<List<Appointment>> GetAppointmentsByStudentIdAsync(string studentUserId);
+        Task<Appointment> GetAppointmentByIdWithUsersAsync(int id);
         Task<List<Appointment>> GetAppointmentsByDateAsync(DateTime date);
+        Task<List<Appointment>> GetAppointmentsInDateRangeAsync(DateTime start, DateTime end);
+        Task<List<Appointment>> GetPastAppointmentsByUserIdAsync(string userId);
+        Task<List<Appointment>> GetUpcomingAppointmentsByUserIdAsync(string userId);
+        Task<List<Appointment>> GetAppointmentsByStatusAsync(AppointmentStatus status);
     }
 
 }
