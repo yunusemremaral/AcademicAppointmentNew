@@ -11,8 +11,8 @@ namespace AcademicAppointmentApi.Presentation.Controllers
 {
     [Route("api/admin/[controller]")]
     [ApiController]
-    // [Authorize(AuthenticationSchemes = "Bearer")]
-    // [Authorize(Roles = "Admin")]
+    //[Authorize(AuthenticationSchemes = "Bearer")]
+    //[Authorize(Roles = "Admin")]
     public class AdminDepartmentController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;

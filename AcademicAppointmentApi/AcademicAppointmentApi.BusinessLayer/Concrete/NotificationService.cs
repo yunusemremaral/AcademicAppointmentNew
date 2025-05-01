@@ -18,10 +18,7 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             _notificationRepository = notificationRepository;
         }
 
-        public async Task<List<Notification>> TGetNotificationsByUserIdAsync(string userId)
-        {
-            return await _notificationRepository.GetNotificationsByUserIdAsync(userId);
-        }
+        
     }
 
 }

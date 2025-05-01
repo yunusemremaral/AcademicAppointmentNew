@@ -56,13 +56,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.Concrete
                     .HasForeignKey<Room>(r => r.AppUserId)
                     .OnDelete(DeleteBehavior.SetNull); // Oda silinirse kullanıcının RoomId'si null olsun
 
-                // Notification - AppUser (Many-to-1)
-                builder.Entity<Notification>()
-                    .HasOne(n => n.User)
-                    .WithMany() // Notification koleksiyonu AppUser'da tanımlı değilse
-                    .HasForeignKey(n => n.UserId)
-                    .OnDelete(DeleteBehavior.Cascade); // Kullanıcı silinirse bildirimler de silinsin
-
+             
                 // Message - Sender/Receiver (Many-to-1)
                 builder.Entity<Message>()
                     .HasOne(m => m.Sender)

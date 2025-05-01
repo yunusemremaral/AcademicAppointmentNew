@@ -19,11 +19,6 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
             _context = context;
         }
 
-        public async Task<List<Notification>> GetNotificationsByUserIdAsync(string userId)
-        {
-            return await _context.Notifications
-                .Where(n => n.UserId == userId)
-                .ToListAsync();
-        }
+       
     }
 }

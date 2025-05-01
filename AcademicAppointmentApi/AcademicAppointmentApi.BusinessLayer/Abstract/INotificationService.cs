@@ -9,7 +9,6 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
     public interface INotificationService : ITGenericService<Notification>
     {
-        Task<List<Notification>> TGetNotificationsByUserIdAsync(string userId);
     }
 
 }

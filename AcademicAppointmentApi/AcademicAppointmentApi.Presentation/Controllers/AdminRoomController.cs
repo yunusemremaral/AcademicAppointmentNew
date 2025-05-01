@@ -2,16 +2,17 @@
 using AcademicAppointmentApi.EntityLayer.Entities;
 using AcademicAppointmentShare.Dtos.RoomDtos;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AcademicAppointmentApi.Presentation.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/admin/[controller]")]
     [ApiController]
-    // [Authorize(AuthenticationSchemes = "Bearer")]
-    // [Authorize(Roles = "Admin")]
+    //[Authorize(AuthenticationSchemes = "Bearer")]
+    //[Authorize(Roles = "Admin")]
     public class AdminRoomController : ControllerBase
     {
         private readonly IRoomService _roomService;
