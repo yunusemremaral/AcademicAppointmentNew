@@ -4,8 +4,10 @@ using AcademicAppointmentShare.Dtos.CourseDtos;
 using AcademicAppointmentShare.Dtos.DepartmentDtos;
 using AcademicAppointmentShare.Dtos.MessageDtos;
 using AcademicAppointmentShare.Dtos.NotificationDtos;
+using AcademicAppointmentShare.Dtos.RoleDtos;
 using AcademicAppointmentShare.Dtos.RoomDtos;
 using AcademicAppointmentShare.Dtos.SchoolDtos;
+using AcademicAppointmentShare.Dtos.UserDtos;
 using AutoMapper;
 
 namespace AcademicAppointmentApi.Presentation.AutoMapper
@@ -108,6 +110,24 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
             CreateMap<Appointment, AppointmentResultDto>()
                 .ForMember(dest => dest.AcademicUserName, opt => opt.MapFrom(src => src.AcademicUser.UserName))
                 .ForMember(dest => dest.StudentUserName, opt => opt.MapFrom(src => src.StudentUser.UserName));
+            #endregion
+
+            #region USER VE ROLE
+            CreateMap<AppUser, UserDto>();
+            CreateMap<CreateUserDto, AppUser>();
+            CreateMap<UpdateUserDto, AppUser>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<AppRole, RoleDto>();
+            CreateMap<AppUser, UserWithDetailsDto>()
+                .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.School != null ? src.School.Name : null))
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : null))
+                .ForMember(dest => dest.RoomName, opt => opt.MapFrom(src => src.Room != null ? src.Room.Name : null));
+
+            CreateMap<Course, UserCourseDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
+                .ForMember(dest => dest.InstructorFullName, opt => opt.MapFrom(src => src.Instructor.UserName ));
+
             #endregion
         }
     }

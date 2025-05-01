@@ -1,5 +1,6 @@
 ﻿using AcademicAppointmentApi.EntityLayer.Entities;
-using AcademicAppointmentApi.Presentation.Dtos.AdminUserDtos;
+using AcademicAppointmentShare.Dtos.UserDtos;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,103 +8,151 @@ using Microsoft.EntityFrameworkCore;
 
 [Route("api/admin/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = "Bearer")]
-[Authorize(Roles = "Admin")]
+//[Authorize(AuthenticationSchemes = "Bearer")]
+//[Authorize(Roles = "Admin")]
 public class AdminUserController : ControllerBase
 {
     private readonly UserManager<AppUser> _userManager;
+    private readonly IMapper _mapper;
 
-    public AdminUserController(UserManager<AppUser> userManager)
+    public AdminUserController(UserManager<AppUser> userManager, IMapper mapper)
     {
         _userManager = userManager;
+        _mapper = mapper;
     }
 
-    // API: AdminUserController.cs (GetAllUsers Metodu)
     [HttpGet]
-    public async Task<IActionResult> GetAllUsers([FromQuery] string role = null)
+    public IActionResult GetAllUsers()
     {
-        var query = _userManager.Users
-            .Include(u => u.School)
-            .Include(u => u.Department)
-            .AsQueryable();
-
-        if (!string.IsNullOrEmpty(role))
-        {
-            var usersInRole = await _userManager.GetUsersInRoleAsync(role);
-            query = query.Where(u => usersInRole.Contains(u));
-        }
-
-        // Materialize the query with ToListAsync()
-        var users = await query.ToListAsync(); // Önce kullanıcıları çek
-
-        var userDtos = new List<AdminUserListDto>();
-        foreach (var user in users)
-        {
-            var roles = await _userManager.GetRolesAsync(user); // Her kullanıcı için roller
-            userDtos.Add(new AdminUserListDto
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                SchoolName = user.School?.Name ?? "",
-                DepartmentName = user.Department?.Name ?? "",
-                Roles = roles.ToList()
-            });
-        }
-
-        return Ok(userDtos);
+        var users = _userManager.Users.ToList();
+        var usersDto = _mapper.Map<List<UserDto>>(users);
+        return Ok(usersDto);
     }
-    // Kullanıcı detayları
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserById(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return NotFound();
+        return Ok(_mapper.Map<UserDto>(user));
+    }
+
+    [HttpGet("{id}/roles")]
+    public async Task<IActionResult> GetUserRoles(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return NotFound();
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return Ok(roles);
+    }
+
+    [HttpPost("{id}/roles")]
+    public async Task<IActionResult> AddUserToRole(string id, [FromBody] string role)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return NotFound();
+
+        var result = await _userManager.AddToRoleAsync(user, role);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+
+        return Ok();
+    }
+
+    [HttpDelete("{id}/roles/{role}")]
+    public async Task<IActionResult> RemoveUserFromRole(string id, string role)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return NotFound();
+
+        var result = await _userManager.RemoveFromRoleAsync(user, role);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+
+        return Ok();
+    }
+
+    [HttpGet("by-role/{roleName}")]
+    public async Task<IActionResult> GetUsersByRole(string roleName)
+    {
+        var users = await _userManager.GetUsersInRoleAsync(roleName);
+        return Ok(_mapper.Map<List<UserDto>>(users));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
+    {
+        var user = _mapper.Map<AppUser>(dto);
+        var result = await _userManager.CreateAsync(user, dto.Password);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+
+        return Ok(_mapper.Map<UserDto>(user));
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return NotFound();
+
+        _mapper.Map(dto, user);
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+
+        return Ok(_mapper.Map<UserDto>(user));
+    }
+    [HttpGet("{id}/details")]
+    public async Task<IActionResult> GetUserDetails(string id)
     {
         var user = await _userManager.Users
             .Include(u => u.School)
             .Include(u => u.Department)
+            .Include(u => u.Room)
             .FirstOrDefaultAsync(u => u.Id == id);
 
-        if (user == null)
-            return NotFound();
+        if (user == null) return NotFound();
 
-        var roles = await _userManager.GetRolesAsync(user);
-
-        var userDto = new AdminUserDetailDto
-        {
-            Id = user.Id,
-            UserName = user.UserName,
-            Email = user.Email,
-            SchoolId = user.SchoolId,
-            DepartmentId = user.DepartmentId,
-            RoomId = user.RoomId,
-            SchoolName = user.School?.Name,
-            DepartmentName = user.Department?.Name,
-            Roles = roles.ToList()
-        };
-
+        var userDto = _mapper.Map<UserWithDetailsDto>(user);
         return Ok(userDto);
     }
-
-    // Kullanıcıya rol ata
-    [HttpPost("{id}/roles")]
-    public async Task<IActionResult> AssignRole(string id, AssignRoleDto dto)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUser(string id)
     {
         var user = await _userManager.FindByIdAsync(id);
-        if (user == null)
-            return NotFound();
+        if (user == null) return NotFound();
 
-        var result = await _userManager.AddToRoleAsync(user, dto.Role);
-        return result.Succeeded ? Ok() : BadRequest(result.Errors);
+        var result = await _userManager.DeleteAsync(user);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+
+        return Ok();
     }
-
-    // Kullanıcıdan rol kaldır
-    [HttpDelete("{id}/roles")]
-    public async Task<IActionResult> RemoveRole(string id, AssignRoleDto dto)
+    [HttpGet("{id}/courses")]
+    public async Task<IActionResult> GetUserCourses(string id)
     {
-        var user = await _userManager.FindByIdAsync(id);
-        if (user == null)
-            return NotFound();
+        var user = await _userManager.Users
+            .Include(u => u.Courses)
+            .FirstOrDefaultAsync(u => u.Id == id);
 
-        var result = await _userManager.RemoveFromRoleAsync(user, dto.Role);
-        return result.Succeeded ? Ok() : BadRequest(result.Errors);
+        if (user == null) return NotFound();
+
+        var courseDtos = _mapper.Map<List<UserCourseDto>>(user.Courses);
+        return Ok(courseDtos);
     }
+
+    [HttpGet("by-role/{roleName}/with-department")]
+    public async Task<IActionResult> GetUsersByRoleWithDepartment(string roleName)
+    {
+        var users = await _userManager.GetUsersInRoleAsync(roleName);
+        var userDetails = users.Select(u => new
+        {
+            u.Id,
+            u.UserName,
+            u.Email,
+            Department = u.Department?.Name,
+            School = u.School?.Name
+        }).ToList();
+
+        return Ok(userDetails);
+    }
+
+
 }
