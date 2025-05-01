@@ -95,6 +95,14 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                 })
                 .ToListAsync();
         }
+        public async Task<IReadOnlyList<Message>> GetAllWithRelationsAsync()
+        {
+            return await _context.Messages
+                .Include(m => m.Sender)
+                .Include(m => m.Receiver)
+                .OrderByDescending(m => m.SentAt)
+                .ToListAsync();
+        }
 
         public async Task<IReadOnlyList<Message>> GetReceivedMessagesAsync(string receiverId)
         {
@@ -117,5 +125,6 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                 })
                 .ToListAsync();
         }
+
     }
 }

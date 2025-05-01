@@ -34,5 +34,9 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
         {
             return await _messageRepository.GetReceivedMessagesAsync(receiverId);
         }
+        public async Task<IReadOnlyList<Message>> TGetAllWithRelationsAsync()
+        {
+            return await _messageRepository.GetAllWithRelationsAsync();
+        }
     }
 }

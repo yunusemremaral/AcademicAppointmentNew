@@ -9,6 +9,8 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
 {
     public interface IMessageRepository : IGenericRepository<Message>
     {
+        Task<IReadOnlyList<Message>> GetAllWithRelationsAsync();
+
         Task<IReadOnlyList<Message>> GetMessagesByUserIdAsync(string userId);
         Task<IReadOnlyList<Message>> GetConversationAsync(string userId1, string userId2);
         Task<IReadOnlyList<Message>> GetSentMessagesAsync(string senderId);

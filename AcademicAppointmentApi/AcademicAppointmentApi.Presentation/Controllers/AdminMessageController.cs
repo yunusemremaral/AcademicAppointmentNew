@@ -108,5 +108,12 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             var dto = _mapper.Map<List<ResultMessageDto>>(messages);
             return Ok(dto);
         }
+        [HttpGet("with-relations")]
+        public async Task<IActionResult> GetAllWithRelations()
+        {
+            var messages = await _messageService.TGetAllWithRelationsAsync();
+            var dto = _mapper.Map<List<ResultMessageDto>>(messages);
+            return Ok(dto);
+        }
     }
 }

@@ -13,5 +13,7 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
         Task<IReadOnlyList<Message>> TGetConversationAsync(string userId1, string userId2);
         Task<IReadOnlyList<Message>> TGetSentMessagesAsync(string senderId);
         Task<IReadOnlyList<Message>> TGetReceivedMessagesAsync(string receiverId);
+        Task<IReadOnlyList<Message>> TGetAllWithRelationsAsync();
+
     }
 }
