@@ -1,6 +1,7 @@
 ﻿using AcademicAppointmentApi.EntityLayer.Entities;
 using AcademicAppointmentShare.Dtos.CourseDtos;
 using AcademicAppointmentShare.Dtos.DepartmentDtos;
+using AcademicAppointmentShare.Dtos.RoomDtos;
 using AcademicAppointmentShare.Dtos.SchoolDtos;
 using AutoMapper;
 
@@ -72,7 +73,15 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
 
             #endregion
 
+            #region ROOM
+            CreateMap<Room, RoomDto>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.AppUser.UserName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.AppUser.Email));
 
+            CreateMap<CreateRoomDto, Room>();
+            CreateMap<UpdateRoomDto, Room>();
+
+            #endregion
         }
     }
 }

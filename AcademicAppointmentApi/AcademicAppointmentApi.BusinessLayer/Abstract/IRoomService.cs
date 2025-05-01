@@ -9,7 +9,10 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
 {
     public interface IRoomService : ITGenericService<Room>
     {
-        Task<Room?> TGetRoomByUserIdAsync(string userId);
+        Task<List<Room>> TGetAllWithUsersAsync();
+        Task<Room?> TGetByIdWithUserAsync(int id);
+        Task<Room?> TGetByUserIdAsync(string userId);
     }
+
 
 }

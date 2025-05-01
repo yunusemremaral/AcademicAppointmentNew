@@ -9,6 +9,9 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
 {
     public interface IRoomRepository : IGenericRepository<Room>
     {
-        Task<Room?> GetRoomByUserIdAsync(string userId);
-    }
+        Task<List<Room>> GetAllWithUsersAsync();
+    Task<Room?> GetByIdWithUserAsync(int id);
+    Task<Room?> GetByUserIdAsync(string userId);
+}
+
 }

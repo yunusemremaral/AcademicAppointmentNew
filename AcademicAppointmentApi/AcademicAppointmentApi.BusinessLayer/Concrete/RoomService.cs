@@ -18,9 +18,19 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             _roomRepository = roomRepository;
         }
 
-        public async Task<Room?> TGetRoomByUserIdAsync(string userId)
+        public async Task<List<Room>> TGetAllWithUsersAsync()
         {
-            return await _roomRepository.GetRoomByUserIdAsync(userId);
+            return await _roomRepository.GetAllWithUsersAsync();
+        }
+
+        public async Task<Room?> TGetByIdWithUserAsync(int id)
+        {
+            return await _roomRepository.GetByIdWithUserAsync(id);
+        }
+
+        public async Task<Room?> TGetByUserIdAsync(string userId)
+        {
+            return await _roomRepository.GetByUserIdAsync(userId);
         }
     }
 }
