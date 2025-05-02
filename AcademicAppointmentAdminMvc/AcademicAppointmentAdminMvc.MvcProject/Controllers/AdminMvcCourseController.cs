@@ -93,89 +93,9 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             return View(vm);
         }
 
-        // GET: /AdminMvcCourse/Create
 
 
-        [HttpGet]
-        public async Task<IActionResult> Create()
-        {
-            var client = CreateClient();
-            var response = await client.GetAsync("api/admin/AdminCourse/WithFullDetails");
-            if (!response.IsSuccessStatusCode) return View(new CourseCreateViewModel());
-
-            var allCourses = JsonConvert.DeserializeObject<List<CourseWithFullDetailsDto>>(await response.Content.ReadAsStringAsync());
-
-            var schools = allCourses
-                .GroupBy(c => new { c.SchoolId, c.SchoolName })
-                .Select(g => new SelectListItem(g.Key.SchoolName, g.Key.SchoolId.ToString()))
-                .ToList();
-
-            var departments = allCourses
-                .GroupBy(c => new { c.DepartmentId, c.DepartmentName })
-                .Select(g => new SelectListItem(g.Key.DepartmentName, g.Key.DepartmentId.ToString()))
-                .ToList();
-
-            var instructors = allCourses
-                .GroupBy(c => new { c.InstructorId, c.InstructorUserName, c.InstructorEmail })
-                .Select(g => new SelectListItem($"{g.Key.InstructorUserName} ({g.Key.InstructorEmail})", g.Key.InstructorId))
-                .ToList();
-
-            var vm = new CourseCreateViewModel
-            {
-                Schools = new SelectList(schools, "Value", "Text"),
-                Departments = new SelectList(departments, "Value", "Text"),
-                Instructors = new SelectList(instructors, "Value", "Text")
-            };
-
-            return View(vm);
-        }
-        [HttpPost]
-        public async Task<IActionResult> Create(CourseCreateViewModel vm)
-        {
-            if (!ModelState.IsValid)
-            {
-                // Dropdown listelerini tekrar yükle
-                var client = CreateClient();
-                var response = await client.GetAsync("api/admin/AdminCourse/WithFullDetails");
-                if (response.IsSuccessStatusCode)
-                {
-                    var allCourses = JsonConvert.DeserializeObject<List<CourseWithFullDetailsDto>>(await response.Content.ReadAsStringAsync());
-
-                    vm.Schools = new SelectList(
-                        allCourses.GroupBy(c => new { c.SchoolId, c.SchoolName })
-                                  .Select(g => new SelectListItem(g.Key.SchoolName, g.Key.SchoolId.ToString())),
-                        "Value", "Text", vm.SchoolId);
-
-                    vm.Departments = new SelectList(
-                        allCourses.GroupBy(c => new { c.DepartmentId, c.DepartmentName })
-                                  .Select(g => new SelectListItem(g.Key.DepartmentName, g.Key.DepartmentId.ToString())),
-                        "Value", "Text", vm.DepartmentId);
-
-                    vm.Instructors = new SelectList(
-                        allCourses.GroupBy(c => new { c.InstructorId, c.InstructorUserName, c.InstructorEmail })
-                                  .Select(g => new SelectListItem($"{g.Key.InstructorUserName} ({g.Key.InstructorEmail})", g.Key.InstructorId)),
-                        "Value", "Text", vm.InstructorId);
-                }
-
-                return View(vm);
-            }
-
-            var dto = new CourseCreateDto
-            {
-                Name = vm.Name,
-                DepartmentId = vm.DepartmentId,
-                InstructorId = vm.InstructorId
-            };
-
-            var clientPost = CreateClient();
-            var result = await clientPost.PostAsJsonAsync("api/admin/AdminCourse", dto);
-
-            if (result.IsSuccessStatusCode)
-                return RedirectToAction("Index");
-
-            ModelState.AddModelError("", "Ders oluşturulamadı.");
-            return View(vm);
-        }
+     
 
 
     }

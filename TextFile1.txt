@@ -4,3 +4,8 @@ ardýndan dtolar cok karýstý dtolarý ayrý bir class libraride 1 kere yazýcaz sonr
 ardýndan bütün entityler için admin panelini yazacagýz a dan z ye ardýdnan paneli düzenleyecegiz ama öncelik 
 þuanda  api tarafýný bi baþtan refactor etme refatorleri unutma mvc tarafýndada token göndermeleri dtolarý falan servisleri
 ayrý bir yere cekecegiz gereksiz kodlarý kaldýracagýz düzenleyecegiz ! 
+
+----
+
+ÝNDEX KISMINA BAKICAM COURSE   SONRA FÝLTRE CALISIYOR ZATEN ÝNDEX KISMINDA UPDATE DELETE  FALNA BAKICAM SONRA CREATE KISMINDA  EKSTRA BÝ 
+ENDPOÝNTKER OLUSTURUP ORADAN CEKÝCEZ 
