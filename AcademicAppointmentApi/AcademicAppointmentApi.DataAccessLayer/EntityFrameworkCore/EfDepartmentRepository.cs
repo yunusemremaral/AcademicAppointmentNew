@@ -60,10 +60,27 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                         Id = d.School.Id,
                         Name = d.School.Name
                     },
-                    FacultyMembers = d.FacultyMembers,  // İhtiyaç varsa eklenebilir
+                    FacultyMembers = d.FacultyMembers,
+                    // İhtiyaç varsa eklenebilir
                     Courses = d.Courses // İhtiyaç varsa eklenebilir
                 })
                 .FirstOrDefaultAsync();
+        }
+        public async Task<IReadOnlyList<Department>> GetDepartmentsWithSchoolAsync()
+        {
+            return await _context.Departments
+                .Select(d => new Department
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    School = new School
+                    {
+                        Id = d.School.Id,
+                        Name = d.School.Name
+                    }
+                })
+                .AsNoTracking()
+                .ToListAsync();
         }
 
 

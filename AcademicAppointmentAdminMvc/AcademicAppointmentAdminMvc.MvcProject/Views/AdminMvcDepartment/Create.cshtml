@@ -1,0 +1,29 @@
+﻿@model DepartmentCreateDto
+
+@{
+    ViewData["Title"] = "Yeni Bölüm Ekle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2>Yeni Bölüm Ekle</h2>
+
+    <form asp-action="Create" method="post">
+        <div class="form-group mb-3">
+            <label asp-for="Name" class="form-label">Bölüm Adı</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="SchoolId" class="form-label">Okul</label>
+            <select asp-for="SchoolId" asp-items="ViewBag.Schools" class="form-select">
+                <option value="">Seçiniz</option>
+            </select>
+            <span asp-validation-for="SchoolId" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+    </form>
+</div>

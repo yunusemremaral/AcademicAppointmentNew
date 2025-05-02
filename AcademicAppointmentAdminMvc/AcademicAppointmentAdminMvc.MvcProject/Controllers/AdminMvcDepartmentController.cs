@@ -1,147 +1,271 @@
-﻿//using AcademicAppointmentAdminMvc.MvcProject.Dtos.DepartmentDtos;
-//using AcademicAppointmentAdminMvc.MvcProject.Dtos.SchoolDtos;
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Mvc;
-//using Newtonsoft.Json;
-//using System.Net.Http.Headers;
-//using System.Text;
+﻿using AcademicAppointmentAdminMvc.MvcProject.Models;
+using AcademicAppointmentShare.Dtos.DepartmentDtos;
+using AcademicAppointmentShare.Dtos.SchoolDtos;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Text;
 
-//namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
-//{
-//    [Authorize(Roles = "Admin")]
-//    public class AdminMvcDepartmentController : Controller
-//    {
-//        private readonly IHttpClientFactory _httpClientFactory;
+namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
+{
+    [Authorize(Roles = "Admin")]
+    public class AdminMvcDepartmentController : Controller
+    {
+        private readonly IHttpClientFactory _httpClientFactory;
 
-//        public AdminMvcDepartmentController(IHttpClientFactory httpClientFactory)
-//        {
-//            _httpClientFactory = httpClientFactory;
-//        }
+        public AdminMvcDepartmentController(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
 
-//        private HttpClient CreateClient()
-//        {
-//            var client = _httpClientFactory.CreateClient("MyApi");
-//            var token = Request.Cookies["JwtToken"];
-//            if (!string.IsNullOrEmpty(token))
-//            {
-//                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-//            }
-//            return client;
-//        }
+        private HttpClient CreateClient()
+        {
+            var client = _httpClientFactory.CreateClient("MyApi");
+            var token = Request.Cookies["JwtToken"];
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+            return client;
+        }
 
-//        [HttpGet]
-//        public async Task<IActionResult> Index()
-//        {
-//            var client = CreateClient();
-//            var response = await client.GetAsync("api/admin/AdminDepartment");
+        public async Task<IActionResult> Index(string schoolName)
+        {
+            var client = CreateClient();
+            var response = await client.GetAsync("api/admin/AdminDepartment/with-school");
 
-//            if (!response.IsSuccessStatusCode)
-//                return View(new List<GetDepartmentDto>());
+            if (!response.IsSuccessStatusCode)
+                return View(new List<DepartmentWithSchoolDto>());
 
-//            var jsonData = await response.Content.ReadAsStringAsync();
-//            var departments = JsonConvert.DeserializeObject<List<GetDepartmentDto>>(jsonData);
-//            return View(departments);
-//        }
+            var json = await response.Content.ReadAsStringAsync();
+            var departments = JsonConvert.DeserializeObject<List<DepartmentWithSchoolDto>>(json);
 
-//        [HttpGet]
-//        public async Task<IActionResult> AddDepartment(int schoolId)
-//        {
-//            var client = CreateClient();
-//            var schoolResponse = await client.GetAsync("api/admin/AdminSchool");
-//            var schoolJson = await schoolResponse.Content.ReadAsStringAsync();
-//            var schoolList = JsonConvert.DeserializeObject<List<GetSchoolDto>>(schoolJson);
+            // Tüm okul adlarını al
+            var schoolNames = departments.Select(d => d.SchoolName).Distinct().OrderBy(n => n).ToList();
+            ViewBag.SchoolNames = new SelectList(schoolNames, schoolName);
 
-//            ViewBag.Schools = schoolList;
-//            ViewBag.SchoolId = schoolId;
+            // Eğer filtre varsa, sadece o okula ait bölümler kalsın
+            if (!string.IsNullOrEmpty(schoolName))
+            {
+                departments = departments.Where(d => d.SchoolName == schoolName).ToList();
 
-//            return View();
-//        }
-      
+                // SchoolId'yi ViewBag'e geçir (ilk denk gelen departmandan alabiliriz)
+                var selectedSchoolId = departments.FirstOrDefault()?.SchoolId;
+                ViewBag.SelectedSchoolId = selectedSchoolId;
+            }
+            else
+            {
+                ViewBag.SelectedSchoolId = null;
+            }
 
-//        [HttpPost]
-//        public async Task<IActionResult> AddDepartment(AddDepartmentDto dto)
-//        {
-//            var client = CreateClient();
-//            var jsonData = JsonConvert.SerializeObject(dto);
-//            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-//            var response = await client.PostAsync("api/admin/AdminDepartment", content);
-
-//            if (response.IsSuccessStatusCode)
-//                return RedirectToAction("Index", "AdminMvcDepartment");
-
-//            // Okullar tekrar yüklenmeli, hata durumunda da dropdown dolu olsun
-//            var schoolResponse = await client.GetAsync("api/admin/AdminSchool");
-//            var schoolJson = await schoolResponse.Content.ReadAsStringAsync();
-//            var schoolList = JsonConvert.DeserializeObject<List<GetSchoolDto>>(schoolJson);
-
-//            ViewBag.Schools = schoolList;
-//            ViewBag.SchoolId = dto.SchoolId;
-
-//            return View(dto);
-//        }
-
-//        [HttpGet]
-//        public async Task<IActionResult> UpdateDepartment(int id)
-//        {
-//            var client = CreateClient();
-
-//            // Department verisi
-//            var response = await client.GetAsync($"api/admin/AdminDepartment/{id}");
-//            var jsonData = await response.Content.ReadAsStringAsync();
-//            var value = JsonConvert.DeserializeObject<UpdateDepartmentDto>(jsonData);
-
-//            // School verisi
-//            var schoolResponse = await client.GetAsync("api/admin/AdminSchool");
-//            var schoolJson = await schoolResponse.Content.ReadAsStringAsync();
-//            var schoolList = JsonConvert.DeserializeObject<List<GetSchoolDto>>(schoolJson);
-
-//            ViewBag.Schools = schoolList;
-
-//            return View(value);
-//        }
-        
+            return View(departments);
+        }
 
 
-//        [HttpPost]
-//        public async Task<IActionResult> UpdateDepartment(UpdateDepartmentDto dto)
-//        {
-//            var client = CreateClient();
-//            var jsonData = JsonConvert.SerializeObject(dto);
-//            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-//            var response = await client.PutAsync("api/admin/AdminDepartment", content);
+        // Create Action
+        [HttpGet]
+        public async Task<IActionResult> Create(int schoolId)
+        {
+            var client = CreateClient();
 
-//            if (response.IsSuccessStatusCode)
-//                return RedirectToAction("Index", "AdminMvcDepartment");
+            // Okulları dropdown için al
+            var response = await client.GetAsync("api/admin/adminschool");
+            if (!response.IsSuccessStatusCode) return View(new DepartmentCreateDto()); // Hata kontrolü
 
-//            // Hata durumunda tekrar okul listesi yüklenmeli
-//            var schoolResponse = await client.GetAsync("api/admin/AdminSchool");
-//            var schoolJson = await schoolResponse.Content.ReadAsStringAsync();
-//            var schoolList = JsonConvert.DeserializeObject<List<GetSchoolDto>>(schoolJson);
+            var schoolList = JsonConvert.DeserializeObject<List<SchoolListDto>>(
+                await response.Content.ReadAsStringAsync()
+            );
 
-//            ViewBag.Schools = schoolList;
+            var model = new DepartmentCreateDto
+            {
+                SchoolId = schoolId // null olabilir, sorun değil
+            };
 
-//            return View(dto);
-//        }
+            ViewBag.Schools = new SelectList(schoolList, "Id", "Name", model.SchoolId);
+            return View(model);
+        }
 
-//        public async Task<IActionResult> DeleteDepartment(int id, int schoolId)
-//        {
-//            var client = CreateClient();
-//            var response = await client.DeleteAsync($"api/admin/AdminDepartment/{id}");
+        [HttpPost]
+        public async Task<IActionResult> Create(DepartmentCreateDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Okul listesi yeniden yüklenmeli
+                var client = CreateClient();
+                var schoolList = JsonConvert.DeserializeObject<List<SchoolListDto>>(
+                    await (await client.GetAsync("api/admin/adminschool")).Content.ReadAsStringAsync()
+                );
+                ViewBag.Schools = new SelectList(schoolList, "Id", "Name", model.SchoolId);
+                return View(model);
+            }
 
-//            return RedirectToAction("Index", "AdminMvcDepartment");
-//        }
-//        public async Task<IActionResult> GetCoursesByDepartment(int departmentId)
-//        {
-//            var client = CreateClient();
-//            var response = await client.GetAsync($"api/admin/AdminDepartment/{departmentId}/courses");
+            var response = await CreateClient().PostAsJsonAsync("api/admin/admindepartment", model);
 
-//            if (!response.IsSuccessStatusCode)
-//                return View(new List<CourseDto>()); // CourseDto’yu aşağıda tanımlarız
+            if (response.IsSuccessStatusCode)
+                return RedirectToAction("Index");
 
-//            var jsonData = await response.Content.ReadAsStringAsync();
-//            var courses = JsonConvert.DeserializeObject<List<CourseDto>>(jsonData);
-//            return View(courses);
-//        }
+            // Hata durumunda
+            var error = await response.Content.ReadAsStringAsync();
+            ModelState.AddModelError("", error);
 
-//    }
-//}
+            // Okul listesi tekrar yüklensin
+            var schools = JsonConvert.DeserializeObject<List<SchoolListDto>>(
+                await (await CreateClient().GetAsync("api/admin/adminschool")).Content.ReadAsStringAsync()
+            );
+            ViewBag.Schools = new SelectList(schools, "Id", "Name", model.SchoolId);
+
+            return View(model);
+        }
+
+        private async Task LoadSchoolsForViewBag()
+        {
+            var client = CreateClient();
+            var schoolsResponse = await client.GetAsync("api/admin/adminschool");
+            if (schoolsResponse.IsSuccessStatusCode)
+            {
+                var schools = JsonConvert.DeserializeObject<List<SchoolListDto>>(
+                    await schoolsResponse.Content.ReadAsStringAsync()
+                );
+                ViewBag.Schools = new SelectList(schools, "Id", "Name");
+            }
+        }
+        // Delete Action
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var client = CreateClient();
+            var response = await client.DeleteAsync($"api/admin/admindepartment/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Hata durumunda
+            var error = await response.Content.ReadAsStringAsync();
+            return StatusCode((int)response.StatusCode, error);
+
+
+
+
+
+
+            //// 2. Get departments with courses
+            //public async Task<IActionResult> DepartmentsWithCourses()
+            //{
+            //    var client = CreateClient();
+            //    var response = await client.GetAsync("api/admin/admindepartment/with-courses");
+
+            //    if (!response.IsSuccessStatusCode)
+            //    {
+            //        return View("Error");
+            //    }
+
+            //    var jsonData = await response.Content.ReadAsStringAsync();
+            //    var departments = JsonConvert.DeserializeObject<List<DepartmentListWithCoursesDto>>(jsonData);
+
+            //    return View(departments);
+            //}
+
+            //// 3. Get courses by department ID
+            //public async Task<IActionResult> CoursesByDepartment(int departmentId)
+            //{
+            //    var client = CreateClient();
+            //    var response = await client.GetAsync($"api/admin/admindepartment/courses/{departmentId}");
+
+            //    if (!response.IsSuccessStatusCode)
+            //    {
+            //        return View("Error");
+            //    }
+
+            //    var jsonData = await response.Content.ReadAsStringAsync();
+            //    var courses = JsonConvert.DeserializeObject<List<DepartmentCourseDto>>(jsonData);
+
+            //    return View(courses);
+            //}
+
+            //// 4. Get department details by ID
+            //public async Task<IActionResult> DepartmentDetails(int id)
+            //{
+            //    var client = CreateClient();
+            //    var response = await client.GetAsync($"api/admin/admindepartment/details/{id}");
+
+            //    if (!response.IsSuccessStatusCode)
+            //    {
+            //        return View("Error");
+            //    }
+
+            //    var jsonData = await response.Content.ReadAsStringAsync();
+            //    var department = JsonConvert.DeserializeObject<DepartmentDetailDto>(jsonData);
+
+            //    return View(department);
+            //}
+
+            //// 5. Get the number of courses in a department
+            //public async Task<IActionResult> CourseCount(int departmentId)
+            //{
+            //    var client = CreateClient();
+            //    var response = await client.GetAsync($"api/admin/admindepartment/course-count/{departmentId}");
+
+            //    if (!response.IsSuccessStatusCode)
+            //    {
+            //        return View("Error");
+            //    }
+
+            //    var jsonData = await response.Content.ReadAsStringAsync();
+            //    var courseCount = JsonConvert.DeserializeObject<int>(jsonData);
+
+            //    return View(courseCount);
+            //}
+
+            //// 6. Create a new department (Post method)
+            //[HttpPost]
+            //public async Task<IActionResult> CreateDepartment([FromBody] DepartmentCreateDto departmentCreateDto)
+            //{
+            //    if (departmentCreateDto == null)
+            //        return BadRequest();
+
+            //    var client = CreateClient();
+            //    var content = new StringContent(JsonConvert.SerializeObject(departmentCreateDto), Encoding.UTF8, "application/json");
+            //    var response = await client.PostAsync("api/admin/admindepartment", content);
+
+            //    if (!response.IsSuccessStatusCode)
+            //        return View("Error");
+
+            //    return RedirectToAction("Index");
+            //}
+
+            //// 7. Update an existing department (Put method)
+            //[HttpPut]
+            //public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentUpdateDto departmentUpdateDto)
+            //{
+            //    if (id != departmentUpdateDto.Id)
+            //        return BadRequest("ID mismatch.");
+
+            //    var client = CreateClient();
+            //    var content = new StringContent(JsonConvert.SerializeObject(departmentUpdateDto), Encoding.UTF8, "application/json");
+            //    var response = await client.PutAsync($"api/admin/admindepartment/{id}", content);
+
+            //    if (!response.IsSuccessStatusCode)
+            //        return View("Error");
+
+            //    return RedirectToAction("Index");
+            //}
+
+            //// 8. Delete a department
+            //[HttpDelete]
+            //public async Task<IActionResult> DeleteDepartment(int id)
+            //{
+            //    var client = CreateClient();
+            //    var response = await client.DeleteAsync($"api/admin/admindepartment/{id}");
+
+            //    if (!response.IsSuccessStatusCode)
+            //        return View("Error");
+
+            //    return RedirectToAction("Index");
+            //}
+        }
+    }
+}

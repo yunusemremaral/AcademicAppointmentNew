@@ -113,6 +113,16 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             await _departmentService.TDeleteAsync(department);
             return NoContent(); 
         }
+        // GET: api/admin/admindepartment/with-school
+        [HttpGet("with-school")]
+        public async Task<IActionResult> GetDepartmentsWithSchool()
+        {
+            var departments = await _departmentService.TGetDepartmentsWithSchoolAsync();
+
+            var departmentDtos = _mapper.Map<List<DepartmentWithSchoolDto>>(departments);
+            return Ok(departmentDtos);
+        }
+
     }
 
 }

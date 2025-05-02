@@ -10,5 +10,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
         Task<IReadOnlyList<Course>> GetCoursesByDepartmentIdAsync(int departmentId);
         Task<Department?> GetByIdWithDetailsAsync(int id);
         Task<int> GetCourseCountAsync(int departmentId);
+        Task<IReadOnlyList<Department>> GetDepartmentsWithSchoolAsync();
+
     }
 }

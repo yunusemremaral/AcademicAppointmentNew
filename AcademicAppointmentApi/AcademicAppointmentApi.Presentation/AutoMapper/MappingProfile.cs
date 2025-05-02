@@ -57,6 +57,11 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
             CreateMap<Department, DepartmentDetailDto>()
                 .ForMember(dest => dest.FacultyMembers, opt => opt.MapFrom(src => src.FacultyMembers));  // Map FacultyMembers to DepartmentAppUserDto
 
+            CreateMap<Department, DepartmentWithSchoolDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.School.Name))
+                .ForMember(dest => dest.SchoolId, opt => opt.MapFrom(src => src.School.Id));
+
             #endregion
 
             #region COURSE
