@@ -85,6 +85,12 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
                 .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.Department.School.Name))
                 .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserName))
                 .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor.Email));
+            CreateMap<Course, CourseWithFullDetailsDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
+                .ForMember(dest => dest.SchoolId, opt => opt.MapFrom(src => src.Department.School.Id))
+                .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.Department.School.Name))
+                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserName))
+                .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor.Email));
 
             #endregion
 
@@ -100,7 +106,7 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
 
             #region NOTIFICATION
             CreateMap<Notification, NotificationDto>().ReverseMap();
-            CreateMap<CreateNotificationDto, Notification>();
+    CreateMap<CreateNotificationDto, Notification>();
             CreateMap<UpdateNotificationDto, Notification>();
 
             #endregion

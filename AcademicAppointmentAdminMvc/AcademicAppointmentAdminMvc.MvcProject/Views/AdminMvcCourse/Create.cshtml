@@ -1,0 +1,33 @@
+﻿@model CourseCreateViewModel
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<form asp-action="Create" method="post" class="w-100">
+    <div class="form-group">
+        <label asp-for="Name">Ders Adı</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-row">
+        <div class="col">
+            <label>Okul</label>
+            @Html.DropDownListFor(m => m.SchoolId, Model.Schools, "Okul Seçiniz", new { @class = "form-control" })
+        </div>
+        <div class="col">
+            <label>Bölüm</label>
+            @Html.DropDownListFor(m => m.DepartmentId, Model.Departments, "Bölüm Seçiniz", new { @class = "form-control" })
+            <span asp-validation-for="DepartmentId" class="text-danger"></span>
+        </div>
+        <div class="col">
+            <label>Akademisyen</label>
+            @Html.DropDownListFor(m => m.InstructorId, Model.Instructors, "Akademisyen Seçiniz", new { @class = "form-control" })
+            <span asp-validation-for="InstructorId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Kaydet</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3 ml-2">Geri</a>
+</form>

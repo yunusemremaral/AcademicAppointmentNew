@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Bölüm Listesi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -18,11 +17,10 @@
 }
 @model IEnumerable<DepartmentWithSchoolDto>
 
-<div class="container mt-4">
-    <h1 class="mb-4">Bölüm Yönetimi</h1>
+    <h2 >Bölümler</h2>
 
     <!-- Filtreleme Alanı -->
-    <form asp-action="Index" method="get" class="mb-4">
+<form asp-action="Index" method="get" class="form-inline mb-3">
         <div class="row">
             <div class="col-md-4">
                 <select name="schoolName" asp-items="@ViewBag.SchoolNames" class="form-select">
@@ -37,7 +35,6 @@
 
     <!-- Tablo -->
     <!-- Tablo -->
-    <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead class="table-dark">
                 <tr>
@@ -56,14 +53,14 @@
                         <td>@department.SchoolName</td>
                         <td>
 
-                   
+
                             <!-- Dersleri Göster Butonu -->
-                           <a class="btn btn-info" 
-                                   asp-action="Details" 
-                                   asp-route-departmentId="@department.Id"
-                                   title="Dersleri Göster">
-                                    Dersler
-                         </a>
+                            <a class="btn btn-info"
+                               asp-action="Details"
+                               asp-route-departmentId="@department.Id"
+                               title="Dersleri Göster">
+                                Dersler
+                            </a>
 
                             <!-- Güncelle Butonu -->
                             <a class="btn btn-warning"
@@ -83,15 +80,15 @@
                                     Sil
                                 </button>
                             </form>
-                     
 
-                            
+
+
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-    </div>
+    
 
     <!-- Alt Tarafa Bölüm Ekle Butonu -->
     <div class="mt-4">
@@ -102,7 +99,6 @@
             <i class="fas fa-plus"></i> Yeni Bölüm Ekle
         </a>
     </div>
-</div>
 
 @section Scripts {
     <script>
@@ -113,7 +109,7 @@
             }
         }
 
-        
+
 
         // Dropdown değiştiğinde otomatik filtrele
         document.querySelector('select[name="schoolName"]').addEventListener('change', function() {

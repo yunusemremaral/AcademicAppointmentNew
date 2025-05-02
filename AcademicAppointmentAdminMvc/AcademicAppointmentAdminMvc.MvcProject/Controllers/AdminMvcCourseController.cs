@@ -1,125 +1,182 @@
-﻿    //using AcademicAppointmentAdminMvc.MvcProject.Dtos.UserMvcDtos;
-    //using Microsoft.AspNetCore.Authorization;
-    //using Microsoft.AspNetCore.Mvc;
-    //using Newtonsoft.Json;
-    //using System.Net.Http.Headers;
-    //using System.Text;
+﻿using AcademicAppointmentAdminMvc.MvcProject.Dtos.UserMvcDtos;
+using AcademicAppointmentAdminMvc.MvcProject.Models;
+using AcademicAppointmentApi.EntityLayer.Entities;
+using AcademicAppointmentShare.Dtos.CourseDtos;
+using AcademicAppointmentShare.Dtos.DepartmentDtos;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Text;
 
-    //namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
-    //{
-    //    [Authorize(Roles = "Admin")]
-    //    public class AdminMvcCourseController : Controller
-    //    {
-    //        private readonly IHttpClientFactory _httpClientFactory;
+namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
+{
+    [Authorize(Roles = "Admin")]
+    public class AdminMvcCourseController : Controller
+    {
+        private readonly IHttpClientFactory _httpClientFactory;
 
-    //        public AdminMvcCourseController(IHttpClientFactory httpClientFactory)
-    //        {
-    //            _httpClientFactory = httpClientFactory;
-    //        }
+        public AdminMvcCourseController(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
 
-    //        private HttpClient CreateClient()
-    //        {
-    //            var client = _httpClientFactory.CreateClient("MyApi");
-    //            var token = Request.Cookies["JwtToken"];
-    //            if (!string.IsNullOrEmpty(token))
-    //            {
-    //                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-    //            }
-    //            return client;
-    //        }
+        private HttpClient CreateClient()
+        {
+            var client = _httpClientFactory.CreateClient("MyApi");
+            var token = Request.Cookies["JwtToken"];
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+            return client;
+        }
+        public async Task<IActionResult> Index(int? schoolId, int? departmentId, string instructorId)
 
-    //        [HttpGet]
-    //        public async Task<IActionResult> Index()
-    //        {
-    //            var client = CreateClient();
-    //            var response = await client.GetAsync("api/AdminCourse");
+        {
+            var client = CreateClient();
+            var res = await client.GetAsync("api/admin/AdminCourse/WithFullDetails");
+            if (!res.IsSuccessStatusCode)
+                return View(new CourseWithFullDetailsViewModel());
 
-    //            if (!response.IsSuccessStatusCode)
-    //                return View(new List<GetCourseDto>());
+            var all = JsonConvert
+                .DeserializeObject<List<CourseWithFullDetailsDto>>(await res.Content.ReadAsStringAsync());
 
-    //            var jsonData = await response.Content.ReadAsStringAsync();
-    //            var courses = JsonConvert.DeserializeObject<List<GetCourseDto>>(jsonData);
-    //            return View(courses);
-    //        }
+            // 1) Tek LINQ zinciriyle filtreleme
+            var filtered = all
+                .Where(c =>
+                    (!schoolId.HasValue || c.SchoolId == schoolId.Value) &&
+                    (!departmentId.HasValue || c.DepartmentId == departmentId.Value) &&
+                    (string.IsNullOrEmpty(instructorId) || c.InstructorId == instructorId)
+                )
+                .ToList();
 
-    //        [HttpGet]
-    //        public async Task<IActionResult> AddCourse()
-    //        {
-    //            var client = CreateClient();
+            // 2) Dropdown verilerini gruplayarak al
+            var schools = all
+                .GroupBy(c => new { c.SchoolId, c.SchoolName })
+                .Select(g => new SelectListItem(g.Key.SchoolName, g.Key.SchoolId.ToString()))
+                .OrderBy(x => x.Text)
+                .ToList();
 
-    //            // Departmanları al
-    //            var departmentResponse = await client.GetAsync("api/AdminDepartment");
-    //            var departmentJson = await departmentResponse.Content.ReadAsStringAsync();
-    //            var departmentList = JsonConvert.DeserializeObject<List<GetDepartmentDto>>(departmentJson);
-    //            ViewBag.Departments = departmentList;
+            var departments = all
+                .Where(c => !schoolId.HasValue || c.SchoolId == schoolId.Value)
+                .GroupBy(c => new { c.DepartmentId, c.DepartmentName })
+                .Select(g => new SelectListItem(g.Key.DepartmentName, g.Key.DepartmentId.ToString()))
+                .OrderBy(x => x.Text)
+                .ToList();
 
-    //            // Eğitmenleri al
-    //            var instructorResponse = await client.GetAsync("api/AdminUser/instructors");
-    //            var instructorJson = await instructorResponse.Content.ReadAsStringAsync();
-    //            var instructorList = JsonConvert.DeserializeObject<List<UserDto>>(instructorJson);
-    //            ViewBag.Instructors = instructorList;
+            var instructors = all
+                .Where(c =>
+                    (!schoolId.HasValue || c.SchoolId == schoolId.Value) &&
+                    (!departmentId.HasValue || c.DepartmentId == departmentId.Value)
+                )
+                .GroupBy(c => new { c.InstructorId, c.InstructorUserName, c.InstructorEmail })
+                .Select(g => new SelectListItem(
+                    $"{g.Key.InstructorUserName} ({g.Key.InstructorEmail})",
+                    g.Key.InstructorId
+                ))
+                .OrderBy(x => x.Text)
+                .ToList();
 
-    //            return View();
-    //        }
+            var vm = new CourseWithFullDetailsViewModel
+            {
+                Courses = filtered,
+                Schools = new SelectList(schools, "Value", "Text", schoolId),
+                Departments = new SelectList(departments, "Value", "Text", departmentId),
+                Instructors = new SelectList(instructors, "Value", "Text", instructorId),
+                SelectedSchoolId = schoolId,
+                SelectedDepartmentId = departmentId,
+                SelectedInstructorId = instructorId
+            };
 
-    //        [HttpPost]
-    //        public async Task<IActionResult> AddCourse(AddCourseDto dto)
-    //        {
-    //            var client = CreateClient();
-    //            var jsonData = JsonConvert.SerializeObject(dto);
-    //            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-    //            var response = await client.PostAsync("api/AdminCourse", content);
+            return View(vm);
+        }
 
-    //            if (response.IsSuccessStatusCode)
-    //                return RedirectToAction("Index");
+        // GET: /AdminMvcCourse/Create
 
-    //            return View(dto); // Hata durumunda geri döner
-    //        }
 
-    //        [HttpGet]
-    //        public async Task<IActionResult> UpdateCourse(int id)
-    //        {
-    //            var client = CreateClient();
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            var client = CreateClient();
+            var response = await client.GetAsync("api/admin/AdminCourse/WithFullDetails");
+            if (!response.IsSuccessStatusCode) return View(new CourseCreateViewModel());
 
-    //            // Course bilgisi
-    //            var response = await client.GetAsync($"api/AdminCourse/{id}");
-    //            var courseJson = await response.Content.ReadAsStringAsync();
-    //            var course = JsonConvert.DeserializeObject<UpdateCourseDto>(courseJson);
+            var allCourses = JsonConvert.DeserializeObject<List<CourseWithFullDetailsDto>>(await response.Content.ReadAsStringAsync());
 
-    //            // Departmanlar
-    //            var departmentResponse = await client.GetAsync("api/AdminDepartment");
-    //            var departmentJson = await departmentResponse.Content.ReadAsStringAsync();
-    //            var departmentList = JsonConvert.DeserializeObject<List<GetDepartmentDto>>(departmentJson);
-    //            ViewBag.Departments = departmentList;
+            var schools = allCourses
+                .GroupBy(c => new { c.SchoolId, c.SchoolName })
+                .Select(g => new SelectListItem(g.Key.SchoolName, g.Key.SchoolId.ToString()))
+                .ToList();
 
-    //            // Eğitmenler
-    //            var instructorResponse = await client.GetAsync("api/AdminUser/instructors");
-    //            var instructorJson = await instructorResponse.Content.ReadAsStringAsync();
-    //            var instructorList = JsonConvert.DeserializeObject<List<UserDto>>(instructorJson);
-    //            ViewBag.Instructors = instructorList;
+            var departments = allCourses
+                .GroupBy(c => new { c.DepartmentId, c.DepartmentName })
+                .Select(g => new SelectListItem(g.Key.DepartmentName, g.Key.DepartmentId.ToString()))
+                .ToList();
 
-    //            return View(course);
-    //        }
+            var instructors = allCourses
+                .GroupBy(c => new { c.InstructorId, c.InstructorUserName, c.InstructorEmail })
+                .Select(g => new SelectListItem($"{g.Key.InstructorUserName} ({g.Key.InstructorEmail})", g.Key.InstructorId))
+                .ToList();
 
-    //        [HttpPost]
-    //        public async Task<IActionResult> UpdateCourse(UpdateCourseDto dto)
-    //        {
-    //            var client = CreateClient();
-    //            var jsonData = JsonConvert.SerializeObject(dto);
-    //            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-    //            var response = await client.PutAsync("api/AdminCourse", content);
+            var vm = new CourseCreateViewModel
+            {
+                Schools = new SelectList(schools, "Value", "Text"),
+                Departments = new SelectList(departments, "Value", "Text"),
+                Instructors = new SelectList(instructors, "Value", "Text")
+            };
 
-    //            if (response.IsSuccessStatusCode)
-    //                return RedirectToAction("Index");
+            return View(vm);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(CourseCreateViewModel vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Dropdown listelerini tekrar yükle
+                var client = CreateClient();
+                var response = await client.GetAsync("api/admin/AdminCourse/WithFullDetails");
+                if (response.IsSuccessStatusCode)
+                {
+                    var allCourses = JsonConvert.DeserializeObject<List<CourseWithFullDetailsDto>>(await response.Content.ReadAsStringAsync());
 
-    //            return View(dto); // Hata varsa View'a geri dön
-    //        }
+                    vm.Schools = new SelectList(
+                        allCourses.GroupBy(c => new { c.SchoolId, c.SchoolName })
+                                  .Select(g => new SelectListItem(g.Key.SchoolName, g.Key.SchoolId.ToString())),
+                        "Value", "Text", vm.SchoolId);
 
-    //        public async Task<IActionResult> DeleteCourse(int id)
-    //        {
-    //            var client = CreateClient();
-    //            var response = await client.DeleteAsync($"api/AdminCourse/{id}");
-    //            return RedirectToAction("Index");
-    //        }
-    //    }
-    //}
+                    vm.Departments = new SelectList(
+                        allCourses.GroupBy(c => new { c.DepartmentId, c.DepartmentName })
+                                  .Select(g => new SelectListItem(g.Key.DepartmentName, g.Key.DepartmentId.ToString())),
+                        "Value", "Text", vm.DepartmentId);
+
+                    vm.Instructors = new SelectList(
+                        allCourses.GroupBy(c => new { c.InstructorId, c.InstructorUserName, c.InstructorEmail })
+                                  .Select(g => new SelectListItem($"{g.Key.InstructorUserName} ({g.Key.InstructorEmail})", g.Key.InstructorId)),
+                        "Value", "Text", vm.InstructorId);
+                }
+
+                return View(vm);
+            }
+
+            var dto = new CourseCreateDto
+            {
+                Name = vm.Name,
+                DepartmentId = vm.DepartmentId,
+                InstructorId = vm.InstructorId
+            };
+
+            var clientPost = CreateClient();
+            var result = await clientPost.PostAsJsonAsync("api/admin/AdminCourse", dto);
+
+            if (result.IsSuccessStatusCode)
+                return RedirectToAction("Index");
+
+            ModelState.AddModelError("", "Ders oluşturulamadı.");
+            return View(vm);
+        }
+
+
+    }
+}

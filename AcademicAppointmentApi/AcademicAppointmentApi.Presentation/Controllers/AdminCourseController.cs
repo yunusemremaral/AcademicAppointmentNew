@@ -98,5 +98,14 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             await _courseService.TDeleteAsync(course);
             return Ok();
         }
+        // GET: api/admin/AdminCourse/WithFullDetails
+        [HttpGet("WithFullDetails")]
+        public async Task<IActionResult> GetAllWithFullDetails()
+        {
+            var courses = await _courseService.GetAllWithDetailsAsync(); // zaten detaylı veriyi çekiyor
+            var dto = _mapper.Map<List<CourseWithFullDetailsDto>>(courses);
+            return Ok(dto);
+        }
+
     }
 }

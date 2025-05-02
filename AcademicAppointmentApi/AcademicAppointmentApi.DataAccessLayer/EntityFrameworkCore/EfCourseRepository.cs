@@ -50,34 +50,34 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<List<Course>> GetAllWithDetailsAsync()
-        {
-            return await _context.Courses
-                .Select(c => new Course
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    DepartmentId = c.DepartmentId,
-                    Department = new Department
+            public async Task<List<Course>> GetAllWithDetailsAsync()
+            {
+                return await _context.Courses
+                    .Select(c => new Course
                     {
-                        Id = c.Department.Id,
-                        Name = c.Department.Name,
-                        SchoolId = c.Department.SchoolId,
-                        School = new School
+                        Id = c.Id,
+                        Name = c.Name,
+                        DepartmentId = c.DepartmentId,
+                        Department = new Department
                         {
-                            Id = c.Department.School.Id,
-                            Name = c.Department.School.Name
+                            Id = c.Department.Id,
+                            Name = c.Department.Name,
+                            SchoolId = c.Department.SchoolId,
+                            School = new School
+                            {
+                                Id = c.Department.School.Id,
+                                Name = c.Department.School.Name
+                            }
+                        },
+                        InstructorId = c.InstructorId,
+                        Instructor = new AppUser
+                        {
+                            Id = c.Instructor.Id,
+                            UserName = c.Instructor.UserName,
+                            Email = c.Instructor.Email
                         }
-                    },
-                    InstructorId = c.InstructorId,
-                    Instructor = new AppUser
-                    {
-                        Id = c.Instructor.Id,
-                        UserName = c.Instructor.UserName,
-                        Email = c.Instructor.Email
-                    }
-                })
-                .ToListAsync();
+                    })
+                    .ToListAsync();
         }
 
         public async Task<List<Course>> GetAllByInstructorIdWithDetailsAsync(string instructorId)
