@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewData["Title"] = "Okul Düzenle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@model SchoolUpdateDto
+
+
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        <label for="Name">Okul Adı</label>
+        <input type="text" class="form-control" id="Name" name="Name" value="@Model.Name" required />
+    </div>
+
+    <button type="submit" class="btn btn-success">Güncelle</button>
+    <a href="@Url.Action("Index", "AdminMvcSchool")" class="btn btn-secondary">Geri</a>
+</form>
+
+

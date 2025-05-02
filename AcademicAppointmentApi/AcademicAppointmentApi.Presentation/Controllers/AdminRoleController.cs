@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcademicAppointmentApi.Presentation.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/admin/[controller]")]
     [ApiController]
+    //[Authorize(AuthenticationSchemes = "Bearer")]
+    //[Authorize(Roles = "Admin")]
     public class AdminRoleController : ControllerBase
     {
         private readonly RoleManager<AppRole> _roleManager;

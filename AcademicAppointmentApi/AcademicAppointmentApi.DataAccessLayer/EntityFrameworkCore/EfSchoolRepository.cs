@@ -30,6 +30,13 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                 .ToListAsync();
         }
 
+        public async Task<School> GetSchoolDetailsWithDepartmentsAsync(int id)
+        {
+            return await _context.Schools
+                .Include(s => s.Departments)  // Departmanları dahil et
+                .AsNoTracking()  // Takip etme, sadece okuma işlemi yapacağımız için performans sağlar
+                .FirstOrDefaultAsync(s => s.Id == id);  // Belirtilen okul id'sini bul
+        }
 
 
         public async Task<int> GetDepartmentCountAsync(int schoolId)

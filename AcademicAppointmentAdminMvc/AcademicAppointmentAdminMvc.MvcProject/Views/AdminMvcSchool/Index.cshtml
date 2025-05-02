@@ -1,66 +1,49 @@
-﻿@model List<SchoolWithDepartmentsDto>
-
+﻿
 @{
-    ViewData["Title"] = "Okul Listesi";
+    ViewData["Title"] = "Okullar";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+@if (TempData["DeleteError"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["DeleteError"]
+    </div>
+}
+@model List<SchoolDetailDto>
 
 
+<h2>@ViewData["Title"]</h2>
 
-
-
-<h2>Okullar</h2>
-
-<a href="/AdminMvcSchool/AddSchool" class="btn btn-success mb-3">Yeni Okul Ekle</a>
-
-<table class="table table-bordered table-striped">
+<table class="table">
     <thead>
         <tr>
-            <th>#</th>
+            <th>Okul Id</th>
+
             <th>Okul Adı</th>
             <th>Bölüm Sayısı</th>
             <th>İşlemler</th>
         </tr>
     </thead>
     <tbody>
-        @if (Model != null && Model.Any())
-        {
-            int index = 1;
-            foreach (var item in Model)
-            {
-                <tr>
-                    <td>@index</td>
-                    <td>@item.Name</td>
-                   
-
-                        @if (item.Departments == null || !item.Departments.Any())
-                        {
-                        <td>Bölüm bulunmamaktadır</td>
-                        }
-                        else
-                        {
-                        <td>@item.Departments?.Count</td>
-                        }
-                    <td>
-                        <a href="/AdminMvcSchool/SchoolDepartments/@item.Id" class="btn btn-sm btn-primary">
-                            Bölümleri Göster
-                        </a>
-                        <a href="/AdminMvcSchool/UpdateSchool/@item.Id" class="btn btn-sm btn-warning">
-                            Güncelle
-                        </a>
-                        <a href="/AdminMvcSchool/DeleteSchool/@item.Id" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?');">
-                            Sil
-                        </a>
-                    </td>
-                </tr>
-                index++;
-            }
-        }
-        else
+        @foreach (var school in Model)
         {
             <tr>
-                <td colspan="4" class="text-center">Kayıtlı okul bulunamadı.</td>
+                <td>@school.Id</td>
+
+                <td>@school.Name</td>
+                <td>@school.Departments.Count</td>
+                <td>
+                    <a href="@Url.Action("Details", "AdminMvcSchool", new { id = school.Id })" class="btn btn-info">Detaylar</a>
+                    <a href="@Url.Action("Edit", "AdminMvcSchool", new { id = school.Id })" class="btn btn-warning">Düzenle</a>
+                    <form method="post" action="@Url.Action("Delete", "AdminMvcSchool", new { id = school.Id })" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">Sil</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>
 </table>
+
+<a href="@Url.Action("Create", "AdminMvcSchool")" class="btn btn-primary">Okul Ekle</a>
+

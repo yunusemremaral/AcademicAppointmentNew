@@ -59,17 +59,24 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 await _schoolService.TUpdateAsync(school);
                 return NoContent();
             }
-            // SİLME 
-            [HttpDelete("{id}")]
-            public async Task<IActionResult> Delete(int id)
-            {
-                var school = await _schoolService.TGetByIdAsync(id);
-                if (school == null) return NotFound();
-                await _schoolService.TDeleteAsync(school);
-                return NoContent();
-            }
-            // OKULLARIN VE DEPARTMANLARIDA BİRLİKTE DÖNÜYOR 
-            [HttpGet("with-departments")]
+        // SİLME 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var school = await _schoolService.TGetByIdAsync(id);
+            if (school == null)
+                return NotFound();
+
+            // Departments doluysa silme
+            if (school.Departments == null)
+                return BadRequest("Bu okulun bağlı bölümleri olduğu için silinemez.");
+
+            await _schoolService.TDeleteAsync(school);
+            return NoContent();
+        }
+
+        // OKULLARIN VE DEPARTMANLARIDA BİRLİKTE DÖNÜYOR 
+        [HttpGet("with-departments")]
             public async Task<IActionResult> GetAllWithDepartments()
             {
                 var schools = await _schoolService.TGetAllWithDepartmentsAsync();
@@ -94,12 +101,35 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             }
 
             //OKULUN ID SINE GÖRE O OKULDAKİ BULUNAN BÖLÜM SAYISINI DÖNÜYOR 
-            [HttpGet("{schoolId}/department-count")]
+            [HttpGet("{schoolId}/department-count")] 
             public async Task<IActionResult> GetDepartmentCount(int schoolId)
             {
                 var count = await _schoolService.TGetDepartmentCountAsync(schoolId);
                 return Ok(new { SchoolId = schoolId, DepartmentCount = count });
             }
+        // OKULUN ID'Sİ İLE O OKULUN DETAYLARI VE DEPARTMANLARINI GETİRİR
+        [HttpGet("{id}/details")]
+        public async Task<IActionResult> GetSchoolDetailsWithDepartments(int id)
+        {
+            // Okul bilgilerini ve departmanlarını alıyoruz
+            var school = await _schoolService.TGetSchoolDetailsWithDepartmentsAsync(id);
+
+            // Eğer okul bulunamazsa 404 döndür
+            if (school == null) return NotFound();
+
+            // Okul bilgilerini ve departmanları DTO'ya dönüştürüyoruz
+            var schoolDetailDto = new SchoolDetailDto
+            {
+                Id = school.Id,
+                Name = school.Name,
+                Departments = school.Departments?.Select(d => _mapper.Map<SDepartmentSchoolDto>(d)).ToList() ?? new List<SDepartmentSchoolDto>()
+            };
+
+            // Detaylı okul bilgisini döndürüyoruz
+            return Ok(schoolDetailDto);
         }
+
+
     }
+}
 
