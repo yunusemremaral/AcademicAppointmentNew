@@ -1,11 +1,10 @@
-﻿@{
+﻿@model SchoolDetailDto
+
+@{
     ViewData["Title"] = "Okul Detayı";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-@model SchoolDetailDto
-
-<div class="container mt-4">
     <!-- Okul Başlığı ve ID'si -->
     <div class="d-flex justify-content-between">
         <h2>@Model.Name - Detaylar</h2>
@@ -15,40 +14,33 @@
     <p class="lead">Okul ve bağlı olduğu bölümler hakkında detaylı bilgiler:</p>
 
     <!-- Bölümler Tablosu -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <strong>Bölümler</strong>
-        </div>
-        <div class="card-body">
-            @if (Model.Departments != null && Model.Departments.Any())
-            {
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Bölüm Adı</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var department in Model.Departments)
-                        {
-                            <tr>
-                                <td>@department.Id</td>
-                                <td>@department.Name</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p>Bu okulda henüz bölüm bulunmamaktadır.</p>
-            }
-        </div>
-    </div>
+    @if (Model.Departments != null && Model.Departments.Any())
+    {
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Bölüm Adı</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var department in Model.Departments)
+                {
+                    <tr>
+                        <td>@department.Id</td>
+                        <td>@department.Name</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Bu okulda henüz bölüm bulunmamaktadır.</p>
+    }
 
     <!-- Butonlar: Bölüm Ekle ve Geri Dön -->
-    <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between mt-3">
         <a href="@Url.Action("Create", "AdminMvcDepartment", new { schoolId = Model.Id })" class="btn btn-success btn-sm">
             <i class="fas fa-plus-circle"></i> Bölüm Ekle
         </a>
@@ -57,4 +49,3 @@
             <i class="fas fa-arrow-left"></i> Geri Dön
         </a>
     </div>
-</div>

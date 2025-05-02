@@ -60,6 +60,11 @@ namespace AcademicAppointmentMvc.MvcProject.AutoMapper
                 .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.School.Name))
                 .ForMember(dest => dest.SchoolId, opt => opt.MapFrom(src => src.School.Id));
+            CreateMap<Course, DepartmentCourseWithInstructorDto>()
+                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserName))
+                .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor.Email))
+                .ForMember(dest => dest.InstructorId, opt => opt.MapFrom(src => src.Instructor.Id)); // string'e uygun olacak şekilde
+
 
             #endregion
 

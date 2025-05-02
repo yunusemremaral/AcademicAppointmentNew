@@ -1,0 +1,39 @@
+﻿@model List<DepartmentCourseWithInstructorDto>
+
+@{
+    ViewData["Title"] = "Bölüm Dersleri";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>@ViewBag.DepartmentName  Bölüm Dersleri </h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Ad</th>
+            <th>Hoca Adı</th>
+            <th>Hoca E-mail</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model)
+        {
+            <tr>
+                <td>@course.Id</td>
+                <td>@course.Name</td>
+                <td>@course.InstructorUserName</td> <!-- Hoca adı -->
+                <td>@course.InstructorEmail</td>   <!-- Hoca e-mail -->
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="d-flex justify-content-between mt-3">
+    <a href="@Url.Action("Create", "AdminMvcSchool", new {  })" class="btn btn-success btn-sm">
+        <i class="fas fa-plus-circle"></i> Ders Ekle
+    </a>
+
+    <a href="@Url.Action("Index", "AdminMvcDepartment")" class="btn btn-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Geri Dön
+    </a>
+</div>

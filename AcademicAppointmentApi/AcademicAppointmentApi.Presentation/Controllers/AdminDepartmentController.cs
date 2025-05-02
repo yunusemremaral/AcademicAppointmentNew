@@ -123,6 +123,31 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             return Ok(departmentDtos);
         }
 
+        [HttpGet("by-department-full/{departmentId}")]
+        public async Task<IActionResult> GetCoursesWithInstructor(int departmentId)
+        {
+            try
+            {
+                var courses = await _departmentService.TGetCoursesWithInstructorByDepartmentIdAsync(departmentId);
+
+                // Map the courses to DTOs
+                var courseDtos = _mapper.Map<List<DepartmentCourseWithInstructorDto>>(courses);
+
+                return Ok(courseDtos);
+            }
+            catch (AutoMapperMappingException ex)
+            {
+                // Log or return the error details
+                return BadRequest($"Mapping Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Log or return the general error details
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
     }
 
 }

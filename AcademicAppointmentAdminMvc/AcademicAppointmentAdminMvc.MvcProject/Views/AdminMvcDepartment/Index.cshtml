@@ -4,7 +4,18 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-
+<!-- Index.cshtml içine en üste ekle -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="toast align-items-center text-white bg-danger border-0 position-absolute top-0 end-0 m-3" role="alert" data-bs-delay="3000">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["ErrorMessage"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+}
 @model IEnumerable<DepartmentWithSchoolDto>
 
 <div class="container mt-4">
@@ -44,34 +55,37 @@
                         <td>@department.DepartmentName</td>
                         <td>@department.SchoolName</td>
                         <td>
-                            <div class="btn-group" role="group">
-                                <!-- Dersleri Göster Butonu -->
-                                <a class="btn btn-sm btn-info"
-                                   href="#"
-                                   title="Dersleri Göster"
-                                   onclick="showCourses(@department.Id)">
-                                    <i class="fas fa-book"></i>
-                                </a>
 
-                                <!-- Güncelle Butonu -->
-                                <a class="btn btn-sm btn-warning"
-                                   asp-action="Edit"
-                                   asp-route-id="@department.Id"
-                                   title="Güncelle">
-                                    <i class="fas fa-edit"></i>
-                                </a>
+                   
+                            <!-- Dersleri Göster Butonu -->
+                           <a class="btn btn-info" 
+                                   asp-action="Details" 
+                                   asp-route-departmentId="@department.Id"
+                                   title="Dersleri Göster">
+                                    Dersler
+                         </a>
 
-                                <!-- Sil Butonu -->
-                                <form asp-action="Delete" method="post" class="d-inline">
-                                    <input type="hidden" name="id" value="@department.Id" />
-                                    <button type="button"
-                                            class="btn btn-sm btn-danger"
-                                            title="Sil"
-                                            onclick="confirmDelete(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            <!-- Güncelle Butonu -->
+                            <a class="btn btn-warning"
+                               asp-action="Edit"
+                               asp-route-id="@department.Id"
+                               title="Güncelle">
+                                Güncelle
+                            </a>
+
+                            <!-- Sil Butonu -->
+                            <form asp-action="Delete" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@department.Id" />
+                                <button type="button"
+                                        class="btn btn-danger"
+                                        title="Sil"
+                                        onclick="confirmDelete(this)">
+                                    Sil
+                                </button>
+                            </form>
+                     
+
+                            
                         </td>
                     </tr>
                 }
@@ -82,6 +96,7 @@
     <!-- Alt Tarafa Bölüm Ekle Butonu -->
     <div class="mt-4">
         <a class="btn btn-success"
+           asp-controller="AdminMvcDepartment"
            asp-action="Create"
            asp-route-schoolId="@ViewBag.SelectedSchoolId">
             <i class="fas fa-plus"></i> Yeni Bölüm Ekle
@@ -98,11 +113,7 @@
             }
         }
 
-        // Dersleri Göster (Placeholder)
-        function showCourses(departmentId) {
-            alert('Dersler gösterilecek - Department ID: ' + departmentId);
-            // Buraya AJAX çağrısı veya yeni sayfa implementasyonu gelecek
-        }
+        
 
         // Dropdown değiştiğinde otomatik filtrele
         document.querySelector('select[name="schoolName"]').addEventListener('change', function() {

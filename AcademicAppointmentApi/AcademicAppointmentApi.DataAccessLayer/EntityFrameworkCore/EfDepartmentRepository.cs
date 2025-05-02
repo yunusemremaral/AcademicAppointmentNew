@@ -32,7 +32,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
 
 
 
-
+        
         public async Task<IReadOnlyList<Course>> GetCoursesByDepartmentIdAsync(int departmentId)
         {
             return await _context.Courses
@@ -44,6 +44,27 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                 })
                 .ToListAsync();
         }
+        public async Task<IReadOnlyList<Course>> GetCoursesWithInstructorByDepartmentIdAsync(int departmentId)
+        {
+            return await _context.Courses
+                .Where(c => c.DepartmentId == departmentId)
+                .Select(c => new Course
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    InstructorId = c.InstructorId,
+                    Instructor = new AppUser
+                    {
+                       Id = c.Instructor.Id,
+                       UserName = c.Instructor.UserName,
+                       Email = c.Instructor.Email
+                    },
+
+                })
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
 
 
         public async Task<Department?> GetByIdWithDetailsAsync(int id)

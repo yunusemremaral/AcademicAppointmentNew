@@ -39,5 +39,10 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
         {
             return await _departmentRepository.GetCourseCountAsync(departmentId);
         }
+
+        public async Task<IReadOnlyList<Course>> TGetCoursesWithInstructorByDepartmentIdAsync(int departmentId)
+        {
+            return await _departmentRepository.GetCoursesWithInstructorByDepartmentIdAsync(departmentId);
+        }
     }
 }

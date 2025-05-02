@@ -1,9 +1,11 @@
 ﻿using AcademicAppointmentAdminMvc.MvcProject.Models;
+using AcademicAppointmentShare.Dtos.CourseDtos;
 using AcademicAppointmentShare.Dtos.DepartmentDtos;
 using AcademicAppointmentShare.Dtos.SchoolDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
@@ -34,26 +36,36 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
         public async Task<IActionResult> Index(string schoolName)
         {
             var client = CreateClient();
-            var response = await client.GetAsync("api/admin/AdminDepartment/with-school");
 
-            if (!response.IsSuccessStatusCode)
+            // TÜM OKULLARI ÇEK (Bölümü olsun olmasın)
+            var schoolsResponse = await client.GetAsync("api/admin/adminschool");
+            if (!schoolsResponse.IsSuccessStatusCode)
                 return View(new List<DepartmentWithSchoolDto>());
 
-            var json = await response.Content.ReadAsStringAsync();
-            var departments = JsonConvert.DeserializeObject<List<DepartmentWithSchoolDto>>(json);
+            var schools = JsonConvert.DeserializeObject<List<SchoolListDto>>(
+                await schoolsResponse.Content.ReadAsStringAsync()
+            );
 
-            // Tüm okul adlarını al
-            var schoolNames = departments.Select(d => d.SchoolName).Distinct().OrderBy(n => n).ToList();
+            // BÖLÜMLERİ ÇEK (Okul bilgileriyle birlikte)
+            var departmentsResponse = await client.GetAsync("api/admin/AdminDepartment/with-school");
+            var departments = departmentsResponse.IsSuccessStatusCode
+                ? JsonConvert.DeserializeObject<List<DepartmentWithSchoolDto>>(
+                    await departmentsResponse.Content.ReadAsStringAsync())
+                : new List<DepartmentWithSchoolDto>();
+
+            // DROPDOWN İÇİN TÜM OKUL ADLARINI KULLAN (Bölümü olmasa bile)
+            var schoolNames = schools.Select(s => s.Name).Distinct().OrderBy(n => n).ToList();
             ViewBag.SchoolNames = new SelectList(schoolNames, schoolName);
 
-            // Eğer filtre varsa, sadece o okula ait bölümler kalsın
+            // Filtreleme yap
             if (!string.IsNullOrEmpty(schoolName))
             {
-                departments = departments.Where(d => d.SchoolName == schoolName).ToList();
+                // Seçilen okulun ID'sini bul (schools listesinden)
+                var selectedSchool = schools.FirstOrDefault(s => s.Name == schoolName);
+                ViewBag.SelectedSchoolId = selectedSchool?.Id;
 
-                // SchoolId'yi ViewBag'e geçir (ilk denk gelen departmandan alabiliriz)
-                var selectedSchoolId = departments.FirstOrDefault()?.SchoolId;
-                ViewBag.SelectedSchoolId = selectedSchoolId;
+                // Departmanları filtrele (eğer bu okula ait departman yoksa liste boş kalır)
+                departments = departments.Where(d => d.SchoolName == schoolName).ToList();
             }
             else
             {
@@ -131,141 +143,99 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                 ViewBag.Schools = new SelectList(schools, "Id", "Name");
             }
         }
-        // Delete Action
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var client = CreateClient();
+
+            // Departman detaylarını al (SchoolId için with-school endpointini kullanıyoruz)
+            var response = await client.GetAsync("api/admin/AdminDepartment/with-school");
+            if (!response.IsSuccessStatusCode)
+                return NotFound();
+
+            var departments = JsonConvert.DeserializeObject<List<DepartmentWithSchoolDto>>(
+                await response.Content.ReadAsStringAsync()
+            );
+
+            var department = departments.FirstOrDefault(d => d.Id == id);
+            if (department == null)
+                return NotFound();
+
+            // Update DTO'sunu oluştur
+            var updateDto = new DepartmentUpdateDto
+            {
+                Id = department.Id,
+                Name = department.DepartmentName,
+                SchoolId = department.SchoolId
+            };
+
+            // Okul listesini yükle
+            await LoadSchoolsForViewBag();
+            return View(updateDto);
+        }
+
+        // Edit POST
+        [HttpPost]
+        public async Task<IActionResult> Edit(DepartmentUpdateDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await LoadSchoolsForViewBag();
+                return View(model);
+            }
+
+            var client = CreateClient();
+            var response = await client.PutAsJsonAsync($"api/admin/AdminDepartment/{model.Id}", model);
+
+            if (response.IsSuccessStatusCode)
+                return RedirectToAction("Index");
+
+            // Hata durumunda
+            var error = await response.Content.ReadAsStringAsync();
+            ModelState.AddModelError("", error);
+            await LoadSchoolsForViewBag();
+            return View(model);
+        }
+
+        // Delete POST
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
             var client = CreateClient();
-            var response = await client.DeleteAsync($"api/admin/admindepartment/{id}");
+            var response = await client.DeleteAsync($"api/admin/AdminDepartment/{id}");
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
+                var error = await response.Content.ReadAsStringAsync();
+                TempData["ErrorMessage"] = error;
+            }
+
+            return RedirectToAction("Index");
+        }
+        public async Task<IActionResult> Details(int departmentId)
+        {
+            var client = CreateClient();
+
+            // API'ye istek atıyoruz
+            var response = await client.GetAsync($"api/admin/AdminDepartment/by-department-full/{departmentId}");
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["ErrorMessage"] = "Dersler getirilemedi.";
                 return RedirectToAction("Index");
             }
 
-            // Hata durumunda
-            var error = await response.Content.ReadAsStringAsync();
-            return StatusCode((int)response.StatusCode, error);
-
-
-
-
-
-
-            //// 2. Get departments with courses
-            //public async Task<IActionResult> DepartmentsWithCourses()
-            //{
-            //    var client = CreateClient();
-            //    var response = await client.GetAsync("api/admin/admindepartment/with-courses");
-
-            //    if (!response.IsSuccessStatusCode)
-            //    {
-            //        return View("Error");
-            //    }
-
-            //    var jsonData = await response.Content.ReadAsStringAsync();
-            //    var departments = JsonConvert.DeserializeObject<List<DepartmentListWithCoursesDto>>(jsonData);
-
-            //    return View(departments);
-            //}
-
-            //// 3. Get courses by department ID
-            //public async Task<IActionResult> CoursesByDepartment(int departmentId)
-            //{
-            //    var client = CreateClient();
-            //    var response = await client.GetAsync($"api/admin/admindepartment/courses/{departmentId}");
-
-            //    if (!response.IsSuccessStatusCode)
-            //    {
-            //        return View("Error");
-            //    }
-
-            //    var jsonData = await response.Content.ReadAsStringAsync();
-            //    var courses = JsonConvert.DeserializeObject<List<DepartmentCourseDto>>(jsonData);
-
-            //    return View(courses);
-            //}
-
-            //// 4. Get department details by ID
-            //public async Task<IActionResult> DepartmentDetails(int id)
-            //{
-            //    var client = CreateClient();
-            //    var response = await client.GetAsync($"api/admin/admindepartment/details/{id}");
-
-            //    if (!response.IsSuccessStatusCode)
-            //    {
-            //        return View("Error");
-            //    }
-
-            //    var jsonData = await response.Content.ReadAsStringAsync();
-            //    var department = JsonConvert.DeserializeObject<DepartmentDetailDto>(jsonData);
-
-            //    return View(department);
-            //}
-
-            //// 5. Get the number of courses in a department
-            //public async Task<IActionResult> CourseCount(int departmentId)
-            //{
-            //    var client = CreateClient();
-            //    var response = await client.GetAsync($"api/admin/admindepartment/course-count/{departmentId}");
-
-            //    if (!response.IsSuccessStatusCode)
-            //    {
-            //        return View("Error");
-            //    }
-
-            //    var jsonData = await response.Content.ReadAsStringAsync();
-            //    var courseCount = JsonConvert.DeserializeObject<int>(jsonData);
-
-            //    return View(courseCount);
-            //}
-
-            //// 6. Create a new department (Post method)
-            //[HttpPost]
-            //public async Task<IActionResult> CreateDepartment([FromBody] DepartmentCreateDto departmentCreateDto)
-            //{
-            //    if (departmentCreateDto == null)
-            //        return BadRequest();
-
-            //    var client = CreateClient();
-            //    var content = new StringContent(JsonConvert.SerializeObject(departmentCreateDto), Encoding.UTF8, "application/json");
-            //    var response = await client.PostAsync("api/admin/admindepartment", content);
-
-            //    if (!response.IsSuccessStatusCode)
-            //        return View("Error");
-
-            //    return RedirectToAction("Index");
-            //}
-
-            //// 7. Update an existing department (Put method)
-            //[HttpPut]
-            //public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentUpdateDto departmentUpdateDto)
-            //{
-            //    if (id != departmentUpdateDto.Id)
-            //        return BadRequest("ID mismatch.");
-
-            //    var client = CreateClient();
-            //    var content = new StringContent(JsonConvert.SerializeObject(departmentUpdateDto), Encoding.UTF8, "application/json");
-            //    var response = await client.PutAsync($"api/admin/admindepartment/{id}", content);
-
-            //    if (!response.IsSuccessStatusCode)
-            //        return View("Error");
-
-            //    return RedirectToAction("Index");
-            //}
-
-            //// 8. Delete a department
-            //[HttpDelete]
-            //public async Task<IActionResult> DeleteDepartment(int id)
-            //{
-            //    var client = CreateClient();
-            //    var response = await client.DeleteAsync($"api/admin/admindepartment/{id}");
-
-            //    if (!response.IsSuccessStatusCode)
-            //        return View("Error");
-
-            //    return RedirectToAction("Index");
-            //}
+            // API'den dönen verileri DepartmentCourseWithInstructorDto'ya dönüştürüyoruz
+            var courseList = JsonConvert.DeserializeObject<List<DepartmentCourseWithInstructorDto>>(
+                await response.Content.ReadAsStringAsync()
+            );
+ 
+            ViewBag.DepartmentName = courseList.FirstOrDefault().Name;
+            return View(courseList); // Detay view'ına yönlendir
         }
+
+
+
+
+
     }
 }
