@@ -13,11 +13,13 @@ namespace AcademicAppointmentApi.Presentation.Controllers
     public class AdminRoleController : ControllerBase
     {
         private readonly RoleManager<AppRole> _roleManager;
+        private readonly UserManager<AppUser> _userManager;  // UserManager'ı ekliyoruz
         private readonly IMapper _mapper;
 
-        public AdminRoleController(RoleManager<AppRole> roleManager, IMapper mapper)
+        public AdminRoleController(RoleManager<AppRole> roleManager, UserManager<AppUser> userManager, IMapper mapper)
         {
             _roleManager = roleManager;
+            _userManager = userManager;  // UserManager'ı inject ediyoruz
             _mapper = mapper;
         }
 
@@ -56,6 +58,26 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             if (!result.Succeeded) return BadRequest(result.Errors);
 
             return Ok();
+        }
+        [HttpPost("assign-role")]
+        public async Task<IActionResult> AssignRoleToUser([FromBody] RoleAssignmentDto model)
+        {
+            if (string.IsNullOrWhiteSpace(model.UserId) || string.IsNullOrWhiteSpace(model.RoleName))
+                return BadRequest("UserId and RoleName are required.");
+
+            // Kullanıcıyı bul
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null) return NotFound("User not found.");
+
+            // Rolü bul
+            var role = await _roleManager.FindByNameAsync(model.RoleName);
+            if (role == null) return NotFound("Role not found.");
+
+            // Kullanıcıya rolü ata
+            var result = await _userManager.AddToRoleAsync(user, role.Name);
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
+            return Ok($"Role {model.RoleName} assigned to user {model.UserId}.");
         }
     }
 }

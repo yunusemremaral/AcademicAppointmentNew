@@ -4,7 +4,22 @@
 }
 
 <h2>Dersler</h2>
+@* Views/AdminMvcCourse/Index.cshtml *@
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 <form method="get" asp-action="Index" asp-controller="AdminMvcCourse" class="form-inline mb-3">
     @* Okullar *@
     @Html.DropDownList(
@@ -62,8 +77,11 @@
                 <td>@c.InstructorUserName</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-warning">Düzenle</a>
-                    <a asp-action="Delete" asp-route-id="@c.Id" class="btn btn-sm btn-danger">Sil</a>
-                    <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-info">Detay</a>
+                    <form asp-action="Delete" asp-route-id="@c.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Dersi silmek istediğinize emin misiniz?')">
+                            Sil
+                        </button>
+                    </form>                    <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-info">Detay</a>
                 </td>
             </tr>
         }

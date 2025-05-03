@@ -1,0 +1,32 @@
+﻿@model CourseDetailDto
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Ders Detayları";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h3 class="mb-0">Ders Detayları</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Ders Adı:</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Bölüm:</dt>
+                <dd class="col-sm-9">@Model.DepartmentName (ID: @Model.DepartmentId)</dd>
+
+                <dt class="col-sm-3">Akademisyen Kullanıcı Adı:</dt>
+                <dd class="col-sm-9">@Model.InstructorUserName</dd>
+
+                <dt class="col-sm-3">Akademisyen Email:</dt>
+                <dd class="col-sm-9">@Model.InstructorEmail</dd>
+            </dl>
+
+            <a asp-action="Index" class="btn btn-secondary mt-3">
+                <i class="fas fa-arrow-left me-2"></i>Geri Dön
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,33 +1,103 @@
-﻿@model CourseCreateViewModel
+﻿@model CourseCreateMvcDto
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<form asp-action="Create" method="post" class="w-100">
-    <div class="form-group">
-        <label asp-for="Name">Ders Adı</label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
 
-    <div class="form-row">
-        <div class="col">
-            <label>Okul</label>
-            @Html.DropDownListFor(m => m.SchoolId, Model.Schools, "Okul Seçiniz", new { @class = "form-control" })
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Yeni Kurs Oluştur</h3>
         </div>
-        <div class="col">
-            <label>Bölüm</label>
-            @Html.DropDownListFor(m => m.DepartmentId, Model.Departments, "Bölüm Seçiniz", new { @class = "form-control" })
-            <span asp-validation-for="DepartmentId" class="text-danger"></span>
-        </div>
-        <div class="col">
-            <label>Akademisyen</label>
-            @Html.DropDownListFor(m => m.InstructorId, Model.Instructors, "Akademisyen Seçiniz", new { @class = "form-control" })
-            <span asp-validation-for="InstructorId" class="text-danger"></span>
+        <div class="card-body">
+            <form asp-action="Create" id="courseForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Kurs Adı -->
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- School Seçimi -->
+                <div class="form-group mb-3">
+                    <label asp-for="SchoolId" class="form-label"></label>
+                    <select asp-for="SchoolId" asp-items="Model.Schools" 
+                            class="form-control" id="schoolSelect">
+                        <option value="">-- Okul Seçin --</option>
+                    </select>
+                    <span asp-validation-for="SchoolId" class="text-danger"></span>
+                </div>
+
+                <!-- Department Seçimi -->
+                <div class="form-group mb-3">
+                    <label asp-for="DepartmentId" class="form-label"></label>
+                    <select asp-for="DepartmentId" asp-items="Model.Departments" 
+                            class="form-control" id="departmentSelect" disabled>
+                        <option value="">-- Bölüm Seçin --</option>
+                    </select>
+                    <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                </div>
+
+                <!-- Instructor Seçimi -->
+                <div class="form-group mb-4">
+                    <label asp-for="InstructorId" class="form-label"></label>
+                    <select asp-for="InstructorId" asp-items="Model.Instructors" 
+                            class="form-control" id="instructorSelect" disabled>
+                        <option value="">-- Eğitmen Seçin --</option>
+                    </select>
+                    <span asp-validation-for="InstructorId" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save me-2"></i>Oluştur
+                </button>
+                <a href="Index" type="submit" class="btn btn-info">
+                    <i class="fas fa-save me-2"></i>Geri Dön
+                </a>
+            </form>
         </div>
     </div>
+</div>
 
-    <button type="submit" class="btn btn-success mt-3">Kaydet</button>
-    <a asp-action="Index" class="btn btn-secondary mt-3 ml-2">Geri</a>
-</form>
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // School değiştiğinde
+            $('#schoolSelect').change(function() {
+                var schoolId = $(this).val();
+                $('#departmentSelect').prop('disabled', true).html('<option>Yükleniyor...</option>');
+                $('#instructorSelect').prop('disabled', true).html('<option>Önce bölüm seçin</option>');
+
+                if (schoolId) {
+                    $.getJSON('/AdminMvcCourse/GetDepartmentsBySchool', { schoolId: schoolId }, function(data) {
+                        var options = '<option value="">-- Bölüm Seçin --</option>';
+                        $.each(data, function(index, item) {
+                            options += '<option value="' + item.value + '">' + item.text + '</option>';
+                        });
+                        $('#departmentSelect').prop('disabled', false).html(options);
+                    });
+                }
+            });
+
+            // Department değiştiğinde
+            $('#departmentSelect').change(function() {
+                var deptId = $(this).val();
+                $('#instructorSelect').prop('disabled', true).html('<option>Yükleniyor...</option>');
+
+                if (deptId) {
+                    $.getJSON('/AdminMvcCourse/GetInstructorsByDepartment', { departmentId: deptId }, function(data) {
+                        var options = '<option value="">-- Eğitmen Seçin --</option>';
+                        $.each(data, function(index, item) {
+                            options += '<option value="' + item.value + '">' + item.text + '</option>';
+                        });
+                        $('#instructorSelect').prop('disabled', false).html(options);
+                    });
+                }
+            });
+        });
+    </script>
+}

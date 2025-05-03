@@ -39,7 +39,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         {
             var course = await _courseService.TGetByIdAsync(id);
             if (course == null) return NotFound();
-            var dto = _mapper.Map<CourseListDto>(course);
+            var dto = _mapper.Map<CourseGetByIdDto>(course);
             return Ok(dto);
         }
 

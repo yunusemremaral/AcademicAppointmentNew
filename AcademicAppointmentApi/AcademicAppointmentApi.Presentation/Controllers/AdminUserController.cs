@@ -153,6 +153,31 @@ public class AdminUserController : ControllerBase
 
         return Ok(userDetails);
     }
+    [HttpGet("instructors-by-department/{departmentId}")]
+    public async Task<IActionResult> GetInstructorsByDepartment(int departmentId)
+    {
+        var usersInRole = await _userManager.GetUsersInRoleAsync("Instructor");
+
+        var filtered = usersInRole
+            .Where(u => u.DepartmentId == departmentId)
+            .ToList();
+
+        var dtoList = _mapper.Map<List<UserSimpleDto>>(filtered);
+        return Ok(dtoList);
+    }
+    [HttpGet("student-by-department/{departmentId}")]
+    public async Task<IActionResult> GetStudentByDepartment(int departmentId)
+    {
+        var usersInRole = await _userManager.GetUsersInRoleAsync("Student");
+
+        var filtered = usersInRole
+            .Where(u => u.DepartmentId == departmentId)
+            .ToList();
+
+        var dtoList = _mapper.Map<List<UserSimpleDto>>(filtered);
+        return Ok(dtoList);
+    }
+
 
 
 }
