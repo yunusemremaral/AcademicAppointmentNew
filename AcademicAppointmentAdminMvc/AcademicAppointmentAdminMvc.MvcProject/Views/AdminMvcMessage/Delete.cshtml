@@ -1,0 +1,29 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@model ResultMessageDto
+
+<div class="container mt-4">
+    <h2>Mesajı Sil</h2>
+    <div class="alert alert-danger">
+        <h5>Aşağıdaki mesajı silmek istediğinizden emin misiniz?</h5>
+        <p>Bu işlem geri alınamaz!</p>
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Gönderen</dt>
+        <dd class="col-sm-9">@Model.SenderName</dd>
+
+        <dt class="col-sm-3">Alıcı</dt>
+        <dd class="col-sm-9">@Model.ReceiverName</dd>
+
+        <dt class="col-sm-3">İçerik</dt>
+        <dd class="col-sm-9">@Model.Content</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Sil</button>
+        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+    </form>
+</div>

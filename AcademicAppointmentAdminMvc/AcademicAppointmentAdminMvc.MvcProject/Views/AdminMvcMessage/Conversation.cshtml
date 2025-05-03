@@ -1,0 +1,41 @@
+﻿@model List<ResultMessageDto>
+
+
+@{
+    ViewData["Title"] = "Konuşma";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="container mt-4">
+    <h2>Kullanıcı Sohbeti</h2>
+
+    @if (Model.Any())
+    {
+        <div class="mb-3">
+            <span class="badge bg-primary">@Model.First().SenderName</span> ↔
+            <span class="badge bg-success">@Model.First().ReceiverName</span>
+        </div>
+
+        <div class="message-container" style="max-height: 60vh; overflow-y: auto;">
+            @foreach (var message in Model)
+            {
+                <div class="card mb-3 @(message.SenderId == ViewBag.UserId1 ? "ms-auto" : "me-auto")" style="max-width: 75%;">
+                    <div class="card-header">
+                        <small class="text-muted">@message.SentAt.ToString("t")</small>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">@message.Content</p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <small>@(message.SenderId == ViewBag.UserId1 ? "Gönderen" : "Alıcı")</small>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">Bu kullanıcılar arasında mesaj bulunamadı.</div>
+    }
+
+    <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+</div>

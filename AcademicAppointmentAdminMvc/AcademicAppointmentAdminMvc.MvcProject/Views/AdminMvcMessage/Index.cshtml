@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Mesajlar";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+
+@model List<ResultMessageDto>
+
+    <h2>Tüm Mesajlar</h2>
+
+    <!-- Filtreleme Formu -->
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                @Html.DropDownList("filterEmail", (SelectList)ViewBag.UserEmails, "Tüm Kullanıcılar", new { @class = "form-control" })
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Filtrele</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Mesaj Listesi -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>İçerik</th>
+                <th>Gönderen</th>
+                <th>Alan</th>
+                <th>Tarih</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var message in Model)
+            {
+                <tr>
+                    <td>@message.Id</td>
+                    <td>@(message.Content?.Length > 30 ? message.Content.Substring(0, 30) + "..." : message.Content)</td>
+                    <td>@message.SenderName</td>
+                    <td>@message.ReceiverName</td>
+                    <td>@message.SentAt.ToString("g")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@message.Id" class="btn btn-info btn-sm">Detay</a>
+                        <a asp-action="Edit" asp-route-id="@message.Id" class="btn btn-warning btn-sm">Düzenle</a>
+
+                        <form asp-action="Delete" method="post" class="d-inline"
+                              onsubmit="return confirm('Bu mesajı silmek istediğinize emin misiniz?');">
+                            <input type="hidden" name="id" value="@message.Id" />
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                        </form>
+                        <a asp-action="Conversation"
+                           asp-route-userId1="@message.SenderId"
+                           asp-route-userId2="@message.ReceiverId"
+                           class="btn btn-info btn-sm">
+                            Sohbeti Gör
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-action="Create" class="btn btn-success">Yeni Mesaj Oluştur</a>

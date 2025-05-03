@@ -1,5 +1,4 @@
-﻿using AcademicAppointmentAdminMvc.MvcProject.Dtos.UserMvcDtos;
-using AcademicAppointmentAdminMvc.MvcProject.Models;
+﻿using AcademicAppointmentAdminMvc.MvcProject.Models;
 using AcademicAppointmentApi.EntityLayer.Entities;
 using AcademicAppointmentShare.Dtos.CourseDtos;
 using AcademicAppointmentShare.Dtos.DepartmentDtos;

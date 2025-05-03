@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Mesaj Oluştur";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@model UpdateMessageDto
+
+<div class="container mt-4">
+    <h2>Mesajı Düzenle</h2>
+
+    <form asp-action="Edit">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label>İçerik</label>
+            <textarea asp-for="Content" class="form-control" rows="5"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-warning">Güncelle</button>
+    </form>
+</div>

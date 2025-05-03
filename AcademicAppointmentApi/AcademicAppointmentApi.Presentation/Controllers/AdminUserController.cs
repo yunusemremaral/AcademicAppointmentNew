@@ -189,6 +189,27 @@ public class AdminUserController : ControllerBase
         return Ok(dtoList);
     }
 
+    [HttpGet("users")]
+    public async Task<IActionResult> GetAllUsers(string schoolId = null, string departmentId = null, string roomId = null)
+    {
+        var query = _userManager.Users.AsQueryable();
+
+        if (!string.IsNullOrEmpty(schoolId))
+            query = query.Where(u => u.SchoolId.ToString() == schoolId);
+
+        if (!string.IsNullOrEmpty(departmentId))
+            query = query.Where(u => u.DepartmentId.ToString() == departmentId);
+
+        if (!string.IsNullOrEmpty(roomId))
+            query = query.Where(u => u.RoomId.ToString() == roomId);
+
+        var users = query.ToList();
+        var usersDto = _mapper.Map<List<UserDto>>(users);
+
+        return Ok(usersDto);
+    }
+
+
 
 
 }

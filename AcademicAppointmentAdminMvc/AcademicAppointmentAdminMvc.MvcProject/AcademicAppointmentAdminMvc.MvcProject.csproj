@@ -29,4 +29,8 @@
     <ProjectReference Include="..\..\AcademicAppointmentShare\AcademicAppointmentShare.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos\" />
+  </ItemGroup>
+
 </Project>
