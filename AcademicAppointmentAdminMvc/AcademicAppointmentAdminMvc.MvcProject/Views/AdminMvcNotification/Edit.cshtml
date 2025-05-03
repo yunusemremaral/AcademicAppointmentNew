@@ -1,0 +1,27 @@
+﻿@model UpdateNotificationDto
+@{
+    ViewData["Title"] = "Bildirim Düzenle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Bildirim Düzenle</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CreatedAt" value="@DateTime.Now"/>
+
+    <div class="form-group">
+        <label>Başlık</label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Mesaj</label>
+        <textarea asp-for="Message" class="form-control"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Okundu Mu?</label>
+        <input asp-for="IsRead" type="checkbox" />
+    </div>
+    <button type="submit" class="btn btn-primary">Güncelle</button>
+    <a asp-action="Index" class="btn btn-secondary">Geri</a>
+</form>

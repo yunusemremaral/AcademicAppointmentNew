@@ -1,0 +1,14 @@
+﻿@model NotificationDto
+@{
+    ViewData["Title"] = "Bildirim Detay";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Bildirim Detayları</h2>
+
+<p><strong>Başlık:</strong> @Model.Title</p>
+<p><strong>Mesaj:</strong> @Model.Message</p>
+<p><strong>Okundu Mu:</strong> @(Model.IsRead ? "Evet" : "Hayır")</p>
+<p><strong>Oluşturulma:</strong> @Model.CreatedAt.ToLocalTime().ToString("f")</p>
+
+<a asp-action="Index" class="btn btn-secondary">Geri</a>

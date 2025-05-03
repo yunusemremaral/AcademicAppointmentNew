@@ -59,6 +59,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateNotification(int id, [FromBody] UpdateNotificationDto dto)
         {
+            
             if (id != dto.Id) return BadRequest();
             var entity = _mapper.Map<Notification>(dto);
             await _genericService.TUpdateAsync(entity);

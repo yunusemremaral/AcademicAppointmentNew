@@ -1,0 +1,42 @@
+﻿@model IEnumerable<NotificationDto>
+@{
+    ViewData["Title"] = "Bildirimler";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Bildirimler</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Başlık</th>
+            <th>Okundu Mu</th>
+            <th>Tarih</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@(item.IsRead ? "Evet" : "Hayır")</td>
+                <td>@item.CreatedAt.ToLocalTime().ToString("g")</td>
+                <td>
+                    <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.Id">Detay</a>
+                    <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@item.Id">Düzenle</a>
+                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                        <button class="btn btn-danger btn-sm" type="submit" onclick="return confirm('Silmek istediğinize emin misiniz?')">Sil</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="btn btn-success" asp-action="Create">Yeni Bildirim</a>
