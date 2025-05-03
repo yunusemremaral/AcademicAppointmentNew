@@ -99,6 +99,9 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
             CreateMap<Room, RoomDto>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.AppUser.UserName))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.AppUser.Email));
+            CreateMap<Room, RoomDetailDto>()
+    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.AppUser.UserName))
+    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.AppUser.Email));
 
             CreateMap<CreateRoomDto, Room>();
             CreateMap<UpdateRoomDto, Room>();

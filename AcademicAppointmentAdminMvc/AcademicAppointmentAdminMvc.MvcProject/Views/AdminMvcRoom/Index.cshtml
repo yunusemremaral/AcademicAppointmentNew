@@ -1,0 +1,46 @@
+﻿@model IEnumerable<RoomDto>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Odalar</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Oda Adı</th>
+            <th>Akademisyen</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var room in Model)
+        {
+            <tr>
+                <td>@room.Id</td>
+                <td>@room.Name</td>
+                <td>@room.UserName</td>
+                <td>
+                    <a class="btn btn-info btn-sm" href="@Url.Action("Details", "AdminMvcRoom", new { id = room.Id })">Detay</a>
+                    <a class="btn btn-warning btn-sm" href="@Url.Action("Edit", "AdminMvcRoom", new { id = room.Id })">Düzenle</a>
+                    <form action="@Url.Action("Delete", "AdminMvcRoom", new { id = room.Id })" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bu odayı silmek istediğinizden emin misiniz?')">Sil</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="btn btn-success" href="@Url.Action("Create", "AdminMvcRoom")">Yeni Oda Ekle</a>
+

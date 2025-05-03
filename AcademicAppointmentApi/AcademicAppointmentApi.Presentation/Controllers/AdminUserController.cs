@@ -177,6 +177,17 @@ public class AdminUserController : ControllerBase
         var dtoList = _mapper.Map<List<UserSimpleDto>>(filtered);
         return Ok(dtoList);
     }
+    [HttpGet("without-room")]
+    public async Task<IActionResult> GetUsersWithoutRoom()
+    {
+        var usersWithoutRoom = await _userManager.Users
+            .Include(u => u.Room)
+            .Where(u => u.Room == null)
+            .ToListAsync();
+
+        var dtoList = _mapper.Map<List<UserSimpleDto>>(usersWithoutRoom);
+        return Ok(dtoList);
+    }
 
 
 

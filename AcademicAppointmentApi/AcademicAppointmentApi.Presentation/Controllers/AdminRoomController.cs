@@ -42,7 +42,15 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             var dto = _mapper.Map<RoomDto>(room);
             return Ok(dto);
         }
+        [HttpGet("details/{id}")]
+        public async Task<IActionResult> GetDetails(int id)
+        {
+            var room = await _roomService.TGetByIdWithUserAsync(id);
+            if (room == null) return NotFound();
 
+            var dto = _mapper.Map<RoomDetailDto>(room);
+            return Ok(dto);
+        }
         // GET: api/AdminRoom/by-user/{userId}
         [HttpGet("by-user/{userId}")]
         public async Task<IActionResult> GetByUserId(string userId)
