@@ -1,0 +1,69 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@model UpdateUserDto
+
+<div class="container mt-4">
+    <h2>Kullanıcı Düzenle</h2>
+    
+    <form asp-action="Edit" class="card shadow p-4">
+        <input type="hidden" asp-for="Id" />
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="UserName" class="control-label"></label>
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PhoneNumber" class="control-label"></label>
+                    <input asp-for="PhoneNumber" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="SchoolId" class="control-label"></label>
+                    <select asp-for="SchoolId" asp-items="ViewBag.Schools" class="form-control">
+                        <option value="">Okul Seçiniz</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DepartmentId" class="control-label"></label>
+                    <select asp-for="DepartmentId" asp-items="ViewBag.Departments" class="form-control">
+                        <option value="">Bölüm Seçiniz</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="RoomId" class="control-label"></label>
+                    <select asp-for="RoomId" asp-items="ViewBag.Rooms" class="form-control">
+                        <option value="">Oda Seçiniz</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a asp-action="Index" class="btn btn-secondary">İptal</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -81,12 +81,48 @@ public class AdminUserController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
     {
-        var user = _mapper.Map<AppUser>(dto);
-        var result = await _userManager.CreateAsync(user, dto.Password);
-        if (!result.Succeeded) return BadRequest(result.Errors);
+        try
+        {
+            // 1. Boşsa DTO’daki ilişkili alanları null bırak (map etmeden önce)
+            if (!dto.SchoolId.HasValue)
+                dto.SchoolId = null;
 
-        return Ok(_mapper.Map<UserDto>(user));
+            if (!dto.DepartmentId.HasValue)
+                dto.DepartmentId = null;
+
+            if (!dto.RoomId.HasValue)
+                dto.RoomId = null;
+
+            // 2. DTO’yu AppUser’a map et
+            var user = _mapper.Map<AppUser>(dto);
+
+            // 3. CreateAsync çağır
+            var result = await _userManager.CreateAsync(user, dto.Password);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new
+                {
+                    Errors = result.Errors.Select(e => e.Description)
+                });
+            }
+
+            // 4. Başarılıysa döndür
+            var userDto = _mapper.Map<UserDto>(user);
+            return Ok(userDto);
+        }
+        catch (Exception ex)
+        {
+            var message = ex.InnerException?.Message ?? ex.Message;
+            return BadRequest(new
+            {
+                Message = "Kullanıcı oluşturulurken bir hata oluştu.",
+                Details = message
+            });
+        }
     }
+
+
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto dto)
@@ -117,14 +153,34 @@ public class AdminUserController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(string id)
     {
-        var user = await _userManager.FindByIdAsync(id);
-        if (user == null) return NotFound();
+        try
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
 
-        var result = await _userManager.DeleteAsync(user);
-        if (!result.Succeeded) return BadRequest(result.Errors);
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+                return Ok();
 
-        return Ok();
+            // IdentityResult hatalarını dön
+            return BadRequest(new
+            {
+                Errors = result.Errors.Select(e => e.Description)
+            });
+        }
+        catch (Exception ex)
+        {
+            // Beklenmedik hata; inner exception varsa o mesajı, yoksa ex.Message'i al
+            var message = ex.InnerException?.Message ?? ex.Message;
+            return BadRequest(new
+            {
+                Message = "Kullanıcı silinirken bir hata oluştu.",
+                Details = message
+            });
+        }
     }
+
     [HttpGet("{id}/courses")]
     public async Task<IActionResult> GetUserCourses(string id)
     {

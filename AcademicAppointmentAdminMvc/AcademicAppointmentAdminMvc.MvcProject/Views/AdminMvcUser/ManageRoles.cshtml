@@ -1,0 +1,83 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@model UserRoleManagementDto
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Rol Yönetimi: @Model.UserName</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Rol Ata</h5>
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="AssignRole" class="form-inline">
+                                <input type="hidden" asp-for="UserId" />
+
+                                <div class="input-group w-100">
+                                    <select asp-for="RoleName" asp-items="Model.AllRoles"
+                                            class="form-control">
+                                        <option value="">Rol Seçiniz</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-plus-circle"></i> Ata
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">Atanmış Roller</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.AssignedRoles.Any())
+                            {
+                                <ul class="list-group">
+                                    @foreach (var role in Model.AssignedRoles)
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            @role
+                                            <form asp-action="RemoveRole" method="post">
+                                                <input type="hidden" name="userId" value="@Model.UserId" />
+                                                <input type="hidden" name="roleName" value="@role" />
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash-alt"></i> Kaldır
+                                                </button>
+                                            </form>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info">Atanmış rol bulunmamaktadır</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Listeye Dön
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

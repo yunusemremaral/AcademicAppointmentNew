@@ -1,0 +1,35 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@model UserWithDetailsDto
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3>Kullanıcı Detayları: @Model.UserName</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Email:</dt>
+                <dd class="col-sm-9">@Model.Email</dd>
+
+                <dt class="col-sm-3">Telefon:</dt>
+                <dd class="col-sm-9">@Model.PhoneNumber</dd>
+
+                <dt class="col-sm-3">Okul:</dt>
+                <dd class="col-sm-9">@(Model.SchoolName ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Bölüm:</dt>
+                <dd class="col-sm-9">@(Model.DepartmentName ?? "Belirtilmemiş")</dd>
+
+                <dt class="col-sm-3">Oda:</dt>
+                <dd class="col-sm-9">@(Model.RoomName ?? "Belirtilmemiş")</dd>
+            </dl>
+
+            <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+        </div>
+    </div>
+</div>

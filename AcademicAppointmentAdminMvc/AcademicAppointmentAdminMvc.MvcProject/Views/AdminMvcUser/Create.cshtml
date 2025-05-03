@@ -1,0 +1,125 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@model CreateUserDto
+
+<div class="container mt-4">
+    <h2>Yeni Kullanıcı Oluştur</h2>
+
+    <form asp-action="Create" class="card shadow p-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="UserName" class="control-label"></label>
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" type="password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="SchoolId" class="control-label"></label>
+                    <select asp-for="SchoolId" id="schoolSelect" asp-items="ViewBag.Schools" class="form-control">
+                        <option value="">Okul Seçiniz</option>
+                    </select>
+                    <span asp-validation-for="SchoolId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DepartmentId" class="control-label"></label>
+                    <select asp-for="DepartmentId" id="departmentSelect" class="form-control"
+                            asp-items="ViewBag.Departments" disabled>
+                        <option value="">Önce okul seçiniz</option>
+                    </select>
+                    <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="RoomId" class="control-label"></label>
+                    <select asp-for="RoomId" asp-items="ViewBag.Rooms" class="form-control">
+                        <option value="">Oda Seçiniz</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary">Oluştur</button>
+            <a asp-action="Index" class="btn btn-secondary">İptal</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Okul seçimi değiştiğinde
+            $('#schoolSelect').change(function() {
+                var schoolId = $(this).val();
+                var departmentSelect = $('#departmentSelect');
+
+                if (schoolId) {
+                    // API'den departmanları çek
+                    $.ajax({
+                        url: `/api/admin/AdminSchool/${schoolId}/departments`,
+                        type: 'GET',
+                        success: function(data) {
+                            departmentSelect.prop('disabled', false);
+                            departmentSelect.empty().append(
+                                $('<option>').val('').text('Bölüm Seçiniz')
+                            );
+
+                            $.each(data, function(index, item) {
+                                departmentSelect.append(
+                                    $('<option>').val(item.id).text(item.name)
+                                );
+                            });
+                        },
+                        error: function() {
+                            alert('Departmanlar yüklenirken bir hata oluştu!');
+                        }
+                    });
+                } else {
+                    departmentSelect.prop('disabled', true).empty().append(
+                        $('<option>').val('').text('Önce okul seçiniz')
+                    );
+                }
+            });
+
+            // Form gönderim kontrolü
+            $('#createForm').submit(function(e) {
+                if (!$('#schoolSelect').val()) {
+                    alert('Lütfen bir okul seçiniz!');
+                    e.preventDefault();
+                }
+                else if (!$('#departmentSelect').val()) {
+                    alert('Lütfen bir bölüm seçiniz!');
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+}
+                    
+
