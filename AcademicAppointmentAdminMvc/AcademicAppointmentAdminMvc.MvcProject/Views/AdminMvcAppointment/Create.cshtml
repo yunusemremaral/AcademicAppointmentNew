@@ -1,0 +1,43 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@model AppointmentCreateDto
+
+<div class="container mt-4">
+    <h2>Yeni Randevu Oluştur</h2>
+
+    <form asp-action="Create">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Akademisyen</label>
+                    @Html.DropDownListFor(m => m.AcademicUserId, (SelectList)ViewBag.AcademicList, "Seçiniz", new { @class = "form-control" })
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Öğrenci</label>
+                    @Html.DropDownListFor(m => m.StudentUserId, (SelectList)ViewBag.StudentList, "Seçiniz", new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Tarih</label>
+                    <input asp-for="ScheduledAt" class="form-control" type="datetime-local" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Konu</label>
+                    <input asp-for="Subject" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Açıklama</label>
+            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Oluştur</button>
+    </form>
+</div>

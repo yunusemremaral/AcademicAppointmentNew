@@ -1,0 +1,55 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@model AppointmentResultDto
+@{
+    ViewData["Title"] = "Randevu Detayları";
+}
+
+<div class="container mt-4">
+    <h2>Randevu Detayları</h2>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">@Model.Id</dd>
+
+        <dt class="col-sm-3">Akademisyen:</dt>
+        <dd class="col-sm-9">@Model.AcademicUserName</dd>
+
+        <dt class="col-sm-3">Öğrenci:</dt>
+        <dd class="col-sm-9">@Model.StudentUserName</dd>
+
+        <dt class="col-sm-3">Tarih:</dt>
+        <dd class="col-sm-9">@Model.ScheduledAt.ToString("f")</dd>
+
+        <dt class="col-sm-3">Konu:</dt>
+        <dd class="col-sm-9">@Model.Subject</dd>
+
+        <dt class="col-sm-3">Açıklama:</dt>
+        <dd class="col-sm-9">@Model.Description</dd>
+
+        <dt class="col-sm-3">Durum:</dt>
+        <dd class="col-sm-9">
+            <span class="badge @GetStatusBadge(Model.Status)">
+                @Model.Status.ToString()
+            </span>
+        </dd>
+    </dl>
+
+    <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+</div>
+
+@functions {
+    string GetStatusBadge(AppointmentStatusDto status)
+    {
+        return status switch
+        {
+            AppointmentStatusDto.Pending => "bg-secondary",
+            AppointmentStatusDto.Confirmed => "bg-primary",
+            AppointmentStatusDto.Cancelled => "bg-danger",
+            AppointmentStatusDto.Completed => "bg-success",
+            _ => "bg-secondary"
+        };
+    }
+}

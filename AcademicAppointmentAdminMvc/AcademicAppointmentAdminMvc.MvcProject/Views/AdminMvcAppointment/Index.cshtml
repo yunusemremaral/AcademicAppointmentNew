@@ -1,0 +1,86 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@model List<AppointmentResultDto>
+
+    <h2>Tüm Randevular</h2>
+
+    <!-- Filtreleme Formu -->
+    <form method="get" class="mb-4">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <select name="status" class="form-select" asp-items="ViewBag.StatusList">
+                    <option value="">Tüm Durumlar</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="startDate" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="endDate" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">Filtrele</button>
+                <a asp-action="Index" class="btn btn-secondary">Temizle</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Randevu Listesi -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Akademisyen</th>
+                <th>Öğrenci</th>
+                <th>Tarih</th>
+                <th>Konu</th>
+                <th>Durum</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.AcademicUserName</td>
+                    <td>@item.StudentUserName</td>
+                    <td>@item.ScheduledAt.ToString("g")</td>
+                    <td>@item.Subject</td>
+                    <td>
+                        <span class="badge @GetStatusBadge(item.Status)">
+                            @item.Status.ToString()
+                        </span>
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detay</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle</a>
+                        <a asp-action="ChangeStatus" asp-route-id="@item.Id" class="btn btn-secondary btn-sm">Durum Değiştir</a>
+                        <form asp-action="Delete" method="post" class="d-inline"
+                              onsubmit="return confirm('Bu randevuyu silmek istediğinize emin misiniz?');">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-action="Create" class="btn btn-success">Yeni Randevu Oluştur</a>
+
+@functions {
+    string GetStatusBadge(AppointmentStatusDto status)
+    {
+        return status switch
+        {
+            AppointmentStatusDto.Pending => "bg-secondary",
+            AppointmentStatusDto.Confirmed => "bg-primary",
+            AppointmentStatusDto.Cancelled => "bg-danger",
+            AppointmentStatusDto.Completed => "bg-success",
+            _ => "bg-secondary"
+        };
+    }
+}
