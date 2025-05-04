@@ -1,66 +1,57 @@
-﻿
+﻿@model CreateUserMvcDto
+
 @{
-    ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Yeni Kullanıcı Oluştur";
 }
 
-@model CreateUserDto
-
 <div class="container mt-4">
-    <h2>Yeni Kullanıcı Oluştur</h2>
+    <h2>@ViewData["Title"]</h2>
 
-    <form asp-action="Create" class="card shadow p-4">
+    <form asp-action="Create" method="post" class="card shadow p-4" id="createForm">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="UserName" class="control-label"></label>
+                <!-- UserName -->
+                <div class="form-group mb-3">
+                    <label asp-for="UserName"></label>
                     <input asp-for="UserName" class="form-control" />
                     <span asp-validation-for="UserName" class="text-danger"></span>
                 </div>
-
-                <div class="form-group">
-                    <label asp-for="Email" class="control-label"></label>
+                <!-- Email -->
+                <div class="form-group mb-3">
+                    <label asp-for="Email"></label>
                     <input asp-for="Email" class="form-control" />
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
-
-                <div class="form-group">
-                    <label asp-for="Password" class="control-label"></label>
+                <!-- Password -->
+                <div class="form-group mb-3">
+                    <label asp-for="Password"></label>
                     <input asp-for="Password" type="password" class="form-control" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
             </div>
-
             <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="SchoolId" class="control-label"></label>
-                    <select asp-for="SchoolId" id="schoolSelect" asp-items="ViewBag.Schools" class="form-control">
-                        <option value="">Okul Seçiniz</option>
+                <!-- School -->
+                <div class="form-group mb-3">
+                    <label asp-for="SchoolId"></label>
+                    <select asp-for="SchoolId" id="schoolSelect" class="form-control">
+                        <option value="">-- Okul Seçiniz --</option>
+                        
                     </select>
                     <span asp-validation-for="SchoolId" class="text-danger"></span>
                 </div>
-
-                <div class="form-group">
-                    <label asp-for="DepartmentId" class="control-label"></label>
-                    <select asp-for="DepartmentId" id="departmentSelect" class="form-control"
-                            asp-items="ViewBag.Departments" disabled>
-                        <option value="">Önce okul seçiniz</option>
+                <!-- Department -->
+                <div class="form-group mb-3">
+                    <label asp-for="DepartmentId"></label>
+                    <select asp-for="DepartmentId" id="departmentSelect" class="form-control" disabled>
+                        <option value="">-- Önce Okul Seçiniz --</option>
                     </select>
                     <span asp-validation-for="DepartmentId" class="text-danger"></span>
                 </div>
-
-                <div class="form-group">
-                    <label asp-for="RoomId" class="control-label"></label>
-                    <select asp-for="RoomId" asp-items="ViewBag.Rooms" class="form-control">
-                        <option value="">Oda Seçiniz</option>
-                    </select>
-                </div>
             </div>
         </div>
-
-        <div class="form-group mt-4">
+        <div class="mt-4">
             <button type="submit" class="btn btn-primary">Oluştur</button>
             <a asp-action="Index" class="btn btn-secondary">İptal</a>
         </div>
@@ -68,58 +59,37 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script>
-        $(document).ready(function() {
-            // Okul seçimi değiştiğinde
-            $('#schoolSelect').change(function() {
-                var schoolId = $(this).val();
-                var departmentSelect = $('#departmentSelect');
+        var schools = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.SchoolsWithDepartments));
 
-                if (schoolId) {
-                    // API'den departmanları çek
-                    $.ajax({
-                        url: `/api/admin/AdminSchool/${schoolId}/departments`,
-                        type: 'GET',
-                        success: function(data) {
-                            departmentSelect.prop('disabled', false);
-                            departmentSelect.empty().append(
-                                $('<option>').val('').text('Bölüm Seçiniz')
-                            );
+        $(function() {
+            var $school = $('#schoolSelect'),
+                $dept   = $('#departmentSelect');
 
-                            $.each(data, function(index, item) {
-                                departmentSelect.append(
-                                    $('<option>').val(item.id).text(item.name)
-                                );
-                            });
-                        },
-                        error: function() {
-                            alert('Departmanlar yüklenirken bir hata oluştu!');
-                        }
-                    });
-                } else {
-                    departmentSelect.prop('disabled', true).empty().append(
-                        $('<option>').val('').text('Önce okul seçiniz')
-                    );
-                }
+            // Okulları doldur
+            $.each(schools, function(_, s) {
+                $school.append($('<option>').val(s.Id).text(s.Name)); // Id ve Name büyük harfle
             });
 
-            // Form gönderim kontrolü
-            $('#createForm').submit(function(e) {
-                if (!$('#schoolSelect').val()) {
-                    alert('Lütfen bir okul seçiniz!');
-                    e.preventDefault();
-                }
-                else if (!$('#departmentSelect').val()) {
-                    alert('Lütfen bir bölüm seçiniz!');
-                    e.preventDefault();
+            // Okul değiştiğinde bölümleri güncelle
+            $school.on('change', function() {
+                var selectedId = parseInt($(this).val(), 10),
+                    found = schools.find(s => s.Id === selectedId); // Id büyük harfle
+
+                $dept.prop('disabled', !found)
+                     .empty()
+                     .append($('<option>').val('').text(found
+                         ? '-- Bölüm Seçiniz --'
+                         : '-- Önce Okul Seçiniz --'));
+
+                if (found) {
+                    $.each(found.Departments, function(_, d) { // Departments büyük harfle
+                        $dept.append($('<option>').val(d.Id).text(d.Name)); // Id ve Name büyük harfle
+                    });
                 }
             });
         });
     </script>
 }
-                    
-

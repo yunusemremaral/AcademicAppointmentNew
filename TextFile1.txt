@@ -1,14 +1,10 @@
-Düzene çekmek  için metodlar tek tek bakýlacak api tarafýnda önce crud metodlarý ardýndan iliþkili metodlar tek tek 
-düzenlenecek  metodlarýn her türlüsü yazýlacak tekrar ugrasmamak için iliþkilere göre metodlarý yazacagýz
-ardýndan dtolar cok karýstý dtolarý ayrý bir class libraride 1 kere yazýcaz sonra 2 projeyi referans verecegiz 
-ardýndan bütün entityler için admin panelini yazacagýz a dan z ye ardýdnan paneli düzenleyecegiz ama öncelik 
-þuanda  api tarafýný bi baþtan refactor etme refatorleri unutma mvc tarafýndada token göndermeleri dtolarý falan servisleri
-ayrý bir yere cekecegiz gereksiz kodlarý kaldýracagýz düzenleyecegiz ! 
-
-----
-
-ÝNDEX KISMINA BAKICAM COURSE   SONRA FÝLTRE CALISIYOR ZATEN ÝNDEX KISMINDA UPDATE DELETE  FALNA BAKICAM SONRA CREATE KISMINDA  EKSTRA BÝ 
-ENDPOÝNTKER OLUSTURUP ORADAN CEKÝCEZ 
-----
-School kýsmýný  silme yerine bakýcaz tek tek 
-BÖLÜM KISMI CALISIYOR AMA DERSLER KISMINA TIKLAYINCA O BÖLÜMÜN DERSLERÝNE GÝTMÝYOR   MUHTEMELEN NULL ÝSE YOKTUR GÝBÝ BÝRÞEY EKLEMEMIZ LAZIM NULL HATASI 
+SORUNLAR
+SCHOOL SÝLMEDE  SÝLEMEZSE HATA YAZMALI ONA BAKICAZ  VE SÝLMÝYOR BAKILACAK 
+BÖLÜMÜN DERSÝ YOKSA BUG OLMALI  NULL EXCEPTÝON VAR DÜZENLE 
+mesaj sohbeti gör deyince isimleride getirebiliyorsak getirelim ! 
+DERS KISMI ÝYÝ GÝBÝ 
+ ODA KISMI NOTÝFÝCATÝON  KISIMLARIDA ÝYÝ 
+  APPOÝNTMENT DA ÝYÝ GÝBÝ 
+   KULLANICKLAR KISMINA BAKICAZ ÞÝMDÝ 
+   USER ROLKISIMLARI ÝYÝ 
+   ----

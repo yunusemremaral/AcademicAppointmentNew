@@ -90,8 +90,6 @@ public class AdminUserController : ControllerBase
             if (!dto.DepartmentId.HasValue)
                 dto.DepartmentId = null;
 
-            if (!dto.RoomId.HasValue)
-                dto.RoomId = null;
 
             // 2. DTO’yu AppUser’a map et
             var user = _mapper.Map<AppUser>(dto);

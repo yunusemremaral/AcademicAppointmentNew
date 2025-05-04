@@ -1,14 +1,11 @@
-﻿using AcademicAppointmentShare.Dtos.UserDtos;
+﻿using AcademicAppointmentAdminMvc.MvcProject.Models;
 using AcademicAppointmentShare.Dtos.RoleDtos;
+using AcademicAppointmentShare.Dtos.SchoolDtos;
+using AcademicAppointmentShare.Dtos.UserDtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using AcademicAppointmentShare.Dtos.RoomDtos;
-using Microsoft.AspNetCore.Authorization;
-using AcademicAppointmentAdminMvc.MvcProject.Models;
-using AcademicAppointmentShare.Dtos.DepartmentDtos;
-using AcademicAppointmentShare.Dtos.SchoolDtos;
 
 namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 {
@@ -27,11 +24,12 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             var client = _httpClientFactory.CreateClient("MyApi");
             var token = Request.Cookies["JwtToken"];
             if (!string.IsNullOrEmpty(token))
+            {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
             return client;
         }
 
-        // GET: AdminUserMvc
         public async Task<IActionResult> Index(string roleFilter, string searchQuery)
         {
             var client = CreateClient();
@@ -45,7 +43,6 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 
             var users = await response.Content.ReadFromJsonAsync<List<UserDto>>();
 
-            // Filtreleme
             if (!string.IsNullOrEmpty(roleFilter))
                 users = await FilterByRole(users, roleFilter);
 
@@ -59,11 +56,9 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             return View(users);
         }
 
-        // GET: AdminUserMvc/Details/5
         public async Task<IActionResult> Details(string id)
         {
-            var client = CreateClient(); 
-
+            var client = CreateClient();
             var response = await client.GetAsync($"/api/admin/AdminUser/{id}/details");
 
             if (!response.IsSuccessStatusCode)
@@ -76,26 +71,36 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             return View(user);
         }
 
-        // GET: AdminUserMvc/Create
         public async Task<IActionResult> Create()
         {
-            await PopulateDropdowns();
-            return View(new CreateUserDto()); // Okul oluşturma DTO'su değil, kullanıcı oluşturma DTO'su
+            var dto = new CreateUserMvcDto();
+            await PopulateDropdowns(dto);  
+            return View(dto);
         }
 
-        // POST: AdminUserMvc/Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateUserDto dto)
+        public async Task<IActionResult> Create(CreateUserMvcDto dto)
         {
+            
             if (!ModelState.IsValid)
             {
-                await PopulateDropdowns(dto.SchoolId);
+                await PopulateDropdowns(dto);
                 return View(dto);
             }
 
+            var createDto = new CreateUserDto
+            {
+                UserName = dto.UserName,
+                Email = dto.Email,
+                Password = dto.Password,
+                SchoolId = dto.SchoolId,
+                DepartmentId = dto.DepartmentId,
+            };
+
             var client = CreateClient();
-            var response = await client.PostAsJsonAsync("/api/admin/AdminUser", dto);
+            var response = await client.PostAsJsonAsync("/api/admin/AdminUser", createDto);
 
             if (response.IsSuccessStatusCode)
             {
@@ -105,71 +110,74 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 
             var error = await response.Content.ReadAsStringAsync();
             TempData["Error"] = $"Hata: {error}";
-            await PopulateDropdowns(dto.SchoolId);
+            await PopulateDropdowns(dto);
             return View(dto);
         }
 
-        // GET: AdminUserMvc/Edit/5
+
+        // Controllers/AdminMvcUserController.cs
+
         public async Task<IActionResult> Edit(string id)
         {
             var client = CreateClient();
-            var response = await client.GetAsync($"/api/admin/AdminUser/{id}/details"); // Detay endpointini kullan
 
-            if (!response.IsSuccessStatusCode)
+            // 1) Kullanıcı detayını al
+            var userResp = await client.GetAsync($"/api/admin/AdminUser/{id}/details");
+            if (!userResp.IsSuccessStatusCode)
             {
                 TempData["Error"] = "Kullanıcı bulunamadı!";
                 return RedirectToAction(nameof(Index));
             }
+            var userDetail = await userResp.Content.ReadFromJsonAsync<UserWithDetailsDto>();
 
-            var user = await response.Content.ReadFromJsonAsync<UserWithDetailsDto>();
-            await PopulateDropdowns();
+            // 2) Okul + bölüm listesini tek seferde çek
+            var schools = await client.GetFromJsonAsync<List<SchoolDetailDto>>("api/admin/AdminSchool/with-departments");
 
-            // Update DTO'suna çevir
-            var updateDto = new UpdateUserDto
+            // 3) ViewModel’i oluştur
+            var vm = new UserEditViewModel
             {
-                Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                SchoolId = user.SchoolId,
-                DepartmentId = user.DepartmentId,
-                RoomId = user.RoomId
+                User = new UpdateUserDto
+                {
+                    Id = userDetail.Id,
+                    UserName = userDetail.UserName,
+                    Email = userDetail.Email,
+                    SchoolId = userDetail.SchoolId,
+                    DepartmentId = userDetail.DepartmentId
+                },
+                SchoolsWithDepartments = schools
             };
 
-            return View(updateDto);
+            return View(vm);
         }
 
-        // POST: AdminUserMvc/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, UpdateUserDto dto)
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, UserEditViewModel vm)
         {
-            if (id != dto.Id)
+            if (id != vm.User.Id)
+                ModelState.AddModelError("", "ID uyuşmadı.");
+
+            if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Geçersiz kullanıcı ID!";
+                // hata varsa dropdown tekrar doldur
+                vm.SchoolsWithDepartments = await CreateClient()
+                    .GetFromJsonAsync<List<SchoolDetailDto>>("api/admin/AdminSchool/with-departments");
+                return View(vm);
+            }
+
+            // API’ye PUT
+            var client = CreateClient();
+            var resp = await client.PutAsJsonAsync($"/api/admin/AdminUser/{id}", vm.User);
+            if (resp.IsSuccessStatusCode)
+            {
+                TempData["Success"] = "Güncelleme başarılı.";
                 return RedirectToAction(nameof(Index));
             }
 
-            if (ModelState.IsValid)
-            {
-                var client = CreateClient();
-                var response = await client.PutAsJsonAsync($"/api/admin/AdminUser/{id}", dto);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["Success"] = "Kullanıcı başarıyla güncellendi!";
-                    return RedirectToAction(nameof(Index));
-                }
-
-                var error = await response.Content.ReadAsStringAsync();
-                TempData["Error"] = $"Güncelleme hatası: {error}";
-            }
-
-            await PopulateDropdowns();
-            return View(dto);
+            TempData["Error"] = "Güncelleme sırasında hata: " + await resp.Content.ReadAsStringAsync();
+            vm.SchoolsWithDepartments = await client
+                .GetFromJsonAsync<List<SchoolDetailDto>>("api/admin/AdminSchool/with-departments");
+            return View(vm);
         }
-
-        // POST: AdminUserMvc/Delete/5
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
@@ -179,12 +187,12 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             if (response.IsSuccessStatusCode)
                 TempData["Success"] = "Kullanıcı başarıyla silindi!";
             else
-                TempData["Error"] = "Silme işlemi başarısız!";
+                TempData["Error"] = "Silme işlemi başarısız akademisyenin dersi mevcut !";
 
+            // Redirect ile tekrar Index aksiyonuna gidiyoruz
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: AdminUserMvc/ManageRoles/5
         public async Task<IActionResult> ManageRoles(string id)
         {
             var client = CreateClient();
@@ -218,7 +226,6 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             return View(model);
         }
 
-        // POST: AdminUserMvc/AssignRole
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignRole(RoleAssignmentDto dto)
@@ -234,7 +241,6 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             return RedirectToAction("ManageRoles", new { id = dto.UserId });
         }
 
-        // POST: AdminUserMvc/RemoveRole
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveRole(string userId, string roleName)
@@ -271,30 +277,16 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             return roles.Select(r => new SelectListItem(r.Name, r.Name)).ToList();
         }
 
-        private async Task PopulateDropdowns(int? schoolId = null)
+        private async Task PopulateDropdowns(CreateUserMvcDto dto)
         {
-            var client = CreateClient();
+            var client = CreateClient(); 
+            // Okul ve Bölüm verilerini tek seferde çek
+            var schoolsWithDepts = await client.GetFromJsonAsync<List<SchoolDetailDto>>("api/admin/AdminSchool/with-departments");
+            dto.SchoolsWithDepartments = schoolsWithDepts;
 
-            // Okulları çek
-            var schools = await client.GetFromJsonAsync<List<SchoolListDto>>("api/admin/AdminSchool");
-            ViewBag.Schools = new SelectList(schools ?? new List<SchoolListDto>(), "Id", "Name");
 
-            // Departmanları dinamik olarak yükle
-            if (schoolId.HasValue)
-            {
-                var departments = await client.GetFromJsonAsync<List<DepartmentListDto>>(
-                    $"api/admin/AdminSchool/{schoolId}/departments");
-                ViewBag.Departments = new SelectList(departments ?? new List<DepartmentListDto>(), "Id", "Name");
-            }
-            else
-            {
-                ViewBag.Departments = new SelectList(new List<DepartmentListDto>(), "Id", "Name");
-            }
-
-            // Odaları çek
-            var rooms = await client.GetFromJsonAsync<List<RoomDto>>("api/admin/AdminRoom");
-            ViewBag.Rooms = new SelectList(rooms ?? new List<RoomDto>(), "Id", "Name");
         }
+
 
         #endregion
     }
