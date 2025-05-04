@@ -1,10 +1,4 @@
-SORUNLAR
-SCHOOL SÝLMEDE  SÝLEMEZSE HATA YAZMALI ONA BAKICAZ  VE SÝLMÝYOR BAKILACAK 
-BÖLÜMÜN DERSÝ YOKSA BUG OLMALI  NULL EXCEPTÝON VAR DÜZENLE 
-mesaj sohbeti gör deyince isimleride getirebiliyorsak getirelim ! 
-DERS KISMI ÝYÝ GÝBÝ 
- ODA KISMI NOTÝFÝCATÝON  KISIMLARIDA ÝYÝ 
-  APPOÝNTMENT DA ÝYÝ GÝBÝ 
-   KULLANICKLAR KISMINA BAKICAZ ÞÝMDÝ 
-   USER ROLKISIMLARI ÝYÝ 
-   ----
+USERNAME GÝRÝÞTE OLDUGU ÝÇÝN  FULL NAME OLARAK KULLANILAMAYACAK BUNA BAKICAZ BU ÇOK BÜYÜK BÝR SORUN 
+tasarýmsal düzenlemeler yapýlacak ! dropdown vb  buton vb þeylerde tek tek ! 
+ayný tempdatayýmý kullanýyorum bak !   bu  olusturuldu falan yazýyorya 
+Dashboardu böylece býrakýyorum yeterli  sýnavvb zamnalara kadar yeterli þuanlýk

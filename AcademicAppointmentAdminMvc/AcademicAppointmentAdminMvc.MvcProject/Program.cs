@@ -41,6 +41,7 @@ builder.Services.AddHttpClient("MyApi", client =>
 builder.Services.AddTransient<JwtCookieHandler>();  // Bu handler, cookie'deki JWT token'ı otomatik olarak işlemek için kullanılır
 
 var app = builder.Build();
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 // 7. Middleware sırasını ayarla
 app.UseHttpsRedirection();  // HTTP'den HTTPS'ye yönlendirme
