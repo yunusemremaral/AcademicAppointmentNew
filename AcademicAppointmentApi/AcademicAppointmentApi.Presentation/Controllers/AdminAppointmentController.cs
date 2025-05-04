@@ -154,6 +154,15 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             var result = await _appointmentService.TGetAppointmentCountsByStatusAsync();
             return Ok(result);
         }
+        [HttpGet("daily-appointment-counts")]
+        public async Task<IActionResult> GetDailyAppointmentCounts()
+        {
+            var result = await _appointmentService.TGetDailyAppointmentCountsAsync();
+            return Ok(result); // Dictionary<string, int>
+        }
+
+
+
 
     }
 }

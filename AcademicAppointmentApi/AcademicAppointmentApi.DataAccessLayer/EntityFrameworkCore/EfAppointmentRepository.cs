@@ -191,6 +191,40 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                 .ToDictionary(g => g.Key, g => g.Count());
         }
 
+        public async Task<Dictionary<string, int>> GetDailyAppointmentCountsAsync()
+        {
+            var today = DateTime.Today;
+            var sevenDaysAgo = today.AddDays(-6);
+
+            // Randevuları al ve tarihe göre grupla
+            var dailyGroups = await _context.Appointments
+                .Where(a => a.ScheduledAt.Date >= sevenDaysAgo && a.ScheduledAt.Date <= today)
+                .GroupBy(a => a.ScheduledAt.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            // 7 günlük eksiksiz liste (tarihler string olarak "yyyy-MM-dd")
+            var result = Enumerable.Range(0, 7)
+                .Select(i =>
+                {
+                    var date = sevenDaysAgo.AddDays(i).Date;
+                    var found = dailyGroups.FirstOrDefault(d => d.Date == date);
+                    return new
+                    {
+                        Date = date.ToString("yyyy-MM-dd"),
+                        Count = found?.Count ?? 0
+                    };
+                })
+                .ToDictionary(x => x.Date, x => x.Count);
+
+            return result;
+        }
+
+
 
 
 

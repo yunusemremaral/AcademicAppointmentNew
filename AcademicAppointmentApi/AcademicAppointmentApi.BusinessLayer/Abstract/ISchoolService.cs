@@ -14,6 +14,9 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
         Task<int> TGetDepartmentCountAsync(int schoolId);
         Task<School> TGetSchoolDetailsWithDepartmentsAsync(int schoolId);
 
+        Task<List<School>> TGetLatest5SchoolsAsync();
+
+
     }
 
 }

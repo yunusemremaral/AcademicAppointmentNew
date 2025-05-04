@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 using AcademicAppointmentAdminMvc.MvcProject.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using AcademicAppointmentShare.Dtos.SchoolDtos;
+using AcademicAppointmentShare.Dtos.UserDtos;
 
 namespace AcademicAppointmentMvc.MvcProject.Controllers
 {
@@ -65,9 +67,23 @@ namespace AcademicAppointmentMvc.MvcProject.Controllers
             // Serialize for JavaScript
             ViewBag.StatusCountsJson = JsonConvert.SerializeObject(statusCounts);
 
+            var responseDailyCounts = await client.GetStringAsync("api/admin/AdminAppointment/daily-appointment-counts");
+            var dailyCounts = JsonConvert.DeserializeObject<Dictionary<string, int>>(responseDailyCounts);
+            ViewBag.DailyCountsJson = JsonConvert.SerializeObject(dailyCounts);
+
+            // Son 5 okul verisi
+            var responseSchools = await client.GetStringAsync("api/admin/AdminSchool/latest-5-schools");
+            var schools = JsonConvert.DeserializeObject<List<SchoolListDto>>(responseSchools);
+            ViewBag.LatestSchools = schools;
+
+            // Son 5 kullanıcı verisi
+            var responseUsers = await client.GetStringAsync("api/admin/AdminUser/latest-5-users");
+            var users = JsonConvert.DeserializeObject<List<UserDto>>(responseUsers);
+            ViewBag.LatestUsers = users;
 
             return View();
         }
+
 
 
 

@@ -43,5 +43,13 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
         {
             return await _context.Departments.CountAsync(d => d.SchoolId == schoolId);
         }
+        public async Task<List<School>> GetLatest5SchoolsAsync()
+        {
+            return await _context.Schools
+                .OrderByDescending(s => s.Id) // GUID sırasına göre ters sıralama
+                .Take(5) // Son 5 okulu al
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

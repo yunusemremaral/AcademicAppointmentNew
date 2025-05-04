@@ -283,8 +283,18 @@ public class AdminUserController : ControllerBase
         var count = _userManager.Users.Count();
         return Ok(new { Count = count });
     }
+    [HttpGet("latest-5-users")]
+    public async Task<IActionResult> GetLatest5Users()
+    {
+        // Son 5 kullanıcıyı GUID sırasına göre almak
+        var users = await _userManager.Users
+            .OrderByDescending(u => u.Id)  // GUID ile ters sıralama
+            .Take(5)  // Son 5 kullanıcıyı al
+            .ToListAsync();
 
-
+        var usersDto = _mapper.Map<List<UserDto>>(users);
+        return Ok(usersDto);
+    }
 
 
 

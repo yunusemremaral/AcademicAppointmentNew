@@ -135,7 +135,13 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             return Ok(new { Count = schools.Count });
         }
 
-
+        [HttpGet("latest-5-schools")]
+        public async Task<IActionResult> GetLatest5Schools()
+        {
+            var schools = await _schoolService.TGetLatest5SchoolsAsync();
+            var schoolsDto = _mapper.Map<List<SchoolListDto>>(schools);
+            return Ok(schoolsDto);
+        }
 
     }
 }

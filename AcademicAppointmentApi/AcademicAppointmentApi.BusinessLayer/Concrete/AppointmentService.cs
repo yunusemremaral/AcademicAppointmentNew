@@ -65,5 +65,10 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
         {
             return await _appointmentRepository.GetAppointmentCountsByStatusAsync();
         }
+
+        public async Task<Dictionary<string, int>> TGetDailyAppointmentCountsAsync()
+        {
+            return await _appointmentRepository.GetDailyAppointmentCountsAsync();
+        }
     }
 }

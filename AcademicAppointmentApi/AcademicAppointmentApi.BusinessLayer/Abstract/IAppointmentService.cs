@@ -17,6 +17,8 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
         Task<List<Appointment>> TGetUpcomingAppointmentsByUserIdAsync(string userId);
         Task<List<Appointment>> TGetAppointmentsByStatusAsync(AppointmentStatus status);
         Task<Dictionary<string, int>> TGetAppointmentCountsByStatusAsync();
+        Task<Dictionary<string, int>> TGetDailyAppointmentCountsAsync();
+
 
     }
 }
