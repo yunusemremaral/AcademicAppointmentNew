@@ -18,7 +18,13 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
         {
             _context = context;
         }
+        public async Task<List<Notification>> GetLastFiveNotificationsAsync()
+        {
+            return await _context.Notifications
+                .OrderByDescending(n => n.CreatedAt)
+                .Take(5)
+                .ToListAsync();
+        }
 
-       
     }
 }

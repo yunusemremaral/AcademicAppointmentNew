@@ -116,6 +116,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
         public IActionResult AccessDenied()
         {
             return View();
+
         }
 
     }

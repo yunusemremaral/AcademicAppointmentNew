@@ -9,5 +9,7 @@ namespace AcademicAppointmentApi.DataAccessLayer.Abstract
 {
     public interface INotificationRepository : IGenericRepository<Notification>
     {
+        Task<List<Notification>> GetLastFiveNotificationsAsync();
+
     }
 }

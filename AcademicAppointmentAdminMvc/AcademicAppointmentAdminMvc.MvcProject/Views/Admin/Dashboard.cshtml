@@ -1,6 +1,8 @@
 ﻿@{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var rnd = new Random();
+
 }
 
 <div class="row">
@@ -171,26 +173,29 @@
         <div class="card">
             <div class="card-body">
                 <div class="d-flex flex-row justify-content-between">
-                    <h4 class="card-title">Latest 5 Users</h4>
-                    <p class="text-muted mb-1 small">View all</p>
+                    <h4 class="card-title">Son 5 Kullanıcı</h4>
                 </div>
                 <div class="preview-list">
                     @foreach (var user in ViewBag.LatestUsers as List<UserDto>)
                     {
+                        
+                        var randomSayi = rnd.Next(1, 28); // 1-27 arası
+                        var imagePath = $"/corona-free-dark-bootstrap-admin-template-1.0.0/template/assets/images/faces/face{randomSayi}.jpg";
+
                         <div class="preview-item border-bottom">
                             <div class="preview-thumbnail">
-                                <img src="assets/images/faces/face6.jpg" alt="image" class="rounded-circle" />
+                                <img src="@imagePath" alt="image" class="rounded-circle" />
                             </div>
                             <div class="preview-item-content d-flex flex-grow">
                                 <div class="flex-grow">
                                     <div class="d-flex d-md-block d-xl-flex justify-content-between">
                                         <h6 class="preview-subject">@user.UserName</h6>
-                                        <p class="text-muted text-small">@user.Email</p>
                                     </div>
-                                    <p class="text-muted">User description or message here.</p>
+                                    <p class="text-muted text-small">@user.Email</p>
                                 </div>
                             </div>
                         </div>
+
                     }
                 </div>
             </div>
@@ -199,21 +204,20 @@
     <div class="col-md-6 col-xl-4 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Latest 5 Schools</h4>
+                <h4 class="card-title">Son 5 Okul</h4>
                 <div class="preview-list">
                     @foreach (var school in ViewBag.LatestSchools as List<SchoolListDto>)
                     {
                         <div class="preview-item border-bottom">
-                            <div class="preview-thumbnail">
-                                <img src="assets/images/faces/face6.jpg" alt="image" class="rounded-circle" />
+                            <div class="icon icon-box-info">
+                                <span class="mdi mdi-domain icon-item"></span>
                             </div>
                             <div class="preview-item-content d-flex flex-grow">
                                 <div class="flex-grow">
                                     <div class="d-flex d-md-block d-xl-flex justify-content-between">
-                                        <h6 class="preview-subject">@school.Id</h6>
-                                        <p class="text-muted text-small">@school.Name</p>
+                                        <h6 class="preview-subject">@school.Name</h6>
                                     </div>
-                                    <p class="text-muted">School description or message here.</p>
+                                    <p class="text-muted text-small">@school.Id</p>
                                 </div>
                             </div>
                         </div>
@@ -225,53 +229,14 @@
     <div class="col-md-12 col-xl-4 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">To do list</h4>
+                <h4 class="card-title">Yapılacaklar Listesi</h4>
                 <div class="add-items d-flex">
-                    <input type="text" class="form-control todo-list-input" placeholder="enter task..">
-                    <button class="add btn btn-primary todo-list-add-btn">Add</button>
+                    <input type="text" class="form-control todo-list-input" placeholder="Görev girin...">
+                    <button class="add btn btn-primary todo-list-add-btn">Ekle</button>
                 </div>
                 <div class="list-wrapper">
                     <ul class="d-flex flex-column-reverse text-white todo-list todo-list-custom">
-                        <li>
-                            <div class="form-check form-check-primary">
-                                <label class="form-check-label">
-                                    <input class="checkbox" type="checkbox"> Create invoice
-                                </label>
-                            </div>
-                            <i class="remove mdi mdi-close-box"></i>
-                        </li>
-                        <li>
-                            <div class="form-check form-check-primary">
-                                <label class="form-check-label">
-                                    <input class="checkbox" type="checkbox"> Meeting with Alita
-                                </label>
-                            </div>
-                            <i class="remove mdi mdi-close-box"></i>
-                        </li>
-                        <li class="completed">
-                            <div class="form-check form-check-primary">
-                                <label class="form-check-label">
-                                    <input class="checkbox" type="checkbox" checked> Prepare for presentation
-                                </label>
-                            </div>
-                            <i class="remove mdi mdi-close-box"></i>
-                        </li>
-                        <li>
-                            <div class="form-check form-check-primary">
-                                <label class="form-check-label">
-                                    <input class="checkbox" type="checkbox"> Plan weekend outing
-                                </label>
-                            </div>
-                            <i class="remove mdi mdi-close-box"></i>
-                        </li>
-                        <li>
-                            <div class="form-check form-check-primary">
-                                <label class="form-check-label">
-                                    <input class="checkbox" type="checkbox"> Pick up kids from school
-                                </label>
-                            </div>
-                            <i class="remove mdi mdi-close-box"></i>
-                        </li>
+                        <!-- Görevler buraya JavaScript ile eklenecek -->
                     </ul>
                 </div>
             </div>
@@ -290,7 +255,7 @@
             data: {
                 labels: Object.keys(dailyCounts),
                 datasets: [{
-                    label: 'Appointments per Day',
+                    label: 'Son 7 Gün Randevu Sayısı',
                     data: Object.values(dailyCounts),
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -322,14 +287,14 @@
                     label: 'Randevu Durumları',
                     data: Object.values(statusCounts),
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.7)',
                         'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 99, 132, 0.7)',
                         'rgba(255, 206, 86, 0.7)',
                         'rgba(75, 192, 192, 0.7)'
                     ],
                     borderColor: [
-                        'rgba(255, 99, 132, 1)',
                         'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
                         'rgba(255, 206, 86, 1)',
                         'rgba(75, 192, 192, 1)'
                     ],
@@ -353,4 +318,60 @@
             }
         });
     </script>
+
+    <script>
+        const input = document.querySelector(".todo-list-input");
+        const addBtn = document.querySelector(".todo-list-add-btn");
+        const list = document.querySelector(".todo-list");
+
+        // Sayfa yüklendiğinde önceki görevleri getir
+        window.addEventListener("load", () => {
+            const storedItems = sessionStorage.getItem("todoItems");
+            if (storedItems) {
+                list.innerHTML = storedItems;
+                attachRemoveEvents();
+            }
+        });
+
+        // Yeni görev ekle
+        addBtn.addEventListener("click", () => {
+            const value = input.value.trim();
+            if (value) {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <div class="form-check form-check-primary">
+                        <label class="form-check-label">
+                            <input class="checkbox" type="checkbox"> ${value}
+                        </label>
+                    </div>
+                    <i class="remove mdi mdi-close-box"></i>
+                `;
+                list.prepend(li);
+                input.value = "";
+                saveList();
+                attachRemoveEvents();
+            }
+        });
+
+        // Listeyi kaydet
+        function saveList() {
+            sessionStorage.setItem("todoItems", list.innerHTML);
+        }
+
+        // Silme işlemini ayarla
+        function attachRemoveEvents() {
+            list.querySelectorAll(".remove").forEach(icon => {
+                icon.onclick = () => {
+                    icon.parentElement.remove();
+                    saveList();
+                };
+            });
+        }
+
+        // Checkbox ile görev durumu değiştiğinde kaydet
+        list.addEventListener("change", () => {
+            saveList();
+        });
+    </script>
+
 }

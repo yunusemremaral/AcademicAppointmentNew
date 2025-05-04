@@ -84,5 +84,12 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             var notifications = await _genericService.TGetAllAsync();
             return Ok(new { Count = notifications.Count });
         }
+        [HttpGet("last5")]
+        public async Task<IActionResult> GetLastFiveNotifications()
+        {
+            var notifications = await _genericService.TGetLastFiveNotificationsAsync();
+            var dto = _mapper.Map<List<NotificationDto>>(notifications);
+            return Ok(dto);
+        }
     }
 }
