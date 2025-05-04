@@ -146,6 +146,13 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpGet("count")]
+        public async Task<IActionResult> GetDepartmentCount()
+        {
+            var count = await _departmentService.TCountAsync();
+            return Ok(count);
+        }
+
 
 
     }

@@ -78,5 +78,11 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             await _genericService.TDeleteAsync(notification);
             return NoContent();
         }
+        [HttpGet("count")]
+        public async Task<IActionResult> GetNotificationCount()
+        {
+            var notifications = await _genericService.TGetAllAsync();
+            return Ok(new { Count = notifications.Count });
+        }
     }
 }

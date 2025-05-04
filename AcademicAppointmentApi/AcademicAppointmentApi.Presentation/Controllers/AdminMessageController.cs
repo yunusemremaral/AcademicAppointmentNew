@@ -115,5 +115,12 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             var dto = _mapper.Map<List<ResultMessageDto>>(messages);
             return Ok(dto);
         }
+        [HttpGet("count")]
+        public async Task<IActionResult> GetMessageCount()
+        {
+            var count = await _messageService.TCountAsync();
+            return Ok(count);
+        }
+
     }
 }

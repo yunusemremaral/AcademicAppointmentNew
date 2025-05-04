@@ -15,6 +15,8 @@ namespace AcademicAppointmentApi.BusinessLayer.Abstract
         Task<T> TAddAsync(T entity);
         Task TUpdateAsync(T entity);
         Task TDeleteAsync(T entity);
+        Task<int> TCountAsync();
+
     }
 
 }

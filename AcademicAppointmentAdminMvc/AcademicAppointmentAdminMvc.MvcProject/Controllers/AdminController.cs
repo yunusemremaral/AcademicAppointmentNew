@@ -1,59 +1,75 @@
-﻿//using Microsoft.AspNetCore.Mvc;
-//using System.Net.Http;
-//using System.Net.Http.Headers;
-//using System.Threading.Tasks;
-//using Newtonsoft.Json;
-//using AcademicAppointmentAdminMvc.MvcProject.Models;
-//using Microsoft.AspNetCore.Authorization;
-//using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using AcademicAppointmentAdminMvc.MvcProject.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
-//namespace AcademicAppointmentMvc.MvcProject.Controllers
-//{
-//    [Authorize(Roles = "Admin")]
-//    public class AdminController : Controller
-//    {
-//        private readonly IHttpClientFactory _httpClientFactory;
-//        private readonly string _apiBaseUrl = "http://localhost:7214/api/AdminUser"; // API base URL'ini buraya koyuyorsunuz
+namespace AcademicAppointmentMvc.MvcProject.Controllers
+{
+    [Authorize(Roles = "Admin")]
+    public class AdminController : Controller
+    {
+        private readonly IHttpClientFactory _httpClientFactory;
 
-//        public AdminController(IHttpClientFactory httpClientFactory)
-//        {
-//            _httpClientFactory = httpClientFactory;
-//        }
+        public AdminController(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
 
-//        public IActionResult Dashboard()
-//        {
-//            // Claims'den username, email, ve role bilgilerini alıyoruz
-//            ViewData["UserName"] = User.FindFirst("username")?.Value;
-//            ViewData["Email"] = User.FindFirst("email")?.Value;
-//            ViewData["Role"] = User.FindFirst(ClaimTypes.Role)?.Value;
+        private HttpClient CreateClient()
+        {
+            var client = _httpClientFactory.CreateClient("MyApi");
+            var token = Request.Cookies["JwtToken"];
+            if (!string.IsNullOrEmpty(token))
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            return client;
+        }
+        public async Task<IActionResult> Dashboard()
+        {
+            var client = CreateClient();
 
-//            return View();
-//        }
+            async Task<int> GetCountAsync(string url)
+            {
+                var response = await client.GetStringAsync(url);
+                if (int.TryParse(response, out int result))
+                {
+                    return result;
+                }
 
-//        // Tüm kullanıcıları çekme
-//        public async Task<IActionResult> GetAllUsers()
-//        {
-//            var client = _httpClientFactory.CreateClient();
+                try
+                {
+                    var countObj = JsonConvert.DeserializeObject<CountDto>(response);
+                    return countObj?.Count ?? 0;
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
 
-//            // Token'ı al ve Authorization header'a ekle
-//            var token = Request.Cookies["JwtToken"];
-//            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ViewBag.KullanıcıSayısı = await GetCountAsync("api/admin/AdminUser/count");
+            ViewBag.OkulSayısı = await GetCountAsync("api/admin/AdminSchool/count");
+            ViewBag.BölümSayısı = await GetCountAsync("api/admin/AdminDepartment/count");
+            ViewBag.DersSayısı = await GetCountAsync("api/admin/AdminCourse/count");
+            ViewBag.RandevuSayısı = await GetCountAsync("api/admin/AdminAppointment/count");
+            ViewBag.ÖgretmenSayısı = await GetCountAsync("api/admin/AdminUser/instructor-count");
+            ViewBag.ÖgrenciSayısı = await GetCountAsync("api/admin/AdminUser/student-count");
+            ViewBag.MessageSayısı = await GetCountAsync("api/admin/AdminNotification/count");
 
-//            // API'ye istek at
-//            var response = await client.GetAsync("https://localhost:7214/api/AdminUser/all");
+            var responseStatus = await client.GetStringAsync("api/admin/AdminAppointment/appointment-status-counts");
+            var statusCounts = JsonConvert.DeserializeObject<Dictionary<string, int>>(responseStatus);
 
-//            if (response.IsSuccessStatusCode)
-//            {
-//                var jsonString = await response.Content.ReadAsStringAsync();
-//                var users = JsonConvert.DeserializeObject<List<UserDto>>(jsonString); // UserDto'yu uygun şekilde oluşturduğunuzdan emin olun
-//                return View(users);
-//            }
-//            else
-//            {
-//                // Hata durumunda uygun bir mesaj göster
-//                ModelState.AddModelError("", "Kullanıcılar alınamadı.");
-//                return View();
-//            }
-//        }
-//    }
-//}
+            // Serialize for JavaScript
+            ViewBag.StatusCountsJson = JsonConvert.SerializeObject(statusCounts);
+
+
+            return View();
+        }
+
+
+
+    }
+}

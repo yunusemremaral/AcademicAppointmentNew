@@ -54,6 +54,10 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync();
         }
+        public async Task<int> CountAsync()
+        {
+            return await _dbSet.CountAsync();
+        }
     }
 
 }

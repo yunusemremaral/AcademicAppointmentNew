@@ -132,6 +132,12 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             return Ok("Appointment status updated successfully.");
         }
 
+        [HttpGet("count")]
+        public async Task<IActionResult> GetAppointmentCount()
+        {
+            var count = await _appointmentService.TCountAsync();
+            return Ok(count);
+        }
 
 
         [HttpDelete("{id}")]
@@ -142,5 +148,12 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             await _appointmentService.TDeleteAsync(entity);
             return Ok("Appointment deleted.");
         }
+        [HttpGet("appointment-status-counts")]
+        public async Task<IActionResult> GetAppointmentCountsByStatus()
+        {
+            var result = await _appointmentService.TGetAppointmentCountsByStatusAsync();
+            return Ok(result);
+        }
+
     }
 }

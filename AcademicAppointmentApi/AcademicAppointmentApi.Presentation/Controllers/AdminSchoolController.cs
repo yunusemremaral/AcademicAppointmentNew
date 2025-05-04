@@ -128,6 +128,13 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             // Detaylı okul bilgisini döndürüyoruz
             return Ok(schoolDetailDto);
         }
+        [HttpGet("count")]
+        public async Task<IActionResult> GetSchoolCount()
+        {
+            var schools = await _schoolService.TGetAllAsync();
+            return Ok(new { Count = schools.Count });
+        }
+
 
 
     }

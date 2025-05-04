@@ -47,6 +47,11 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
         {
             await _genericRepository.DeleteAsync(entity);
         }
+
+        public async Task<int> TCountAsync()
+        {
+            return await _genericRepository.CountAsync();
+        }
     }
 
 }

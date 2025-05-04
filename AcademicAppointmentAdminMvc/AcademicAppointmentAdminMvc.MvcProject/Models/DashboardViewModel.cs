@@ -1,0 +1,4 @@
+﻿namespace AcademicAppointmentAdminMvc.MvcProject.Models
+{
+    
+}

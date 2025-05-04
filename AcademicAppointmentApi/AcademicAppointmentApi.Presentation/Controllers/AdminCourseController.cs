@@ -106,6 +106,13 @@ namespace AcademicAppointmentApi.Presentation.Controllers
             var dto = _mapper.Map<List<CourseWithFullDetailsDto>>(courses);
             return Ok(dto);
         }
+        [HttpGet("count")]
+        public async Task<IActionResult> GetCourseCount()
+        {
+            var count = await _courseService.TCountAsync();
+            return Ok(count);
+        }
+
 
     }
 }

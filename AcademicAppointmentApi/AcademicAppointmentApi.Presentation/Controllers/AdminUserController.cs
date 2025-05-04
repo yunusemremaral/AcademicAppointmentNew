@@ -262,6 +262,28 @@ public class AdminUserController : ControllerBase
 
         return Ok(usersDto);
     }
+    // /api/admin/adminuser/instructor-count
+    [HttpGet("instructor-count")]
+    public async Task<IActionResult> GetInstructorCount()
+    {
+        var instructors = await _userManager.GetUsersInRoleAsync("Instructor");
+        return Ok(new { Count = instructors.Count });
+    }
+
+    // /api/admin/adminuser/student-count
+    [HttpGet("student-count")]
+    public async Task<IActionResult> GetStudentCount()
+    {
+        var students = await _userManager.GetUsersInRoleAsync("Student");
+        return Ok(new { Count = students.Count });
+    }
+    [HttpGet("count")]
+    public IActionResult GetUserCount()
+    {
+        var count = _userManager.Users.Count();
+        return Ok(new { Count = count });
+    }
+
 
 
 

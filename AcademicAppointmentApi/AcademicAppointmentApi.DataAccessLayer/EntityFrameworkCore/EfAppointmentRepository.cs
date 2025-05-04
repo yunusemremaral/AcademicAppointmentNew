@@ -182,6 +182,17 @@ namespace AcademicAppointmentApi.DataAccessLayer.EntityFrameworkCore
                     }
                 }).ToListAsync();
         }
+        public async Task<Dictionary<string, int>> GetAppointmentCountsByStatusAsync()
+        {
+            var appointments = await _context.Appointments.ToListAsync();
+
+            return appointments
+                .GroupBy(a => a.Status.ToString())
+                .ToDictionary(g => g.Key, g => g.Count());
+        }
+
+
+
 
     }
 }
