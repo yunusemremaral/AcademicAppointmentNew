@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using Newtonsoft.Json;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -198,20 +199,26 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
         }
 
         // Delete POST
+
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
             var client = CreateClient();
             var response = await client.DeleteAsync($"api/admin/AdminDepartment/{id}");
 
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                TempData["ErrorMessage"] = error;
+                TempData["SuccessMessage"] = "Bölüm başarıyla silindi.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Bu bölüm silinemez çünkü bağlı dersler bulunmaktadır.";
             }
 
             return RedirectToAction("Index");
         }
+
+
         public async Task<IActionResult> Details(int departmentId)
         {
             var client = CreateClient();

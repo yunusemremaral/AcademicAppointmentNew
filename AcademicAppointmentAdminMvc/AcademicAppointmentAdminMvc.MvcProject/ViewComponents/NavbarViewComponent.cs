@@ -44,7 +44,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.ViewComponents
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
 
-            var username = jwtToken.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+            var username = jwtToken.Claims.FirstOrDefault(c => c.Type == "userfullname")?.Value;
             var email = jwtToken.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
            
 

@@ -5,7 +5,7 @@ namespace AcademicAppointmentApi.Presentation.Dtos
     public class RegisterDto
     {
         [Required(ErrorMessage = "Kullanıcı adı zorunludur")]
-        public string UserName { get; set; }
+        public string UserFullName { get; set; }
 
         [Required(ErrorMessage = "Email zorunludur")]
         [EmailAddress(ErrorMessage = "Geçerli bir email adresi giriniz")]

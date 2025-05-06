@@ -36,7 +36,7 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         {
             var user = new AppUser
             {
-                UserName = dto.UserName,
+                UserName = dto.UserFullName,
                 Email = dto.Email,
                 SchoolId = null,
                 DepartmentId = null

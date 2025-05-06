@@ -9,6 +9,7 @@ using AcademicAppointmentShare.Dtos.RoomDtos;
 using AcademicAppointmentShare.Dtos.SchoolDtos;
 using AcademicAppointmentShare.Dtos.UserDtos;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 
 namespace AcademicAppointmentApi.Presentation.AutoMapper
 {
@@ -134,7 +135,9 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
 
             #region USER VE ROLE
             CreateMap<AppUser, UserDto>()
-                .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.UserFullName));
+                .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.UserFullName))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
 
             CreateMap<CreateUserDto, AppUser>()
                 .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.UserFullName));
@@ -154,6 +157,13 @@ namespace AcademicAppointmentApi.Presentation.AutoMapper
 
 
             #endregion
+            #region ROLE
+            CreateMap<AppRole, RoleDto>().ReverseMap();
+            CreateMap<RoleAssignmentDto, IdentityUserRole<string>>() // Opsiyonel: kullanıcıya rol atamak için kullanılabilir.
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.RoleId, opt => opt.Ignore()); // Burada rol adı -> rol ID dönüştürme ayrı yapılmalı
+            #endregion
+
         }
     }
 }

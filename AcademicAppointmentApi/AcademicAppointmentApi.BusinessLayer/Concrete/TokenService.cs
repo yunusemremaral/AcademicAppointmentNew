@@ -33,9 +33,10 @@ namespace AcademicAppointmentApi.BusinessLayer.Concrete
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("username", user.UserName),
-            new Claim("schoolId", user.SchoolId.ToString()),
-            new Claim("departmentId", user.DepartmentId.ToString())
+            new Claim("username", user.UserName ?? ""),
+            new Claim("userfullname", user.UserFullName ?? ""),
+            new Claim("schoolId", user.SchoolId?.ToString() ?? ""),
+            new Claim("departmentId", user.DepartmentId?.ToString() ?? "")
             };
 
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));

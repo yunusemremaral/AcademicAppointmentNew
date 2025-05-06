@@ -47,10 +47,13 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                 users = await FilterByRole(users, roleFilter);
 
             if (!string.IsNullOrEmpty(searchQuery))
+            {
                 users = users.Where(u =>
-                    u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    u.UserFullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                    (u.Email != null && u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                    (u.UserFullName != null && u.UserFullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
                 ).ToList();
+            }
+
 
             ViewBag.Roles = await GetRoleList();
             return View(users);
