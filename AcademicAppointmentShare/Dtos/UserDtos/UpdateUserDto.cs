@@ -9,10 +9,10 @@ namespace AcademicAppointmentShare.Dtos.UserDtos
     public class UpdateUserDto
     {
         public string Id { get; set; }
-        public string UserName { get; set; }
-
+        public string UserFullName { get; set; }
         public string Email { get; set; }
         public int? SchoolId { get; set; }
         public int? DepartmentId { get; set; }
     }
+
 }

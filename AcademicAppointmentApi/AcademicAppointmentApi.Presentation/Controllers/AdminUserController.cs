@@ -94,6 +94,9 @@ public class AdminUserController : ControllerBase
             // 2. DTO’yu AppUser’a map et
             var user = _mapper.Map<AppUser>(dto);
 
+            var emailUsernamePart = dto.Email.Split('@')[0];
+            user.UserName = emailUsernamePart;
+
             // 3. CreateAsync çağır
             var result = await _userManager.CreateAsync(user, dto.Password);
 
@@ -199,7 +202,7 @@ public class AdminUserController : ControllerBase
         var userDetails = users.Select(u => new
         {
             u.Id,
-            u.UserName,
+            u.UserFullName,
             u.Email,
             Department = u.Department?.Name,
             School = u.School?.Name

@@ -8,7 +8,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Models
     public class CreateUserMvcDto
     {
         [Required]
-        public string UserName { get; set; }
+        public string UserFullName { get; set; }
 
         [Required]
         [EmailAddress]

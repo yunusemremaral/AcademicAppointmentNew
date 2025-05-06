@@ -50,7 +50,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.ViewComponents
 
             return new UserDto
             {
-                UserName = username,
+                UserFullName = username,
                 Email = email,
             };
         }

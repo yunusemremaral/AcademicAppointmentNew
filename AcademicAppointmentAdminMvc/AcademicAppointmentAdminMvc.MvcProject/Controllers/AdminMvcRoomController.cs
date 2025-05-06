@@ -73,7 +73,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             ViewBag.Users = users.Select(u => new SelectListItem
             {
                 Value = u.Id,
-                Text = $"{u.UserName} ({u.Email})"
+                Text = $"{u.UserFullName} ({u.Email})"
             }).ToList();
 
             return View();

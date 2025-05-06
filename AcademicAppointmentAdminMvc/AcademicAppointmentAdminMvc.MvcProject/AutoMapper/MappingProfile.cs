@@ -56,21 +56,15 @@ namespace AcademicAppointmentMvc.MvcProject.AutoMapper
             // Map Faculty Members (AppUser) to DepartmentAppUserDto
             CreateMap<Department, DepartmentDetailDto>()
                 .ForMember(dest => dest.FacultyMembers, opt => opt.MapFrom(src => src.FacultyMembers));  // Map FacultyMembers to DepartmentAppUserDto
+
             CreateMap<Department, DepartmentWithSchoolDto>()
                 .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.School.Name))
                 .ForMember(dest => dest.SchoolId, opt => opt.MapFrom(src => src.School.Id));
             CreateMap<Course, DepartmentCourseWithInstructorDto>()
-                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserName))
+                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserFullName))
                 .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor.Email))
                 .ForMember(dest => dest.InstructorId, opt => opt.MapFrom(src => src.Instructor.Id)); // string'e uygun olacak şekilde
-            CreateMap<Course, CourseWithFullDetailsDto>()
-                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
-                .ForMember(dest => dest.SchoolId, opt => opt.MapFrom(src => src.Department.School.Id))
-                .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.Department.School.Name))
-                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserName))
-                .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor.Email));
-
 
 
             #endregion
@@ -84,23 +78,29 @@ namespace AcademicAppointmentMvc.MvcProject.AutoMapper
 
             CreateMap<Course, CourseDetailDto>()
                 .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
-                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserName))
+                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserFullName))
                 .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor.Email));
 
             CreateMap<Course, CourseWithInstructorAndDepartmentDto>()
                 .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
                 .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.Department.School.Name))
-                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserName))
+                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserFullName))
+                .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor.Email));
+            CreateMap<Course, CourseWithFullDetailsDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
+                .ForMember(dest => dest.SchoolId, opt => opt.MapFrom(src => src.Department.School.Id))
+                .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.Department.School.Name))
+                .ForMember(dest => dest.InstructorUserName, opt => opt.MapFrom(src => src.Instructor.UserFullName))
                 .ForMember(dest => dest.InstructorEmail, opt => opt.MapFrom(src => src.Instructor.Email));
 
             #endregion
 
             #region ROOM
             CreateMap<Room, RoomDto>()
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.AppUser.UserName))
+                .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.AppUser.UserFullName))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.AppUser.Email));
             CreateMap<Room, RoomDetailDto>()
-    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.AppUser.UserName))
+    .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.AppUser.UserFullName))
     .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.AppUser.Email));
 
             CreateMap<CreateRoomDto, Room>();
@@ -119,8 +119,8 @@ namespace AcademicAppointmentMvc.MvcProject.AutoMapper
             CreateMap<CreateMessageDto, Message>();
             CreateMap<UpdateMessageDto, Message>();
             CreateMap<Message, ResultMessageDto>()
-                .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.UserName))
-                .ForMember(dest => dest.ReceiverName, opt => opt.MapFrom(src => src.Receiver.UserName));
+                .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.UserFullName))
+                .ForMember(dest => dest.ReceiverName, opt => opt.MapFrom(src => src.Receiver.UserFullName));
 
             #endregion
 
@@ -128,26 +128,30 @@ namespace AcademicAppointmentMvc.MvcProject.AutoMapper
             CreateMap<AppointmentCreateDto, Appointment>();
             CreateMap<AppointmentUpdateDto, Appointment>();
             CreateMap<Appointment, AppointmentResultDto>()
-                .ForMember(dest => dest.AcademicUserName, opt => opt.MapFrom(src => src.AcademicUser.UserName))
-                .ForMember(dest => dest.StudentUserName, opt => opt.MapFrom(src => src.StudentUser.UserName));
+                .ForMember(dest => dest.AcademicUserName, opt => opt.MapFrom(src => src.AcademicUser.UserFullName))
+                .ForMember(dest => dest.StudentUserName, opt => opt.MapFrom(src => src.StudentUser.UserFullName));
             #endregion
 
             #region USER VE ROLE
-            CreateMap<AppUser, UserDto>();
-            CreateMap<CreateUserDto, AppUser>();
+            CreateMap<AppUser, UserDto>()
+                .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.UserFullName));
+
+            CreateMap<CreateUserDto, AppUser>()
+                .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.UserFullName));
+
             CreateMap<UpdateUserDto, AppUser>()
+                .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.UserFullName))
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
-            CreateMap<AppRole, RoleDto>();
             CreateMap<AppUser, UserWithDetailsDto>()
+                .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.UserFullName))
                 .ForMember(dest => dest.SchoolName, opt => opt.MapFrom(src => src.School != null ? src.School.Name : null))
                 .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.Name : null))
                 .ForMember(dest => dest.RoomName, opt => opt.MapFrom(src => src.Room != null ? src.Room.Name : null));
 
-            CreateMap<Course, UserCourseDto>()
-                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
-                .ForMember(dest => dest.InstructorFullName, opt => opt.MapFrom(src => src.Instructor.UserName ));
-            CreateMap<AppUser, UserSimpleDto>();
+            CreateMap<AppUser, UserSimpleDto>()
+                .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.UserFullName));
+
 
             #endregion
         }

@@ -49,7 +49,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             if (!string.IsNullOrEmpty(searchQuery))
                 users = users.Where(u =>
                     u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    u.UserName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                    u.UserFullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
                 ).ToList();
 
             ViewBag.Roles = await GetRoleList();
@@ -92,7 +92,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
 
             var createDto = new CreateUserDto
             {
-                UserName = dto.UserName,
+                UserFullName = dto.UserFullName,
                 Email = dto.Email,
                 Password = dto.Password,
                 SchoolId = dto.SchoolId,
@@ -139,7 +139,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                 User = new UpdateUserDto
                 {
                     Id = userDetail.Id,
-                    UserName = userDetail.UserName,
+                    UserFullName = userDetail.UserFullName,
                     Email = userDetail.Email,
                     SchoolId = userDetail.SchoolId,
                     DepartmentId = userDetail.DepartmentId
@@ -218,7 +218,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
             var model = new UserRoleManagementDto
             {
                 UserId = id,
-                UserName = user.UserName,
+                UserFullName = user.UserFullName,
                 AllRoles = roles.Select(r => new SelectListItem(r.Name, r.Name)).ToList(),
                 AssignedRoles = userRoles
             };

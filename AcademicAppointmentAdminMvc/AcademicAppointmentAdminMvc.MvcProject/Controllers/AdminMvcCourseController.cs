@@ -211,7 +211,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                         dto.Instructors = new SelectList(
                             instructors.Select(i => new {
                                 Id = i.Id,
-                                DisplayText = $"{i.UserName} ({i.Email})"
+                                DisplayText = $"{i.UserFullName} ({i.Email})"
                             }),
                             "Id",
                             "DisplayText",
@@ -261,7 +261,7 @@ namespace AcademicAppointmentAdminMvc.MvcProject.Controllers
                         await response.Content.ReadAsStringAsync());
                     return Json(instructors.Select(i => new {
                         value = i.Id,
-                        text = $"{i.UserName} ({i.Email})" // Format düzeltildi
+                        text = $"{i.UserFullName} ({i.Email})" // Format düzeltildi
                     }));
                 }
                 return Json(new List<object>());

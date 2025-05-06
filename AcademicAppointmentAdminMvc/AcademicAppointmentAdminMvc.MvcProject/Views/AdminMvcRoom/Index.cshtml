@@ -29,7 +29,7 @@
             <tr>
                 <td>@room.Id</td>
                 <td>@room.Name</td>
-                <td>@room.UserName</td>
+                <td>@room.UserFullName</td>
                 <td>
                     <a class="btn btn-info btn-sm" href="@Url.Action("Details", "AdminMvcRoom", new { id = room.Id })">Detay</a>
                     <a class="btn btn-warning btn-sm" href="@Url.Action("Edit", "AdminMvcRoom", new { id = room.Id })">Düzenle</a>
