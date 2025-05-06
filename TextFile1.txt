@@ -1,4 +1,3 @@
-USERNAME GÝRÝÞTE OLDUGU ÝÇÝN  FULL NAME OLARAK KULLANILAMAYACAK BUNA BAKICAZ BU ÇOK BÜYÜK BÝR SORUN 
 tasarýmsal düzenlemeler yapýlacak ! dropdown vb  buton vb þeylerde tek tek ! 
 ayný tempdatayýmý kullanýyorum bak !   bu  olusturuldu falan yazýyorya 
 Dashboardu böylece býrakýyorum yeterli  sýnavvb zamnalara kadar yeterli þuanlýk

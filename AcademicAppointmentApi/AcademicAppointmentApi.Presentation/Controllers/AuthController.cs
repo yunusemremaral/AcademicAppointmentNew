@@ -34,12 +34,15 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
+            var emailUsernamePart = dto.Email.Split('@')[0];
+
             var user = new AppUser
             {
-                UserName = dto.UserFullName,
+                UserName = emailUsernamePart,
+                UserFullName = dto.UserFullName,
                 Email = dto.Email,
-                SchoolId = null,
-                DepartmentId = null
+                SchoolId = dto.SchoolId,
+                DepartmentId = dto.DepartmentId
             };
 
             var res = await _userManager.CreateAsync(user, dto.Password);
@@ -75,13 +78,24 @@ namespace AcademicAppointmentApi.Presentation.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null) return Unauthorized("User not found.");
+            if (user == null)
+                return Unauthorized("Kullanıcı bulunamadı.");
 
             var pwRes = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-            if (!pwRes.Succeeded) return Unauthorized("Invalid password.");
+            if (!pwRes.Succeeded)
+                return Unauthorized("Şifre hatalı.");
 
-            var token = await _tokenService.CreateAccessTokenAsync(user);
-            return Ok(new { token });
+            if (!user.EmailConfirmed)
+            {
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var link = Url.Action("ConfirmEmail", "Auth", new { token, email = user.Email }, Request.Scheme);
+                await _emailService.SendConfirmationEmailAsync(user.Email, link);
+
+                return Unauthorized("Email doğrulanmamış. Yeni bir doğrulama bağlantısı e-posta adresinize gönderildi.");
+            }
+
+            var tokenJwt = await _tokenService.CreateAccessTokenAsync(user);
+            return Ok(new { token = tokenJwt });
         }
 
         [HttpPost("logout")]
@@ -120,6 +134,22 @@ namespace AcademicAppointmentApi.Presentation.Controllers
                 return BadRequest(result.Errors);
 
             return Ok("Password has been reset successfully.");
+        }
+        [HttpPost("resend-confirmation")]
+        public async Task<IActionResult> ResendConfirmation([FromBody] string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return NotFound("Kullanıcı bulunamadı.");
+
+            if (user.EmailConfirmed)
+                return BadRequest("Email zaten doğrulanmış.");
+
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var link = Url.Action("ConfirmEmail", "Auth", new { token, email = user.Email }, Request.Scheme);
+            await _emailService.SendConfirmationEmailAsync(user.Email, link);
+
+            return Ok("Yeni doğrulama bağlantısı gönderildi.");
         }
     }
 }
