@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AkademicAppointmentAdminMvc
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AkademicAppointmentReact", "AkademicAppointmentReact", "{7AE96CEF-E831-4E08-80AE-8E5BF392A233}"
 	ProjectSection(SolutionItems) = preProject
-		TextFile1.txt = TextFile1.txt
+		TextFile2.txt = TextFile2.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcademicAppointmentApi.Presentation", "AcademicAppointmentApi\AcademicAppointmentApi.Presentation\AcademicAppointmentApi.Presentation.csproj", "{C6F8D93C-3D7E-4614-84C7-2E475D2AC7EA}"

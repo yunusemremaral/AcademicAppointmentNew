@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  overflow-x: hidden;
+  height: 100%;
+  touch-action: manipulation;
+}
+
+body {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+  height: 100%;
+  position: relative;
+}
+
+/* Scrollbar'ı gizleme */
+::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera için */
+  width: 0;
+  background: transparent;
+}
+
+* {
+  -ms-overflow-style: none; /* IE and Edge için */
+  scrollbar-width: none; /* Firefox için */
+}
+
+#root {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: black;
+}
+
+/* Sidebar dışındaki bileşenler için arka plan */
+.content-area {
+  background: linear-gradient(to bottom, #f0f4f8, #e6f0f9);
+}
+
+/* Mobil dokunma efektlerini kaldır */
+@media (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  input, textarea, button, select, a {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  a:focus, button:focus {
+    outline: none;
+  }
+}
+
+/* Özel kaydırma çubuğu stili */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}
+
+/* Kaydırma alanı için mask efekti */
+.mask-fade-bottom {
+  mask-image: linear-gradient(to bottom, 
+    black 0%,
+    black 95%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(to bottom,
+    black 0%,
+    black 95%,
+    transparent 100%
+  );
+}
+
+
+
